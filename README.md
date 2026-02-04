@@ -1,233 +1,326 @@
-# ClueWrite Skills
+# ClueWrite 📝
 
-A repository-driven agentic framework for automated manuscript generation using AI agent.
+**Transform your research code into publication-ready manuscripts automatically.**
 
-## Overview
+ClueWrite is an AI-powered system that reads your research repository—code, data, and notebooks—and generates scientifically accurate manuscripts with verified facts, proper citations, and journal-specific formatting.
 
-This repository contains AI agent skills for transforming scientific repositories (code, data, notebooks) into publication-ready manuscripts. The system supports multiple journal formats including Nature Methods, PLOS Computational Biology, and Bioinformatics.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Installation
+## 🎯 What ClueWrite Does
 
-### Option 1: Clone to Global Skills Directory (Recommended for reuse across projects)
+Instead of manually translating your computational research into text:
 
-```bash
-# Clone to a permanent location
-git clone <your-repo-url> ~/cluewrite
-
-# Create symlinks to global skills directory
-mkdir -p ~/.claude/skills
-ln -s ~/cluewrite/.claude/skills/plan-manuscript ~/.claude/skills/plan-manuscript
-ln -s ~/cluewrite/.claude/skills/draft-section ~/.claude/skills/draft-section
-ln -s ~/cluewrite/.claude/skills/review-manuscript ~/.claude/skills/review-manuscript
+```
+Your Research Repo          ClueWrite              Publication
+├── data/results.csv    ──────────────────>    ┌─────────────────┐
+├── scripts/analyze.py  ──────────────────>    │ Abstract        │
+├── figures/fig1.png    ──────────────────>    │ Introduction    │
+└── notebooks/          ──────────────────>    │ Methods         │
+                                                │ Results         │
+                                                │ Discussion      │
+                                                └─────────────────┘
 ```
 
-### Option 2: Clone into Existing Project (Project-specific installation)
+ClueWrite:
+- ✅ **Extracts findings** from your data files
+- ✅ **Verifies all numbers** against source CSVs
+- ✅ **Describes methods** by reading your code
+- ✅ **Formats for journals** (Nature, PLOS, Bioinformatics)
+- ✅ **Maintains evidence chains** from data to claims
+
+## 🚀 Quick Example
+
+See a real example: [example/](example/) - A complete protein structure prediction project
 
 ```bash
-# Navigate to your existing project
+# In your research project directory
+cd my-research-project
+
+# Step 1: Tell ClueWrite about your project
+# Edit PROJECT.md with your findings and data sources
+
+# Step 2: Plan the manuscript
+"Use plan-manuscript to create an outline for Bioinformatics journal"
+
+# Step 3: Draft sections
+"Use draft-section to write the Methods section"
+"Use draft-section to write the Results section"
+
+# Step 4: Review for compliance
+"Use review-manuscript to check the draft"
+```
+
+**Result**: A complete manuscript draft where every claim is traced back to your source data.
+
+## 📊 Real-World Example
+
+The `example/` directory contains a complete demonstration:
+
+**Input**: Protein prediction project with:
+- CSV data: `benchmark_results.csv` (model accuracies)
+- Python scripts: `train_model.py`, `evaluate.py`
+- Figures: `accuracy_comparison.png`
+- BibTeX: `references.bib`
+
+**ClueWrite Output**:
+- Detailed manuscript plan mapping data→sections
+- Methods section describing the code implementation
+- Results section with verified statistics
+- Proper figure captions derived from plotting code
+- Journal-compliant formatting for Bioinformatics
+
+[→ View Full Example](example/)
+
+## 🔧 Installation
+
+### Global Installation (Use Across All Projects)
+
+```bash
+# 1. Clone ClueWrite
+git clone https://github.com/realmarcin/cluewrite.git ~/cluewrite
+
+# 2. Install globally
+cd ~/cluewrite
+./install.sh global
+
+# 3. Setup any research project
 cd /path/to/your/research/project
-
-# Clone this repo's skills into your project
-git clone <your-repo-url> temp-skills
-cp -r temp-skills/.claude/skills/* .claude/skills/
-rm -rf temp-skills
-
-# Or use git submodule for easier updates
-git submodule add <your-repo-url> .claude/scientific-writer
-ln -s .claude/scientific-writer/.claude/skills/* .claude/skills/
+~/cluewrite/install.sh setup-project
 ```
 
-### Option 3: Add as Additional Working Directory
+### What This Does
 
-AI agent supports multiple working directories. Add this repo as an additional directory:
+- Creates `~/.claude/skills/` with symbolic links to ClueWrite skills
+- Skills become available in all your AI agent sessions
+- Each project gets:
+  - `PROJECT.md` template for documenting your findings
+  - `scripts/` with verification tools
+  - `drafts/` for manuscript sections
 
+## 📖 How It Works
+
+### 1. Repository Ingestion
+
+ClueWrite reads your project structure:
+```
+your-project/
+├── data/processed/results.csv    → Numerical evidence
+├── scripts/analyze.py             → Methodology
+├── figures/fig1.png              → Visual results
+└── PROJECT.md                    → Key findings summary
+```
+
+### 2. Planning
+
+The `plan-manuscript` skill creates a detailed outline:
+- Maps each section to specific files
+- Links claims to data sources
+- Applies journal-specific structure
+
+### 3. Drafting with Verification
+
+The `draft-section` skill:
+- Reads relevant code/data files
+- Generates academic prose
+- **Verifies every number** using `verify_stats.py`
+- Cites from your `references.bib`
+
+Example fact-checking:
 ```bash
-# Clone to a permanent location
-git clone <your-repo-url> ~/cluewrite
-
-# When starting AI agent in your project, add this directory
-# The skills will be available to your project
+# Agent writes: "The model achieved 87% accuracy"
+# Behind the scenes:
+python scripts/verify_stats.py --file data/results.csv --col accuracy --op mean
+# Returns: 0.87 ✓
 ```
 
-## Quick Start
+### 4. Review
 
-### 1. Initialize Your Research Project
+The `review-manuscript` skill acts as "Reviewer #2":
+- Checks journal-specific requirements
+- Verifies citation integrity
+- Flags missing figures or data availability statements
 
-First, ensure your project has the necessary directory structure:
+## 🎓 Skills Included
 
-```bash
-cd /path/to/your/research/project
+### `plan-manuscript`
+Maps your repository to a manuscript outline for your target journal.
 
-# Create required directories
-mkdir -p data/processed data/raw
-mkdir -p figures
-mkdir -p scripts
-mkdir -p drafts
-mkdir -p .claude/skills
+**Supports**:
+- Nature Methods
+- PLOS Computational Biology
+- Bioinformatics
 
-# Initialize PROJECT.md if not exists
-touch PROJECT.md
-```
+### `draft-section`
+Writes individual sections with fact-checking.
 
-### 2. Use the Skills
+**Features**:
+- Reads code to describe methods
+- Verifies numbers against data files
+- Generates LaTeX equations from code
+- Maintains variable name consistency
 
-Start AI agent in your research project directory:
+### `review-manuscript`
+Reviews drafts for compliance and accuracy.
 
-```bash
-cd /path/to/your/research/project
-# Start AI agent
-```
+**Checks**:
+- Word counts
+- Citation integrity
+- Figure references
+- Data availability statements
 
-Then use the skills in sequence:
+## 📁 Project Structure
 
-```
-1. Plan the manuscript:
-   "Use the plan-manuscript skill to create an outline for a PLOS Computational Biology paper"
-
-2. Draft sections:
-   "Use the draft-section skill to write the Methods section"
-   "Use the draft-section skill to write the Results section"
-
-3. Review the manuscript:
-   "Use the review-manuscript skill to check the draft"
-```
-
-## Skills Included
-
-### 1. `plan-manuscript`
-- Analyzes repository structure
-- Maps data files, notebooks, and scripts to manuscript sections
-- Generates detailed outline based on target journal (Nature Methods, PLOS, Bioinformatics)
-- Creates `manuscript_plan.md`
-
-### 2. `draft-section`
-- Drafts specific manuscript sections
-- Enforces fact-checking via Python tools
-- Maintains consistency between code and text
-- Uses subagent delegation (context: fork)
-
-### 3. `review-manuscript`
-- Adversarial peer review simulation
-- Journal-specific compliance checks
-- Citation integrity verification
-- Stylistic linting
-
-## Directory Structure
-
-Your research project should follow this structure:
+Your research project should have:
 
 ```
 your-research-project/
-├── .claude/
-│   ├── skills/                    # Skills (symlinked or copied)
-│   │   ├── plan-manuscript/
-│   │   ├── draft-section/
-│   │   └── review-manuscript/
-│   └── PROJECT.md                  # Project state and context
+├── .claude/skills/        # ClueWrite skills (symlinked)
+├── PROJECT.md            # Your project context
 ├── data/
-│   ├── raw/                       # Raw data (excluded from ingestion)
-│   └── processed/                 # Processed data (included)
-├── scripts/
-│   ├── verify_stats.py           # Fact-checking tool (optional)
-│   └── lint_manuscript.py        # Prose linter (optional)
-├── figures/
-│   └── *.png, *.pdf              # Manuscript figures
-├── drafts/
-│   ├── manuscript_plan.md        # Generated by plan-manuscript
-│   └── section_*.md              # Generated by draft-section
-├── references.bib                # BibTeX references
-└── README.md                     # Project documentation
+│   └── processed/        # Data files with results
+├── scripts/              # Analysis code
+├── figures/              # Generated plots
+├── references.bib        # Citations
+└── drafts/              # Generated manuscript sections
 ```
 
-## Supporting Scripts (Optional)
+## 🛠️ Verification Tools
 
-The skills reference Python scripts for enhanced functionality. Create these in your project's `scripts/` directory:
+ClueWrite includes Python tools to ensure accuracy:
 
-### `scripts/verify_stats.py`
+### `verify_stats.py`
+Verifies numerical claims against source data:
+```bash
+python scripts/verify_stats.py \
+  --file data/results.csv \
+  --col accuracy \
+  --op mean
+# Output: 0.8734
+```
+
+### `clean_ipynb.py`
+Converts Jupyter notebooks to clean markdown:
+```bash
+python scripts/clean_ipynb.py notebook.ipynb -o clean.md
+# Removes base64 images, keeps code and markdown
+```
+
+## 🔄 Workflow
+
+```mermaid
+graph LR
+    A[Research Code] --> B[plan-manuscript]
+    B --> C[manuscript_plan.md]
+    C --> D[draft-section]
+    D --> E[drafts/*.md]
+    E --> F[review-manuscript]
+    F --> G[review_report.md]
+    G --> H[Revise & Compile]
+    H --> I[Final Manuscript]
+```
+
+## 💡 Key Features
+
+### ✅ Fact-Checking
+Every numerical claim is verified against source data files.
+
+### ✅ Code→Text Consistency
+Variable names in the code match those in the manuscript.
+
+### ✅ Evidence Chains
+Each claim links to specific files/line numbers.
+
+### ✅ Journal Compliance
+Automatic formatting for target journals.
+
+### ✅ Reproducibility
+Complete provenance from data to publication.
+
+## 📚 Example Outputs
+
+### From PROJECT.md:
+```markdown
+## Key Finding
+Our model achieves 87% accuracy on the benchmark.
+
+Evidence: data/results.csv (line 45), figures/accuracy.png
+```
+
+### Generated Methods Section:
+```markdown
+## Methods
+
+The model was trained using AdamW optimizer (learning rate 1e-4,
+weight decay 0.01) for 100 epochs on 4× NVIDIA A100 GPUs. The loss
+function combined RMSD and TM-score as implemented in
+`scripts/train_model.py:87-89`.
+```
+
+### With Verification:
 ```python
-#!/usr/bin/env python3
-import argparse
-import pandas as pd
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--file', required=True)
-parser.add_argument('--col', required=True)
-parser.add_argument('--op', choices=['mean', 'max', 'min', 'std', 'count'])
-
-args = parser.parse_args()
-df = pd.read_csv(args.file)
-
-if args.op == 'mean':
-    print(df[args.col].mean())
-elif args.op == 'max':
-    print(df[args.col].max())
-elif args.op == 'min':
-    print(df[args.col].min())
-elif args.op == 'std':
-    print(df[args.col].std())
-elif args.op == 'count':
-    print(df[args.col].count())
+# The agent reads train_model.py and finds:
+optimizer = torch.optim.AdamW(
+    model.parameters(),
+    lr=1e-4,          # ← Extracted
+    weight_decay=0.01  # ← Extracted
+)
 ```
 
-## Workflow Example
+## 🤝 Contributing
 
-```bash
-# 1. Start in your research project
-cd ~/my-research-project
-
-# 2. Ensure skills are available (Option 1 from above)
-
-# 3. Start AI agent
-# Start AI agent
-
-# 4. In Claude, run the workflow:
-# "Use plan-manuscript to create an outline for Nature Methods"
-# "Use draft-section to write the Introduction"
-# "Use draft-section to write the Results"
-# "Use review-manuscript to check compliance"
-```
-
-## Updating Skills
-
-If you used symlinks (Option 1), updating is easy:
-
-```bash
-cd ~/cluewrite
-git pull origin main
-# Skills automatically updated in all projects
-```
-
-If you used git submodules (Option 2):
-
-```bash
-cd /path/to/your/project
-git submodule update --remote .claude/scientific-writer
-```
-
-## Architecture
-
-This system implements a hybrid "K-Dense" architecture:
-- **Global Context**: PROJECT.md maintains project state
-- **Capability Store**: Skills define atomic actions
-- **Execution Layer**: Python tools for deterministic operations
-- **Orchestrator**: plan-manuscript manages workflow
-
-See `data/deepresearch.md` for the full technical specification.
-
-## Contributing
-
-Contributions welcome! To add new journal templates or skills:
+We welcome contributions! To add:
+- **New journal templates**: Add to skills/plan-manuscript
+- **New verification tools**: Add to scripts/
+- **Documentation improvements**: Update README or USAGE_GUIDE
 
 1. Fork this repository
-2. Add new skill directories in `.claude/skills/`
-3. Update this README
-4. Submit a pull request
+2. Create your feature branch
+3. Submit a pull request
 
-## License
+## 📄 License
 
-[Your chosen license]
+MIT License - see [LICENSE](LICENSE)
 
-## Citation
+## 🙏 Citation
 
-If you use this system in your research, please cite:
-[Your citation format]
+If ClueWrite helps your research, please cite:
+
+```bibtex
+@software{cluewrite2026,
+  title={ClueWrite: Repository-Driven Scientific Manuscript Generation},
+  author={ClueWrite Contributors},
+  year={2026},
+  url={https://github.com/realmarcin/cluewrite}
+}
+```
+
+## 🔗 Resources
+
+- **[Full Example](example/)**: Complete protein prediction project
+- **[Usage Guide](USAGE_GUIDE.md)**: Detailed integration instructions
+- **[Technical Spec](data/deepresearch.md)**: Architecture details
+
+## ❓ FAQ
+
+**Q: Does this work with non-Python projects?**
+A: Yes! The skills read any text files. Verification tools are Python, but you can write your own for other languages.
+
+**Q: Can I customize for my specific journal?**
+A: Yes! Edit the skill files to add new journal templates.
+
+**Q: How does it handle figures?**
+A: ClueWrite reads the scripts that generate figures to write accurate captions.
+
+**Q: Does it hallucinate numbers?**
+A: No! The verification loop ensures every number comes from your data files.
+
+## 🎯 Next Steps
+
+1. **Try the example**: `cd example/` and explore
+2. **Install globally**: `./install.sh global`
+3. **Setup your project**: Use `setup-project` in your research directory
+4. **Start writing**: Use the skills with your AI agent
+
+---
+
+**Made with ❤️ for researchers who code**
