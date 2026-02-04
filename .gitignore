@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Drafts and outputs (project-specific)
+drafts/
+manuscript_plan.md
+review_round_*.md
+repo_map.md
+bib_index.md
+
+# Data files (users should manage their own)
+data/raw/
+data/processed/
+*.csv
+*.xlsx
+
+# Figures (users should manage their own)
+figures/
+
+# Generated PDFs
+*.pdf
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+context/
+temp-skills/

@@ -1,0 +1,57 @@
+# Project Context for Claude Code
+
+## Project Overview
+<!-- Brief description of your research project -->
+
+## Manuscript Status
+
+### Target Journal
+<!-- e.g., Nature Methods, PLOS Computational Biology, Bioinformatics -->
+
+### Current Phase
+<!-- Planning | Drafting | Reviewing | Revising -->
+
+### Section Status
+- [ ] Abstract
+- [ ] Introduction
+- [ ] Methods
+- [ ] Results
+- [ ] Discussion
+- [ ] References
+
+## Key Findings
+<!-- Summarize main results from your analysis -->
+<!-- This prevents Claude from needing to re-read raw data constantly -->
+
+1. **Finding 1**: [Brief description]
+   - Supporting data: `data/processed/results.csv`
+   - Supporting figure: `figures/fig1.png`
+
+2. **Finding 2**: [Brief description]
+   - Supporting data: `data/processed/analysis.csv`
+   - Supporting figure: `figures/fig2.png`
+
+## Repository Map
+
+### Data Files
+<!-- List key data files and their contents -->
+- `data/processed/summary.csv` - Summary statistics (columns: ...)
+- `data/processed/results.csv` - Main results (columns: ...)
+
+### Analysis Scripts
+<!-- Map scripts to their outputs -->
+- `scripts/preprocess.py` - Data cleaning and preprocessing
+- `scripts/analyze.py` - Main analysis pipeline
+- `scripts/plot_fig1.py` - Generates Figure 1
+
+### Figures
+<!-- List figures and their purposes -->
+- `figures/fig1.png` - Overview of methodology
+- `figures/fig2.png` - Main results comparison
+
+## Citation Index
+<!-- Will be populated by the ingest-repo skill -->
+<!-- Format: [key]: "Title" (Year) -->
+
+## Notes
+<!-- Any additional context or special instructions -->
