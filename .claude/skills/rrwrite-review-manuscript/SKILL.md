@@ -1,5 +1,5 @@
 ---
-name: rrw-review-manuscript
+name: rrwrite-review-manuscript
 description: Performs adversarial review of manuscripts, outlines, literature reviews, or other academic content against journal requirements and quality standards.
 allowed-tools:
 ---
@@ -108,7 +108,7 @@ Focus on:
 ## Prose Linting (For Manuscript Drafts)
 
 Run the prose linter:
-`python scripts/rrw-lint-manuscript.py manuscript/full_manuscript.md`
+`python scripts/rrwrite-lint-manuscript.py manuscript/full_manuscript.md`
 
 ## Output Format (per schema: schemas/manuscript.yaml)
 
@@ -175,7 +175,7 @@ Generate a review report in `manuscript/` directory with naming convention:
 
 After generating the review, validate it:
 ```bash
-python scripts/rrw-validate-manuscript.py --file manuscript/review_TYPE_vN.md --type review
+python scripts/rrwrite-validate-manuscript.py --file manuscript/review_TYPE_vN.md --type review
 ```
 
 Report validation status. If validation passes, confirm review completion.

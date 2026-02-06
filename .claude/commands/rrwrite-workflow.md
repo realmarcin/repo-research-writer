@@ -1,9 +1,9 @@
 ---
-name: rrw-workflow
-description: Guide through the complete RRW manuscript generation workflow
+name: rrwrite-workflow
+description: Guide through the complete RRWrite manuscript generation workflow
 ---
 
-# RRW Workflow Assistant
+# RRWrite Workflow Assistant
 
 I'll guide you through the complete manuscript generation workflow. Let me first check what stage you're at.
 
@@ -14,21 +14,21 @@ Let me check your project structure:
 **Files to check:**
 - `CLUEWRITE.md` - Your documented findings
 - `manuscript_plan.md` - Manuscript outline
-- `rrw-drafts/literature_review.md` - Literature research
-- `rrw-drafts/*.md` - Drafted sections
+- `rrwrite-drafts/literature_review.md` - Literature research
+- `rrwrite-drafts/*.md` - Drafted sections
 - `references.bib` - Citations
 
 ## Complete Workflow
 
 ### Stage 1: Project Setup ✓/✗
 **Prerequisites:**
-- [ ] RRW installed globally
+- [ ] RRWrite installed globally
 - [ ] Project directory initialized
 - [ ] CLUEWRITE.md created and filled out
 
 **If not done:**
 ```bash
-# Install RRW (one time)
+# Install RRWrite (one time)
 cd /path/to/repo-research-writer && ./install.sh global
 
 # Setup this project
@@ -45,19 +45,19 @@ cd /your/research/project
 
 **Run:**
 ```
-Use /rrw-plan-manuscript to create an outline for [Your Target Journal]
+Use /rrwrite-plan-manuscript to create an outline for [Your Target Journal]
 ```
 
 **Examples:**
-- "Use /rrw-plan-manuscript for Nature Methods"
-- "Use /rrw-plan-manuscript for PLOS Computational Biology"
-- "Use /rrw-plan-manuscript for Bioinformatics"
+- "Use /rrwrite-plan-manuscript for Nature Methods"
+- "Use /rrwrite-plan-manuscript for PLOS Computational Biology"
+- "Use /rrwrite-plan-manuscript for Bioinformatics"
 
 **Output:** `manuscript_plan.md`
 
 **Then review:**
 ```
-Use /rrw-review-manuscript to review manuscript_plan.md
+Use /rrwrite-review-manuscript to review manuscript_plan.md
 ```
 
 ---
@@ -67,22 +67,22 @@ Use /rrw-review-manuscript to review manuscript_plan.md
 
 **Run:**
 ```
-Use /rrw-research-literature to research background for [your topic]
+Use /rrwrite-research-literature to research background for [your topic]
 ```
 
 **Example:**
 ```
-Use /rrw-research-literature for transformer-based protein structure prediction
+Use /rrwrite-research-literature for transformer-based protein structure prediction
 ```
 
 **Outputs:**
-- `rrw-drafts/literature_review.md` (summary)
+- `rrwrite-drafts/literature_review.md` (summary)
 - `bib_additions.bib` (new citations with DOIs)
 - `literature_evidence.csv` (quotes for verification)
 
 **Then review:**
 ```
-Use /rrw-review-manuscript to review rrw-drafts/literature_review.md
+Use /rrwrite-review-manuscript to review rrwrite-drafts/literature_review.md
 ```
 
 **Manual step:**
@@ -100,33 +100,33 @@ cat bib_additions.bib >> references.bib
 
 1. **Methods** (most straightforward)
    ```
-   Use /rrw-draft-section to write the Methods section
+   Use /rrwrite-draft-section to write the Methods section
    ```
 
 2. **Results** (based on data)
    ```
-   Use /rrw-draft-section to write the Results section
+   Use /rrwrite-draft-section to write the Results section
    ```
 
 3. **Introduction** (with literature context)
    ```
-   Use /rrw-draft-section to write the Introduction section
+   Use /rrwrite-draft-section to write the Introduction section
    ```
 
 4. **Discussion** (synthesize everything)
    ```
-   Use /rrw-draft-section to write the Discussion section
+   Use /rrwrite-draft-section to write the Discussion section
    ```
 
 5. **Abstract** (summarize complete work)
    ```
-   Use /rrw-draft-section to write the Abstract
+   Use /rrwrite-draft-section to write the Abstract
    ```
 
 **After each section, verify numbers:**
 ```bash
 # Example: Check accuracy claim
-python scripts/rrw-verify-stats.py \
+python scripts/rrwrite-verify-stats.py \
   --file data/results.csv \
   --col accuracy \
   --op mean
@@ -139,12 +139,12 @@ python scripts/rrw-verify-stats.py \
 
 **Run:**
 ```
-Use /rrw-review-manuscript to review the complete manuscript
+Use /rrwrite-review-manuscript to review the complete manuscript
 ```
 
 **Specify file:**
 ```
-Use /rrw-review-manuscript to review rrw-drafts/full_manuscript.md
+Use /rrwrite-review-manuscript to review rrwrite-drafts/full_manuscript.md
 ```
 
 **Output:** `review_manuscript_round_1.md`
@@ -161,17 +161,17 @@ Use /rrw-review-manuscript to review rrw-drafts/full_manuscript.md
 
 **Combine sections:**
 ```bash
-cat rrw-drafts/abstract.md \
-    rrw-drafts/introduction.md \
-    rrw-drafts/methods.md \
-    rrw-drafts/results.md \
-    rrw-drafts/discussion.md \
-    > rrw-drafts/full_manuscript.md
+cat rrwrite-drafts/abstract.md \
+    rrwrite-drafts/introduction.md \
+    rrwrite-drafts/methods.md \
+    rrwrite-drafts/results.md \
+    rrwrite-drafts/discussion.md \
+    > rrwrite-drafts/full_manuscript.md
 ```
 
 **Compile to PDF (if pandoc installed):**
 ```bash
-pandoc rrw-drafts/full_manuscript.md \
+pandoc rrwrite-drafts/full_manuscript.md \
   -o manuscript.pdf \
   --bibliography references.bib \
   --csl styles/nature.csl
@@ -190,27 +190,27 @@ pandoc rrw-drafts/full_manuscript.md \
 
 ```bash
 # Planning
-"Use /rrw-plan-manuscript for [Journal]"
+"Use /rrwrite-plan-manuscript for [Journal]"
 
 # Literature
-"Use /rrw-research-literature for [topic]"
+"Use /rrwrite-research-literature for [topic]"
 
 # Drafting (one at a time)
-"Use /rrw-draft-section to write the Methods section"
-"Use /rrw-draft-section to write the Results section"
-"Use /rrw-draft-section to write the Introduction section"
-"Use /rrw-draft-section to write the Discussion section"
-"Use /rrw-draft-section to write the Abstract"
+"Use /rrwrite-draft-section to write the Methods section"
+"Use /rrwrite-draft-section to write the Results section"
+"Use /rrwrite-draft-section to write the Introduction section"
+"Use /rrwrite-draft-section to write the Discussion section"
+"Use /rrwrite-draft-section to write the Abstract"
 
 # Reviewing
-"Use /rrw-review-manuscript to review [file]"
+"Use /rrwrite-review-manuscript to review [file]"
 ```
 
 ---
 
 ## Need Help?
 
-- **Detailed workflow:** See `WORKFLOW.md` in RRW repository
+- **Detailed workflow:** See `WORKFLOW.md` in RRWrite repository
 - **Example project:** See `example/` directory
 - **Installation issues:** See `INSTALL.md`
 - **Usage scenarios:** See `USAGE_GUIDE.md`

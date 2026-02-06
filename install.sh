@@ -1,11 +1,11 @@
 #!/bin/bash
-# Installation script for Repo Research Writer (RRW) Skills
+# Installation script for Repo Research Writer (RRWrite) Skills
 
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "Repo Research Writer (RRW) Skills - Installation"
+echo "Repo Research Writer (RRWrite) Skills - Installation"
 echo "=============================================="
 echo ""
 
@@ -17,7 +17,7 @@ install_global() {
     mkdir -p ~/.claude/skills
 
     # Create symlinks
-    for skill in rrw-plan-manuscript rrw-draft-section rrw-review-manuscript rrw-research-literature; do
+    for skill in rrwrite-plan-manuscript rrwrite-draft-section rrwrite-review-manuscript rrwrite-research-literature; do
         target=~/.claude/skills/$skill
         if [ -L "$target" ] || [ -e "$target" ]; then
             echo "  ⚠️  Removing existing $skill"
@@ -67,9 +67,9 @@ setup_project() {
 
     # Copy scripts
     echo "  ✓ Copying verification scripts to scripts/"
-    cp "$SCRIPT_DIR/scripts/rrw-verify-stats.py" scripts/
-    cp "$SCRIPT_DIR/scripts/rrw-clean-ipynb.py" scripts/
-    cp "$SCRIPT_DIR/scripts/rrw-validate-manuscript.py" scripts/
+    cp "$SCRIPT_DIR/scripts/rrwrite-verify-stats.py" scripts/
+    cp "$SCRIPT_DIR/scripts/rrwrite-clean-ipynb.py" scripts/
+    cp "$SCRIPT_DIR/scripts/rrwrite-validate-manuscript.py" scripts/
     chmod +x scripts/*.py
 
     # Copy schema
@@ -110,7 +110,7 @@ install_local() {
     mkdir -p .claude/skills
 
     # Copy skills to project
-    for skill in rrw-plan-manuscript rrw-draft-section rrw-review-manuscript rrw-research-literature; do
+    for skill in rrwrite-plan-manuscript rrwrite-draft-section rrwrite-review-manuscript rrwrite-research-literature; do
         target=.claude/skills/$skill
         if [ -e "$target" ]; then
             echo "  ⚠️  Removing existing $skill"

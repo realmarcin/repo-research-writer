@@ -1,17 +1,17 @@
-# Repo Research Writer (RRW) 📝
+# Repo Research Writer (RRWrite) 📝
 
 **Transform your research code into publication-ready manuscripts automatically.**
 
-Repo Research Writer (RRW) is an AI-powered system that reads your research repository—code, data, and notebooks—and generates scientifically accurate manuscripts with verified facts, proper citations, and journal-specific formatting.
+Repo Research Writer (RRWrite) is an AI-powered system that reads your research repository—code, data, and notebooks—and generates scientifically accurate manuscripts with verified facts, proper citations, and journal-specific formatting.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🎯 What RRW Does
+## 🎯 What RRWrite Does
 
 Instead of manually translating your computational research into text:
 
 ```
-Your Research Repo            RRW                  Publication
+Your Research Repo            RRWrite              Publication
 ├── data/results.csv    ──────────────────>    ┌─────────────────┐
 ├── scripts/analyze.py  ──────────────────>    │ Abstract        │
 ├── figures/fig1.png    ──────────────────>    │ Introduction    │
@@ -21,7 +21,7 @@ Your Research Repo            RRW                  Publication
                                                 └─────────────────┘
 ```
 
-RRW:
+RRWrite:
 - ✅ **Extracts findings** from your data files
 - ✅ **Verifies all numbers** against source CSVs
 - ✅ **Describes methods** by reading your code
@@ -40,17 +40,17 @@ cd my-research-project
 # Edit CLUEWRITE.md with your findings and data sources
 
 # Step 2: Plan the manuscript
-"Use /rrw-plan-manuscript to create an outline for Bioinformatics journal"
+"Use /rrwrite-plan-manuscript to create an outline for Bioinformatics journal"
 
 # Step 3: Research the literature
-"Use /rrw-research-literature to find relevant background papers and related work"
+"Use /rrwrite-research-literature to find relevant background papers and related work"
 
 # Step 3: Draft sections
-"Use /rrw-draft-section to write the Methods section"
-"Use /rrw-draft-section to write the Results section"
+"Use /rrwrite-draft-section to write the Methods section"
+"Use /rrwrite-draft-section to write the Results section"
 
 # Step 4: Review for compliance
-"Use /rrw-review-manuscript to check the draft"
+"Use /rrwrite-review-manuscript to check the draft"
 ```
 
 **Result**: A complete manuscript draft where every claim is traced back to your source data.
@@ -65,7 +65,7 @@ The `example/` directory contains a complete demonstration:
 - Figures: `accuracy_comparison.png`
 - BibTeX: `references.bib`
 
-**RRW Output**:
+**RRWrite Output**:
 - Detailed manuscript plan mapping data→sections
 - Methods section describing the code implementation
 - Results section with verified statistics
@@ -79,7 +79,7 @@ The `example/` directory contains a complete demonstration:
 ### Global Installation (Recommended - Use Across All Projects)
 
 ```bash
-# 1. Clone RRW to a permanent location
+# 1. Clone RRWrite to a permanent location
 git clone https://github.com/realmarcin/repo-research-writer.git ~/repo-research-writer
 # Note: You can clone anywhere, just remember the path!
 
@@ -107,19 +107,19 @@ cd /path/to/your/research/project
 
 #### `./install.sh global`
 - Creates `~/.claude/skills/` directory
-- Creates **symbolic links** (not copies) pointing to RRW skills:
+- Creates **symbolic links** (not copies) pointing to RRWrite skills:
   ```
-  ~/.claude/skills/rrw-plan-manuscript → /path/to/repo-research-writer/.claude/skills/rrw-plan-manuscript
-  ~/.claude/skills/rrw-draft-section → /path/to/repo-research-writer/.claude/skills/rrw-draft-section
-  ~/.claude/skills/rrw-review-manuscript → /path/to/repo-research-writer/.claude/skills/rrw-review-manuscript
+  ~/.claude/skills/rrwrite-plan-manuscript → /path/to/repo-research-writer/.claude/skills/rrwrite-plan-manuscript
+  ~/.claude/skills/rrwrite-draft-section → /path/to/repo-research-writer/.claude/skills/rrwrite-draft-section
+  ~/.claude/skills/rrwrite-review-manuscript → /path/to/repo-research-writer/.claude/skills/rrwrite-review-manuscript
   ```
-- **Benefit**: Update RRW once (`git pull`), all projects get updates automatically
+- **Benefit**: Update RRWrite once (`git pull`), all projects get updates automatically
 
 #### `./install.sh setup-project`
 Prepares your research project by:
-1. Creating directory structure (`rrw-drafts/`, `scripts/`, `figures/`, `data/`)
+1. Creating directory structure (`rrwrite-drafts/`, `scripts/`, `figures/`, `data/`)
 2. Copying `CLUEWRITE.md` template for documenting findings
-3. Copying verification tools (`rrw-verify-stats.py`, `rrw-clean-ipynb.py`)
+3. Copying verification tools (`rrwrite-verify-stats.py`, `rrwrite-clean-ipynb.py`)
 4. Creating `.gitignore` for manuscript drafts
 
 #### `./install.sh local`
@@ -142,37 +142,37 @@ your-project/
 
 ### 2. Planning
 
-The `/rrw-plan-manuscript` skill creates a detailed outline:
+The `/rrwrite-plan-manuscript` skill creates a detailed outline:
 - Maps each section to specific files
 - Links claims to data sources
 - Applies journal-specific structure
 
 ### 3. Drafting with Verification
 
-The `/rrw-draft-section` skill:
+The `/rrwrite-draft-section` skill:
 - Reads relevant code/data files
 - Generates academic prose
-- **Verifies every number** using `rrw-verify-stats.py`
+- **Verifies every number** using `rrwrite-verify-stats.py`
 - Cites from your `references.bib`
 
 Example fact-checking:
 ```bash
 # Agent writes: "The model achieved 87% accuracy"
 # Behind the scenes:
-python scripts/rrw-verify-stats.py --file data/results.csv --col accuracy --op mean
+python scripts/rrwrite-verify-stats.py --file data/results.csv --col accuracy --op mean
 # Returns: 0.87 ✓
 ```
 
 ### 4. Review
 
-The `/rrw-review-manuscript` skill acts as "Reviewer #2":
+The `/rrwrite-review-manuscript` skill acts as "Reviewer #2":
 - Checks journal-specific requirements
 - Verifies citation integrity
 - Flags missing figures or data availability statements
 
 ## 🎓 Skills Included
 
-### `/rrw-plan-manuscript`
+### `/rrwrite-plan-manuscript`
 Maps your repository to a manuscript outline for your target journal.
 
 **Supports**:
@@ -180,7 +180,7 @@ Maps your repository to a manuscript outline for your target journal.
 - PLOS Computational Biology
 - Bioinformatics
 
-### `/rrw-draft-section`
+### `/rrwrite-draft-section`
 Writes individual sections with fact-checking.
 
 **Features**:
@@ -189,7 +189,7 @@ Writes individual sections with fact-checking.
 - Generates LaTeX equations from code
 - Maintains variable name consistency
 
-### `/rrw-review-manuscript`
+### `/rrwrite-review-manuscript`
 Reviews drafts for compliance and accuracy.
 
 **Checks**:
@@ -204,7 +204,7 @@ Your research project should have:
 
 ```
 your-research-project/
-├── .claude/skills/        # RRW skills (symlinked)
+├── .claude/skills/        # RRWrite skills (symlinked)
 ├── CLUEWRITE.md            # Your project context
 ├── manuscript/            # All manuscript outputs (schema-validated)
 │   ├── outline.md        # Manuscript plan
@@ -228,48 +228,48 @@ See [MANUSCRIPT_SCHEMA.md](MANUSCRIPT_SCHEMA.md) for detailed naming conventions
 
 ## 🛠️ Verification Tools
 
-RRW includes Python tools to ensure accuracy:
+RRWrite includes Python tools to ensure accuracy:
 
-### `rrw-verify-stats.py`
+### `rrwrite-verify-stats.py`
 Verifies numerical claims against source data:
 ```bash
-python scripts/rrw-verify-stats.py \
+python scripts/rrwrite-verify-stats.py \
   --file data/results.csv \
   --col accuracy \
   --op mean
 # Output: 0.8734
 ```
 
-### `rrw-clean-ipynb.py`
+### `rrwrite-clean-ipynb.py`
 Converts Jupyter notebooks to clean markdown:
 ```bash
-python scripts/rrw-clean-ipynb.py notebook.ipynb -o clean.md
+python scripts/rrwrite-clean-ipynb.py notebook.ipynb -o clean.md
 # Removes base64 images, keeps code and markdown
 ```
 
-### `rrw-validate-manuscript.py`
+### `rrwrite-validate-manuscript.py`
 Validates manuscript outputs against LinkML schema:
 ```bash
 # Validate outline
-python scripts/rrw-validate-manuscript.py \
+python scripts/rrwrite-validate-manuscript.py \
   --file manuscript/outline.md \
   --type outline
 
 # Validate section
-python scripts/rrw-validate-manuscript.py \
+python scripts/rrwrite-validate-manuscript.py \
   --file manuscript/methods.md \
   --type section
 
 # Validate full manuscript
-python scripts/rrw-validate-manuscript.py \
+python scripts/rrwrite-validate-manuscript.py \
   --file manuscript/full_manuscript.md \
   --type manuscript
 ```
 
-### `rrw-assemble-manuscript.py`
+### `rrwrite-assemble-manuscript.py`
 Assembles individual sections into full manuscript:
 ```bash
-python scripts/rrw-assemble-manuscript.py
+python scripts/rrwrite-assemble-manuscript.py
 # Creates manuscript/full_manuscript.md from sections
 ```
 
@@ -289,13 +289,13 @@ Skills automatically validate outputs after generation. See [MANUSCRIPT_SCHEMA.m
 
 ```mermaid
 graph LR
-    A[Research Code] --> B[/rrw-plan-manuscript]
+    A[Research Code] --> B[/rrwrite-plan-manuscript]
     B --> C[manuscript/outline.md]
-    C --> D[/rrw-draft-section]
+    C --> D[/rrwrite-draft-section]
     D --> E[manuscript/*.md sections]
     E --> F[Assemble]
     F --> G[manuscript/full_manuscript.md]
-    G --> H[/rrw-review-manuscript]
+    G --> H[/rrwrite-review-manuscript]
     H --> I[manuscript/review_manuscript_v1.md]
     I --> J[Revise & Finalize]
 ```
@@ -350,7 +350,7 @@ optimizer = torch.optim.AdamW(
 ## 🤝 Contributing
 
 We welcome contributions! To add:
-- **New journal templates**: Add to skills/rrw-plan-manuscript
+- **New journal templates**: Add to skills/rrwrite-plan-manuscript
 - **New verification tools**: Add to scripts/
 - **Documentation improvements**: Update README or USAGE_GUIDE
 
@@ -364,12 +364,12 @@ MIT License - see [LICENSE](LICENSE)
 
 ## 🙏 Citation
 
-If RRW helps your research, please cite:
+If RRWrite helps your research, please cite:
 
 ```bibtex
-@software{rrw2026,
-  title={Repo Research Writer (RRW): Repository-Driven Scientific Manuscript Generation},
-  author={RRW Contributors},
+@software{rrwrite2026,
+  title={Repo Research Writer (RRWrite): Repository-Driven Scientific Manuscript Generation},
+  author={RRWrite Contributors},
   year={2026},
   url={https://github.com/realmarcin/repo-research-writer}
 }
@@ -411,21 +411,21 @@ A: No! The verification loop ensures every number comes from your data files.
    cd /your/research/project
    /path/to/repo-research-writer/install.sh setup-project
    ```
-5. **Start writing**: In your AI agent, type `/rrw-workflow` for guided assistance
+5. **Start writing**: In your AI agent, type `/rrwrite-workflow` for guided assistance
 
 ## 🔍 Installation Troubleshooting
 
 **"Skills not found"?**
 - Check if skills are linked: `ls -la ~/.claude/skills/`
-- Verify symlinks point to correct location: `readlink ~/.claude/skills/rrw-plan-manuscript`
-- If path is wrong, re-run: `./install.sh global` from the correct RRW directory
+- Verify symlinks point to correct location: `readlink ~/.claude/skills/rrwrite-plan-manuscript`
+- If path is wrong, re-run: `./install.sh global` from the correct RRWrite directory
 
 **"Can't find install.sh"?**
-- Make sure you're in the RRW repository directory
-- Check: `pwd` should show the path where you cloned RRW
+- Make sure you're in the RRWrite repository directory
+- Check: `pwd` should show the path where you cloned RRWrite
 - The directory should contain: `.claude/`, `scripts/`, `README.md`, `install.sh`
 
-**Want to move RRW?**
+**Want to move RRWrite?**
 ```bash
 # If you move the repo, re-run global install
 cd /new/location/of/repo-research-writer

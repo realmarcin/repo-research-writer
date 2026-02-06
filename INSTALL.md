@@ -1,17 +1,17 @@
-# Repo Research Writer (RRW) Installation Guide
+# Repo Research Writer (RRWrite) Installation Guide
 
 ## Understanding the Installation
 
-RRW uses a **global + per-project** installation model:
+RRWrite uses a **global + per-project** installation model:
 
 1. **Global**: Install skills once to `~/.claude/skills/` (available everywhere)
 2. **Per-Project**: Setup each research project with directory structure and tools
 
 ## Installation Paths
 
-### Where Can I Clone RRW?
+### Where Can I Clone RRWrite?
 
-You can clone RRW anywhere you want! Common choices:
+You can clone RRWrite anywhere you want! Common choices:
 
 ```bash
 # Option 1: Home directory (simple)
@@ -44,9 +44,9 @@ cd ~/repo-research-writer
 **What happens:**
 ```
 Creating symbolic links:
-~/.claude/skills/rrw-plan-manuscript → ~/repo-research-writer/.claude/skills/rrw-plan-manuscript
-~/.claude/skills/rrw-draft-section → ~/repo-research-writer/.claude/skills/rrw-draft-section
-~/.claude/skills/rrw-review-manuscript → ~/repo-research-writer/.claude/skills/rrw-review-manuscript
+~/.claude/skills/rrwrite-plan-manuscript → ~/repo-research-writer/.claude/skills/rrwrite-plan-manuscript
+~/.claude/skills/rrwrite-draft-section → ~/repo-research-writer/.claude/skills/rrwrite-draft-section
+~/.claude/skills/rrwrite-review-manuscript → ~/repo-research-writer/.claude/skills/rrwrite-review-manuscript
 ```
 
 **Verify it worked:**
@@ -74,7 +74,7 @@ cd /path/to/your/research/project
 **What happens:**
 ```
 Creating directories:
-  ✓ rrw-drafts/
+  ✓ rrwrite-drafts/
   ✓ scripts/
   ✓ figures/
   ✓ data/processed/
@@ -82,8 +82,8 @@ Creating directories:
 
 Copying files:
   ✓ CLUEWRITE.md (template)
-  ✓ scripts/rrw-verify-stats.py
-  ✓ scripts/rrw-clean-ipynb.py
+  ✓ scripts/rrwrite-verify-stats.py
+  ✓ scripts/rrwrite-clean-ipynb.py
   ✓ .gitignore
 ```
 
@@ -94,7 +94,7 @@ Copying files:
 nano CLUEWRITE.md
 
 # Start your AI agent and use the skills
-"Use /rrw-plan-manuscript to create an outline"
+"Use /rrwrite-plan-manuscript to create an outline"
 ```
 
 ## Alternative: Local Installation
@@ -104,7 +104,7 @@ If you want skills **only** in one project (not global):
 ```bash
 cd /path/to/your/research/project
 
-# Copy RRW repo temporarily
+# Copy RRWrite repo temporarily
 git clone https://github.com/realmarcin/repo-research-writer.git temp-rrw
 
 # Install locally
@@ -127,9 +127,9 @@ rm -rf temp-rrw
 ls -la ~/.claude/skills/
 
 # Should see:
-# rrw-plan-manuscript -> /path/to/repo-research-writer/.claude/skills/rrw-plan-manuscript
-# rrw-draft-section -> /path/to/repo-research-writer/.claude/skills/rrw-draft-section
-# rrw-review-manuscript -> /path/to/repo-research-writer/.claude/skills/rrw-review-manuscript
+# rrwrite-plan-manuscript -> /path/to/repo-research-writer/.claude/skills/rrwrite-plan-manuscript
+# rrwrite-draft-section -> /path/to/repo-research-writer/.claude/skills/rrwrite-draft-section
+# rrwrite-review-manuscript -> /path/to/repo-research-writer/.claude/skills/rrwrite-review-manuscript
 ```
 
 ### Check Project Setup
@@ -141,7 +141,7 @@ cd /your/research/project
 ls -d drafts scripts figures data
 
 # Verify files exist
-ls CLUEWRITE.md scripts/rrw-verify-stats.py scripts/rrw-clean-ipynb.py
+ls CLUEWRITE.md scripts/rrwrite-verify-stats.py scripts/rrwrite-clean-ipynb.py
 ```
 
 ## Common Issues
@@ -153,7 +153,7 @@ ls CLUEWRITE.md scripts/rrw-verify-stats.py scripts/rrw-clean-ipynb.py
 **Solution**:
 ```bash
 # Check where symlink points
-readlink ~/.claude/skills/rrw-plan-manuscript
+readlink ~/.claude/skills/rrwrite-plan-manuscript
 
 # If path is wrong, re-run from correct location
 cd /actual/repo-research-writer/location
@@ -162,7 +162,7 @@ cd /actual/repo-research-writer/location
 
 ### "install.sh: command not found"
 
-**Problem**: Not in RRW directory
+**Problem**: Not in RRWrite directory
 
 **Solution**:
 ```bash
@@ -176,7 +176,7 @@ ls install.sh README.md .claude/
 ./install.sh global
 ```
 
-### I moved the RRW repository
+### I moved the RRWrite repository
 
 **Problem**: Symlinks are broken
 
@@ -202,7 +202,7 @@ cd /path/to/research/project
 ```
 
 **Key Points**:
-- ✅ Clone RRW anywhere you want
+- ✅ Clone RRWrite anywhere you want
 - ✅ Use full path to `install.sh` when setting up projects
 - ✅ Symlinks mean updates propagate to all projects
 - ✅ Each project gets its own `CLUEWRITE.md` and `scripts/`

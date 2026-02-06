@@ -1,4 +1,4 @@
-# Repo Research Writer (RRW) Workflow Guide
+# Repo Research Writer (RRWrite) Workflow Guide
 
 Complete step-by-step workflow for generating a scientific manuscript from your research repository.
 
@@ -14,7 +14,7 @@ Research Repository → Manuscript Outline → Literature Review → Draft Secti
 
 **Goal**: Set up your project structure and document your findings.
 
-#### Step 1.1: Install RRW (One-time)
+#### Step 1.1: Install RRWrite (One-time)
 ```bash
 cd /path/to/repo-research-writer
 ./install.sh global
@@ -28,7 +28,7 @@ cd /path/to/your/research/project
 
 **Creates:**
 - `CLUEWRITE.md` (template)
-- `rrw-drafts/`, `scripts/`, `figures/`, `data/` directories
+- `rrwrite-drafts/`, `scripts/`, `figures/`, `data/` directories
 - Verification scripts
 
 #### Step 1.3: Document Your Findings
@@ -57,12 +57,12 @@ Edit `CLUEWRITE.md` with:
 
 #### Step 2.1: Generate Outline
 ```
-Use /rrw-plan-manuscript to create an outline for [Target Journal]
+Use /rrwrite-plan-manuscript to create an outline for [Target Journal]
 ```
 
 **Example:**
 ```
-"Use /rrw-plan-manuscript to create an outline for Bioinformatics journal"
+"Use /rrwrite-plan-manuscript to create an outline for Bioinformatics journal"
 ```
 
 **Output**: `manuscript_plan.md`
@@ -73,7 +73,7 @@ Use /rrw-plan-manuscript to create an outline for [Target Journal]
 
 #### Step 2.2: Review Outline (Optional but Recommended)
 ```
-Use /rrw-review-manuscript to review the outline in manuscript_plan.md
+Use /rrwrite-review-manuscript to review the outline in manuscript_plan.md
 ```
 
 **Checks:**
@@ -97,12 +97,12 @@ Use /rrw-review-manuscript to review the outline in manuscript_plan.md
 
 #### Step 3.1: Research Background and Related Work
 ```
-Use /rrw-research-literature to find relevant papers for my [topic] manuscript
+Use /rrwrite-research-literature to find relevant papers for my [topic] manuscript
 ```
 
 **Example:**
 ```
-"Use /rrw-research-literature for transformer-based protein structure prediction"
+"Use /rrwrite-research-literature for transformer-based protein structure prediction"
 ```
 
 **What happens:**
@@ -114,14 +114,14 @@ Use /rrw-research-literature to find relevant papers for my [topic] manuscript
 6. Extracts direct quotes from each paper
 
 **Outputs:**
-- `rrw-drafts/literature_review.md` (structured summary, ~1000 words)
+- `rrwrite-drafts/literature_review.md` (structured summary, ~1000 words)
 - `bib_additions.bib` (BibTeX entries with DOIs)
 - `literature_evidence.csv` (DOIs + direct quotes)
 - `literature_integration_notes.md` (where to cite)
 
 #### Step 3.2: Review Literature Coverage
 ```
-Use /rrw-review-manuscript to review the literature review in rrw-drafts/literature_review.md
+Use /rrwrite-review-manuscript to review the literature review in rrwrite-drafts/literature_review.md
 ```
 
 **Checks:**
@@ -154,31 +154,31 @@ Use /rrw-review-manuscript to review the literature review in rrw-drafts/literat
 
 **For each section:**
 ```
-Use /rrw-draft-section to write the [Section Name] section
+Use /rrwrite-draft-section to write the [Section Name] section
 ```
 
 **Examples:**
 ```
-"Use /rrw-draft-section to write the Methods section"
-"Use /rrw-draft-section to write the Results section"
-"Use /rrw-draft-section to write the Introduction section"
-"Use /rrw-draft-section to write the Discussion section"
-"Use /rrw-draft-section to write the Abstract"
+"Use /rrwrite-draft-section to write the Methods section"
+"Use /rrwrite-draft-section to write the Results section"
+"Use /rrwrite-draft-section to write the Introduction section"
+"Use /rrwrite-draft-section to write the Discussion section"
+"Use /rrwrite-draft-section to write the Abstract"
 ```
 
 **What happens:**
 1. Reads relevant files from manuscript_plan.md
 2. Reads citations from bib_index.md or references.bib
 3. Generates text with proper formatting
-4. **Verifies numerical claims** using rrw-verify-stats.py
-5. Saves to `rrw-drafts/[section_name].md`
+4. **Verifies numerical claims** using rrwrite-verify-stats.py
+5. Saves to `rrwrite-drafts/[section_name].md`
 
 #### Step 4.2: Verify Numerical Claims (Critical!)
 
 After drafting, manually verify key claims:
 ```bash
 # Check a specific statistic
-python scripts/rrw-verify-stats.py \
+python scripts/rrwrite-verify-stats.py \
   --file data/results.csv \
   --col accuracy \
   --op mean
@@ -204,12 +204,12 @@ grep "alphafold2021" literature_evidence.csv
 
 #### Step 5.1: Review Complete Draft
 ```
-Use /rrw-review-manuscript to review the complete manuscript draft
+Use /rrwrite-review-manuscript to review the complete manuscript draft
 ```
 
 **Point to main manuscript file or specify sections:**
 ```
-"Use /rrw-review-manuscript to review rrw-drafts/full_manuscript.md"
+"Use /rrwrite-review-manuscript to review rrwrite-drafts/full_manuscript.md"
 ```
 
 **Checks:**
@@ -231,7 +231,7 @@ Work through review report systematically:
 
 **Revise sections:**
 ```
-"Use /rrw-draft-section to revise the Methods section addressing [specific issue]"
+"Use /rrwrite-draft-section to revise the Methods section addressing [specific issue]"
 ```
 
 #### Step 5.3: Iterate
@@ -247,19 +247,19 @@ Work through review report systematically:
 #### Step 6.1: Combine Sections
 ```bash
 # Manually combine all sections
-cat rrw-drafts/abstract.md \
-    rrw-drafts/introduction.md \
-    rrw-drafts/methods.md \
-    rrw-drafts/results.md \
-    rrw-drafts/discussion.md \
-    > rrw-drafts/full_manuscript.md
+cat rrwrite-drafts/abstract.md \
+    rrwrite-drafts/introduction.md \
+    rrwrite-drafts/methods.md \
+    rrwrite-drafts/results.md \
+    rrwrite-drafts/discussion.md \
+    > rrwrite-drafts/full_manuscript.md
 ```
 
 #### Step 6.2: Compile to PDF (Optional)
 
 Using Pandoc (if installed):
 ```bash
-pandoc rrw-drafts/full_manuscript.md \
+pandoc rrwrite-drafts/full_manuscript.md \
   -o manuscript.pdf \
   --bibliography references.bib \
   --csl styles/[journal].csl \
@@ -285,28 +285,28 @@ pandoc rrw-drafts/full_manuscript.md \
 
 ```bash
 # 1. Plan
-"Use /rrw-plan-manuscript for [Journal]"
+"Use /rrwrite-plan-manuscript for [Journal]"
 
 # 2. Research
-"Use /rrw-research-literature for background"
+"Use /rrwrite-research-literature for background"
 
 # 3. Review outline and literature
-"Use /rrw-review-manuscript to review manuscript_plan.md"
-"Use /rrw-review-manuscript to review literature_review.md"
+"Use /rrwrite-review-manuscript to review manuscript_plan.md"
+"Use /rrwrite-review-manuscript to review literature_review.md"
 
 # 4. Draft sections (in order)
-"Use /rrw-draft-section to write Methods"
-"Use /rrw-draft-section to write Results"
-"Use /rrw-draft-section to write Introduction"
-"Use /rrw-draft-section to write Discussion"
-"Use /rrw-draft-section to write Abstract"
+"Use /rrwrite-draft-section to write Methods"
+"Use /rrwrite-draft-section to write Results"
+"Use /rrwrite-draft-section to write Introduction"
+"Use /rrwrite-draft-section to write Discussion"
+"Use /rrwrite-draft-section to write Abstract"
 
 # 5. Review and revise
-"Use /rrw-review-manuscript to review the complete draft"
+"Use /rrwrite-review-manuscript to review the complete draft"
 # Address feedback, iterate
 
 # 6. Compile
-cat rrw-drafts/*.md > rrw-drafts/full_manuscript.md
+cat rrwrite-drafts/*.md > rrwrite-drafts/full_manuscript.md
 ```
 
 ---
@@ -318,7 +318,7 @@ cat rrw-drafts/*.md > rrw-drafts/full_manuscript.md
 your-research-project/
 ├── CLUEWRITE.md                          # Your documented findings
 ├── manuscript_plan.md                   # Generated outline
-├── rrw-drafts/
+├── rrwrite-drafts/
 │   ├── literature_review.md            # Literature summary
 │   ├── abstract.md                     # Drafted sections
 │   ├── introduction.md
@@ -335,7 +335,7 @@ your-research-project/
 ├── data/
 │   └── *.csv                           # Your research data
 ├── scripts/
-│   ├── rrw-verify-stats.py       # Verification tools
+│   ├── rrwrite-verify-stats.py       # Verification tools
 │   └── *.py                            # Your analysis scripts
 └── figures/
     └── *.png                           # Your figures
@@ -363,7 +363,7 @@ your-research-project/
 
 ### During Drafting
 - ✅ Draft one section at a time
-- ✅ Verify every number with rrw-verify-stats.py
+- ✅ Verify every number with rrwrite-verify-stats.py
 - ✅ Use exact citation keys from references.bib
 
 ### During Review
@@ -431,7 +431,7 @@ grep "alphafold2021" references.bib
 
 ## 🎓 Learning Path
 
-**First time using RRW?** Follow this progression:
+**First time using RRWrite?** Follow this progression:
 
 1. **Explore the example** (`cd example/`)
    - Read CLUEWRITE.md to see how findings are documented
@@ -451,4 +451,4 @@ grep "alphafold2021" references.bib
 
 ---
 
-**Ready to start?** Run: `/rrw-workflow` in your research project to begin!
+**Ready to start?** Run: `/rrwrite-workflow` in your research project to begin!

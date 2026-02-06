@@ -19,7 +19,7 @@ cd ~/repo-research-writer  # or cd /your/preferred/path
 
 **What this does:**
 - Creates `~/.claude/skills/` directory
-- Creates symbolic links pointing to RRW skills
+- Creates symbolic links pointing to RRWrite skills
 - Skills are now available in all AI agent sessions
 
 **Benefits**: Skills are available to ALL your projects. Update once, use everywhere.
@@ -39,7 +39,7 @@ nano CLUEWRITE.md  # or use your preferred editor
 ```
 
 **What this does:**
-- Creates directory structure (rrw-drafts/, scripts/, figures/, data/)
+- Creates directory structure (rrwrite-drafts/, scripts/, figures/, data/)
 - Copies CLUEWRITE.md template
 - Copies verification scripts
 - Creates .gitignore
@@ -49,8 +49,8 @@ nano CLUEWRITE.md  # or use your preferred editor
 **Note:** If you used `install.sh setup-project`, the scripts are already copied!
 
 The setup script automatically:
-- Copies `rrw-verify-stats.py` to `scripts/`
-- Copies `rrw-clean-ipynb.py` to `scripts/`
+- Copies `rrwrite-verify-stats.py` to `scripts/`
+- Copies `rrwrite-clean-ipynb.py` to `scripts/`
 - Makes them executable
 
 **Manual copy (if needed):**
@@ -71,11 +71,11 @@ cd /Users/yourname/research/my-awesome-project
 In the agent, invoke the skills:
 
 ```
-"Use the /rrw-plan-manuscript skill to create an outline targeting Nature Methods"
+"Use the /rrwrite-plan-manuscript skill to create an outline targeting Nature Methods"
 
-"Use the /rrw-draft-section skill to write the Methods section"
+"Use the /rrwrite-draft-section skill to write the Methods section"
 
-"Use the /rrw-review-manuscript skill to check the draft"
+"Use the /rrwrite-review-manuscript skill to check the draft"
 ```
 
 ## Scenario 2: Installing Per-Project (No Global Installation)
@@ -179,15 +179,15 @@ cp ~/research-writer/scripts/research-writer-verify-stats.py ./scripts/
 ### In Claude session:
 
 ```
-User: "Use /rrw-plan-manuscript to outline a paper for PLOS Comp Bio"
+User: "Use /rrwrite-plan-manuscript to outline a paper for PLOS Comp Bio"
 
 Claude: Agent: [Analyzes repo, creates manuscript_plan.md]
 
-User: "Use /rrw-draft-section to write the Results section"
+User: "Use /rrwrite-draft-section to write the Results section"
 
-Claude: Agent: [Reads relevant data files, generates rrw-drafts/results.md]
+Claude: Agent: [Reads relevant data files, generates rrwrite-drafts/results.md]
 
-User: "Use /rrw-review-manuscript to check it"
+User: "Use /rrwrite-review-manuscript to check it"
 
 Claude: Agent: [Reviews for PLOS compliance, generates review_round_1.md]
 ```
@@ -230,9 +230,9 @@ git submodule update --remote
 ```bash
 # Re-copy the updated skills
 cd /path/to/project
-rm -rf .claude/skills/rrw-plan-manuscript
-rm -rf .claude/skills/rrw-draft-section
-rm -rf .claude/skills/rrw-review-manuscript
+rm -rf .claude/skills/rrwrite-plan-manuscript
+rm -rf .claude/skills/rrwrite-draft-section
+rm -rf .claude/skills/rrwrite-review-manuscript
 
 git clone <this-repo-url> temp-skills
 cp -r temp-skills/.claude/skills/* .claude/skills/
@@ -243,7 +243,7 @@ rm -rf temp-skills
 
 **Skills not found?**
 - Check symlinks: `ls -la ~/.claude/skills/`
-- Verify SKILL.md exists: `cat ~/.claude/skills/rrw-plan-manuscript/SKILL.md`
+- Verify SKILL.md exists: `cat ~/.claude/skills/rrwrite-plan-manuscript/SKILL.md`
 
 **Verification scripts failing?**
 - Ensure scripts are executable: `chmod +x scripts/*.py`

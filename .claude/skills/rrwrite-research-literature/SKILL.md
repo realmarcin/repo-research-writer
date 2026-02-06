@@ -1,5 +1,5 @@
 ---
-name: rrw-research-literature
+name: rrwrite-research-literature
 description: Performs deep literature research on manuscript topics and generates a comprehensive one-page summary of background and related work with citations.
 allowed-tools:
 context: fork
@@ -234,7 +234,7 @@ Generate **three files** in the `manuscript/` directory (per schema: schemas/man
 
 After generating files, validate the literature review:
 ```bash
-python scripts/rrw-validate-manuscript.py --file manuscript/literature.md --type literature
+python scripts/rrwrite-validate-manuscript.py --file manuscript/literature.md --type literature
 ```
 
 If validation passes, confirm completion. If it fails, fix issues and re-validate.
@@ -301,7 +301,7 @@ After generating the literature review:
 ## Example Usage
 
 ```
-User: "Use /rrw-research-literature to research the background for my protein structure prediction paper"
+User: "Use /rrwrite-research-literature to research the background for my protein structure prediction paper"
 
 Agent:
 1. Reads CLUEWRITE.md and manuscript_plan.md
