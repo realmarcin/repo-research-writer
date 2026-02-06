@@ -29,11 +29,14 @@ install_global() {
 
     echo ""
     echo "✅ Global installation complete!"
-    echo "Skills are now available to all your AI agent projects."
+    echo "Skills are now available globally to all your AI agent sessions."
     echo ""
-    echo "To use in a project:"
+    echo "📋 Next Step: Setup each research project (once per project)"
+    echo ""
     echo "  cd /path/to/your/research/project"
     echo "  bash $SCRIPT_DIR/install.sh setup-project"
+    echo ""
+    echo "This creates directories and copies PROJECT.md template + scripts."
 }
 
 # Function to setup a project
