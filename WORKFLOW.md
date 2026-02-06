@@ -451,4 +451,4 @@ grep "alphafold2021" references.bib
 
 ---
 
-**Ready to start?** Run: `/workflow` in your research project to begin!
+**Ready to start?** Run: `/cluewrite-workflow` in your research project to begin!

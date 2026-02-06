@@ -360,7 +360,7 @@ A: No! The verification loop ensures every number comes from your data files.
    cd /your/research/project
    /path/to/cluewrite/install.sh setup-project
    ```
-5. **Start writing**: In your AI agent, type `/workflow` for guided assistance
+5. **Start writing**: In your AI agent, type `/cluewrite-workflow` for guided assistance
 
 ## 🔍 Installation Troubleshooting
 

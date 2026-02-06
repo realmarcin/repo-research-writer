@@ -1,5 +1,5 @@
 ---
-name: workflow
+name: cluewrite-workflow
 description: Guide through the complete ClueWrite manuscript generation workflow
 ---
 
