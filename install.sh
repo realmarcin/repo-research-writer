@@ -17,7 +17,7 @@ install_global() {
     mkdir -p ~/.claude/skills
 
     # Create symlinks
-    for skill in cluewrite-plan-manuscript cluewrite-draft-section cluewrite-review-manuscript; do
+    for skill in cluewrite-plan-manuscript cluewrite-draft-section cluewrite-review-manuscript cluewrite-research-literature; do
         target=~/.claude/skills/$skill
         if [ -L "$target" ] || [ -e "$target" ]; then
             echo "  ⚠️  Removing existing $skill"
@@ -103,7 +103,7 @@ install_local() {
     mkdir -p .claude/skills
 
     # Copy skills to project
-    for skill in cluewrite-plan-manuscript cluewrite-draft-section cluewrite-review-manuscript; do
+    for skill in cluewrite-plan-manuscript cluewrite-draft-section cluewrite-review-manuscript cluewrite-research-literature; do
         target=.claude/skills/$skill
         if [ -e "$target" ]; then
             echo "  ⚠️  Removing existing $skill"

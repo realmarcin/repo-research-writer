@@ -42,6 +42,9 @@ cd my-research-project
 # Step 2: Plan the manuscript
 "Use cluewrite-plan-manuscript to create an outline for Bioinformatics journal"
 
+# Step 3: Research the literature
+"Use cluewrite-research-literature to find relevant background papers and related work"
+
 # Step 3: Draft sections
 "Use cluewrite-draft-section to write the Methods section"
 "Use cluewrite-draft-section to write the Results section"
