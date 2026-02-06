@@ -1,6 +1,6 @@
 # Manuscript Schema and Conventions
 
-This document explains the LinkML schema (`schemas/manuscript.yaml`) and file naming conventions used by Research Writer.
+This document explains the LinkML schema (`schemas/manuscript.yaml`) and file naming conventions used by Repo Research Writer (RRW).
 
 ## Overview
 
@@ -30,7 +30,7 @@ your-project/
 ├── schemas/
 │   └── manuscript.yaml      # LinkML schema definition
 ├── scripts/
-│   └── cluewrite-validate-manuscript.py  # Validator
+│   └── rrw-validate-manuscript.py  # Validator
 └── data/                    # Your research data
 ```
 
@@ -93,27 +93,27 @@ All manuscript files are validated against the LinkML schema to ensure:
 
 ```bash
 # Validate outline
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/outline.md \
   --type outline
 
 # Validate literature review
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/literature.md \
   --type literature
 
 # Validate section
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/methods.md \
   --type section
 
 # Validate full manuscript
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/full_manuscript.md \
   --type manuscript
 
 # Validate review
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/review_manuscript_v1.md \
   --type review
 ```
@@ -160,21 +160,21 @@ Defines review report structure:
 
 The skills automatically use these conventions:
 
-1. **`cluewrite-plan-manuscript`**
+1. **`/rrw-plan-manuscript`**
    - Creates `manuscript/outline.md`
    - Validates against schema
 
-2. **`cluewrite-research-literature`**
+2. **`/rrw-research-literature`**
    - Creates `manuscript/literature.md`
    - Creates `manuscript/literature_citations.bib`
    - Creates `manuscript/literature_evidence.csv`
    - Validates against schema
 
-3. **`cluewrite-draft-section`**
+3. **`/rrw-draft-section`**
    - Creates `manuscript/SECTIONNAME.md`
    - Validates against schema
 
-4. **`cluewrite-review-manuscript`**
+4. **`/rrw-review-manuscript`**
    - Creates `manuscript/review_TYPE_vN.md`
    - Validates against schema
 

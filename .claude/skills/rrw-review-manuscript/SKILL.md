@@ -1,5 +1,5 @@
 ---
-name: cluewrite-review-manuscript
+name: rrw-review-manuscript
 description: Performs adversarial review of manuscripts, outlines, literature reviews, or other academic content against journal requirements and quality standards.
 allowed-tools:
 ---
@@ -27,7 +27,7 @@ Focus on:
 - Missing sections or components
 - Target journal structure compliance
 
-### If reviewing `cluewrite-cluewrite-drafts/literature_review.md`:
+### If reviewing `manuscript/literature.md`:
 Focus on:
 - Coverage completeness (foundational, related, recent)
 - Citation accuracy and verifiability
@@ -35,7 +35,7 @@ Focus on:
 - Integration guidance quality
 - Balance between domains/approaches
 
-### If reviewing manuscript drafts (`cluewrite-cluewrite-drafts/*.md`):
+### If reviewing manuscript drafts (`manuscript/*.md`):
 Focus on:
 - Technical accuracy and reproducibility
 - Journal-specific compliance
@@ -108,7 +108,7 @@ Focus on:
 ## Prose Linting (For Manuscript Drafts)
 
 Run the prose linter:
-`python scripts/cluewrite-lint-manuscript.py manuscript/full_manuscript.md`
+`python scripts/rrw-lint-manuscript.py manuscript/full_manuscript.md`
 
 ## Output Format (per schema: schemas/manuscript.yaml)
 
@@ -175,7 +175,7 @@ Generate a review report in `manuscript/` directory with naming convention:
 
 After generating the review, validate it:
 ```bash
-python scripts/cluewrite-validate-manuscript.py --file manuscript/review_TYPE_vN.md --type review
+python scripts/rrw-validate-manuscript.py --file manuscript/review_TYPE_vN.md --type review
 ```
 
 Report validation status. If validation passes, confirm review completion.

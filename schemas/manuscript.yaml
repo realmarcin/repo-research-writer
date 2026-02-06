@@ -1,6 +1,6 @@
 id: https://w3id.org/research-writer/manuscript
 name: manuscript-schema
-title: Research Writer Manuscript Schema
+title: Repo Research Writer (RRW) Manuscript Schema
 description: >-
   LinkML schema defining the structure, naming conventions, and validation rules
   for manuscript generation outputs including outlines, literature research,

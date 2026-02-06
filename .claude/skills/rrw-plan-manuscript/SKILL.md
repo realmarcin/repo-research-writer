@@ -1,5 +1,5 @@
 ---
-name: cluewrite-plan-manuscript
+name: rrw-plan-manuscript
 description: Analyzes the repository structure and generates a detailed manuscript outline based on target journal guidelines (Nature, PLOS, Bioinformatics).
 allowed-tools:
 ---
@@ -53,7 +53,7 @@ The outline MUST include:
 1. Create `manuscript/outline.md` with the structured plan
 2. Validate the outline:
    ```bash
-   python scripts/cluewrite-validate-manuscript.py --file manuscript/outline.md --type outline
+   python scripts/rrw-validate-manuscript.py --file manuscript/outline.md --type outline
    ```
 3. If validation passes, confirm creation and ask user to review
 4. If validation fails, fix issues and re-validate

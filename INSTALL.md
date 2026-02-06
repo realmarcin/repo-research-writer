@@ -1,27 +1,27 @@
-# ClueWrite Installation Guide
+# Repo Research Writer (RRW) Installation Guide
 
 ## Understanding the Installation
 
-ClueWrite uses a **global + per-project** installation model:
+RRW uses a **global + per-project** installation model:
 
 1. **Global**: Install skills once to `~/.claude/skills/` (available everywhere)
 2. **Per-Project**: Setup each research project with directory structure and tools
 
 ## Installation Paths
 
-### Where Can I Clone ClueWrite?
+### Where Can I Clone RRW?
 
-You can clone ClueWrite anywhere you want! Common choices:
+You can clone RRW anywhere you want! Common choices:
 
 ```bash
 # Option 1: Home directory (simple)
-git clone https://github.com/realmarcin/research-writer.git ~/research-writer
+git clone https://github.com/realmarcin/repo-research-writer.git ~/repo-research-writer
 
 # Option 2: Documents folder
-git clone https://github.com/realmarcin/research-writer.git ~/Documents/research-writer
+git clone https://github.com/realmarcin/repo-research-writer.git ~/Documents/repo-research-writer
 
 # Option 3: Custom location
-git clone https://github.com/realmarcin/research-writer.git /your/custom/path/research-writer
+git clone https://github.com/realmarcin/repo-research-writer.git /your/custom/path/repo-research-writer
 ```
 
 **Important**: Remember where you clone it! You'll need this path for setup.
@@ -32,10 +32,10 @@ git clone https://github.com/realmarcin/research-writer.git /your/custom/path/re
 
 ```bash
 # 1. Clone to your preferred location
-git clone https://github.com/realmarcin/research-writer.git ~/research-writer
+git clone https://github.com/realmarcin/repo-research-writer.git ~/repo-research-writer
 
 # 2. Navigate to the cloned directory
-cd ~/research-writer
+cd ~/repo-research-writer
 
 # 3. Run the global installer
 ./install.sh global
@@ -44,9 +44,9 @@ cd ~/research-writer
 **What happens:**
 ```
 Creating symbolic links:
-~/.claude/skills/research-writer-plan-manuscript → ~/research-writer/.claude/skills/research-writer-plan-manuscript
-~/.claude/skills/research-writer-draft-section → ~/research-writer/.claude/skills/research-writer-draft-section
-~/.claude/skills/research-writer-review-manuscript → ~/research-writer/.claude/skills/research-writer-review-manuscript
+~/.claude/skills/rrw-plan-manuscript → ~/repo-research-writer/.claude/skills/rrw-plan-manuscript
+~/.claude/skills/rrw-draft-section → ~/repo-research-writer/.claude/skills/rrw-draft-section
+~/.claude/skills/rrw-review-manuscript → ~/repo-research-writer/.claude/skills/rrw-review-manuscript
 ```
 
 **Verify it worked:**
@@ -62,19 +62,19 @@ ls -la ~/.claude/skills/
 cd /path/to/your/research/project
 
 # Run the project setup
-~/research-writer/install.sh setup-project
+~/repo-research-writer/install.sh setup-project
 ```
 
 **If you cloned to a different location:**
 ```bash
 # Use the actual path where you cloned
-/your/actual/path/to/research-writer/install.sh setup-project
+/your/actual/path/to/repo-research-writer/install.sh setup-project
 ```
 
 **What happens:**
 ```
 Creating directories:
-  ✓ cluewrite-drafts/
+  ✓ rrw-drafts/
   ✓ scripts/
   ✓ figures/
   ✓ data/processed/
@@ -82,8 +82,8 @@ Creating directories:
 
 Copying files:
   ✓ CLUEWRITE.md (template)
-  ✓ scripts/research-writer-verify-stats.py
-  ✓ scripts/research-writer-clean-ipynb.py
+  ✓ scripts/rrw-verify-stats.py
+  ✓ scripts/rrw-clean-ipynb.py
   ✓ .gitignore
 ```
 
@@ -94,7 +94,7 @@ Copying files:
 nano CLUEWRITE.md
 
 # Start your AI agent and use the skills
-"Use cluewrite-plan-manuscript to create an outline"
+"Use /rrw-plan-manuscript to create an outline"
 ```
 
 ## Alternative: Local Installation
@@ -104,16 +104,16 @@ If you want skills **only** in one project (not global):
 ```bash
 cd /path/to/your/research/project
 
-# Copy ClueWrite repo temporarily
-git clone https://github.com/realmarcin/research-writer.git temp-cluewrite
+# Copy RRW repo temporarily
+git clone https://github.com/realmarcin/repo-research-writer.git temp-rrw
 
 # Install locally
-cd temp-cluewrite
+cd temp-rrw
 ./install.sh local
 
 # Clean up
 cd ..
-rm -rf temp-cluewrite
+rm -rf temp-rrw
 ```
 
 **Result**: Skills copied to `.claude/skills/` in current project only.
@@ -127,9 +127,9 @@ rm -rf temp-cluewrite
 ls -la ~/.claude/skills/
 
 # Should see:
-# cluewrite-plan-manuscript -> /path/to/research-writer/.claude/skills/research-writer-plan-manuscript
-# cluewrite-draft-section -> /path/to/research-writer/.claude/skills/research-writer-draft-section
-# cluewrite-review-manuscript -> /path/to/research-writer/.claude/skills/research-writer-review-manuscript
+# rrw-plan-manuscript -> /path/to/repo-research-writer/.claude/skills/rrw-plan-manuscript
+# rrw-draft-section -> /path/to/repo-research-writer/.claude/skills/rrw-draft-section
+# rrw-review-manuscript -> /path/to/repo-research-writer/.claude/skills/rrw-review-manuscript
 ```
 
 ### Check Project Setup
@@ -141,7 +141,7 @@ cd /your/research/project
 ls -d drafts scripts figures data
 
 # Verify files exist
-ls CLUEWRITE.md scripts/research-writer-verify-stats.py scripts/research-writer-clean-ipynb.py
+ls CLUEWRITE.md scripts/rrw-verify-stats.py scripts/rrw-clean-ipynb.py
 ```
 
 ## Common Issues
@@ -153,21 +153,21 @@ ls CLUEWRITE.md scripts/research-writer-verify-stats.py scripts/research-writer-
 **Solution**:
 ```bash
 # Check where symlink points
-readlink ~/.claude/skills/research-writer-plan-manuscript
+readlink ~/.claude/skills/rrw-plan-manuscript
 
 # If path is wrong, re-run from correct location
-cd /actual/research-writer/location
+cd /actual/repo-research-writer/location
 ./install.sh global
 ```
 
 ### "install.sh: command not found"
 
-**Problem**: Not in ClueWrite directory
+**Problem**: Not in RRW directory
 
 **Solution**:
 ```bash
 # Find where you cloned it
-cd ~/research-writer  # or wherever you cloned
+cd ~/repo-research-writer  # or wherever you cloned
 
 # Verify you're in the right place
 ls install.sh README.md .claude/
@@ -176,14 +176,14 @@ ls install.sh README.md .claude/
 ./install.sh global
 ```
 
-### I moved the ClueWrite repository
+### I moved the RRW repository
 
 **Problem**: Symlinks are broken
 
 **Solution**:
 ```bash
 # Navigate to new location
-cd /new/research-writer/location
+cd /new/repo-research-writer/location
 
 # Re-run installer (updates symlinks)
 ./install.sh global
@@ -193,16 +193,16 @@ cd /new/research-writer/location
 
 ```bash
 # ONE TIME (Global Install)
-cd /path/to/research-writer
+cd /path/to/repo-research-writer
 ./install.sh global
 
 # FOR EACH PROJECT
 cd /path/to/research/project
-/path/to/research-writer/install.sh setup-project
+/path/to/repo-research-writer/install.sh setup-project
 ```
 
 **Key Points**:
-- ✅ Clone ClueWrite anywhere you want
+- ✅ Clone RRW anywhere you want
 - ✅ Use full path to `install.sh` when setting up projects
 - ✅ Symlinks mean updates propagate to all projects
 - ✅ Each project gets its own `CLUEWRITE.md` and `scripts/`

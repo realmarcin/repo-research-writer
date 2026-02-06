@@ -1,17 +1,17 @@
-# ClueWrite 📝
+# Repo Research Writer (RRW) 📝
 
 **Transform your research code into publication-ready manuscripts automatically.**
 
-ClueWrite is an AI-powered system that reads your research repository—code, data, and notebooks—and generates scientifically accurate manuscripts with verified facts, proper citations, and journal-specific formatting.
+Repo Research Writer (RRW) is an AI-powered system that reads your research repository—code, data, and notebooks—and generates scientifically accurate manuscripts with verified facts, proper citations, and journal-specific formatting.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🎯 What ClueWrite Does
+## 🎯 What RRW Does
 
 Instead of manually translating your computational research into text:
 
 ```
-Your Research Repo          ClueWrite              Publication
+Your Research Repo            RRW                  Publication
 ├── data/results.csv    ──────────────────>    ┌─────────────────┐
 ├── scripts/analyze.py  ──────────────────>    │ Abstract        │
 ├── figures/fig1.png    ──────────────────>    │ Introduction    │
@@ -21,7 +21,7 @@ Your Research Repo          ClueWrite              Publication
                                                 └─────────────────┘
 ```
 
-ClueWrite:
+RRW:
 - ✅ **Extracts findings** from your data files
 - ✅ **Verifies all numbers** against source CSVs
 - ✅ **Describes methods** by reading your code
@@ -40,17 +40,17 @@ cd my-research-project
 # Edit CLUEWRITE.md with your findings and data sources
 
 # Step 2: Plan the manuscript
-"Use cluewrite-plan-manuscript to create an outline for Bioinformatics journal"
+"Use /rrw-plan-manuscript to create an outline for Bioinformatics journal"
 
 # Step 3: Research the literature
-"Use cluewrite-research-literature to find relevant background papers and related work"
+"Use /rrw-research-literature to find relevant background papers and related work"
 
 # Step 3: Draft sections
-"Use cluewrite-draft-section to write the Methods section"
-"Use cluewrite-draft-section to write the Results section"
+"Use /rrw-draft-section to write the Methods section"
+"Use /rrw-draft-section to write the Results section"
 
 # Step 4: Review for compliance
-"Use cluewrite-review-manuscript to check the draft"
+"Use /rrw-review-manuscript to check the draft"
 ```
 
 **Result**: A complete manuscript draft where every claim is traced back to your source data.
@@ -65,7 +65,7 @@ The `example/` directory contains a complete demonstration:
 - Figures: `accuracy_comparison.png`
 - BibTeX: `references.bib`
 
-**ClueWrite Output**:
+**RRW Output**:
 - Detailed manuscript plan mapping data→sections
 - Methods section describing the code implementation
 - Results section with verified statistics
@@ -79,47 +79,47 @@ The `example/` directory contains a complete demonstration:
 ### Global Installation (Recommended - Use Across All Projects)
 
 ```bash
-# 1. Clone ClueWrite to a permanent location
-git clone https://github.com/realmarcin/research-writer.git ~/research-writer
+# 1. Clone RRW to a permanent location
+git clone https://github.com/realmarcin/repo-research-writer.git ~/repo-research-writer
 # Note: You can clone anywhere, just remember the path!
 
 # 2. Install globally
-cd ~/research-writer
+cd ~/repo-research-writer
 ./install.sh global
 
 # 3. Setup any research project
 cd /path/to/your/research/project
-~/research-writer/install.sh setup-project
+~/repo-research-writer/install.sh setup-project
 ```
 
 **If you cloned to a different location:**
 ```bash
-# Replace ~/research-writer with your actual path
-cd /your/actual/path/to/research-writer
+# Replace ~/repo-research-writer with your actual path
+cd /your/actual/path/to/repo-research-writer
 ./install.sh global
 
 # Then use the full path when setting up projects
 cd /path/to/your/research/project
-/your/actual/path/to/research-writer/install.sh setup-project
+/your/actual/path/to/repo-research-writer/install.sh setup-project
 ```
 
 ### What install.sh Does
 
 #### `./install.sh global`
 - Creates `~/.claude/skills/` directory
-- Creates **symbolic links** (not copies) pointing to ClueWrite skills:
+- Creates **symbolic links** (not copies) pointing to RRW skills:
   ```
-  ~/.claude/skills/cluewrite-plan-manuscript → /path/to/cluewrite/.claude/skills/cluewrite-plan-manuscript
-  ~/.claude/skills/cluewrite-draft-section → /path/to/cluewrite/.claude/skills/cluewrite-draft-section
-  ~/.claude/skills/cluewrite-review-manuscript → /path/to/cluewrite/.claude/skills/cluewrite-review-manuscript
+  ~/.claude/skills/rrw-plan-manuscript → /path/to/repo-research-writer/.claude/skills/rrw-plan-manuscript
+  ~/.claude/skills/rrw-draft-section → /path/to/repo-research-writer/.claude/skills/rrw-draft-section
+  ~/.claude/skills/rrw-review-manuscript → /path/to/repo-research-writer/.claude/skills/rrw-review-manuscript
   ```
-- **Benefit**: Update ClueWrite once (`git pull`), all projects get updates automatically
+- **Benefit**: Update RRW once (`git pull`), all projects get updates automatically
 
 #### `./install.sh setup-project`
 Prepares your research project by:
-1. Creating directory structure (`cluewrite-drafts/`, `scripts/`, `figures/`, `data/`)
+1. Creating directory structure (`rrw-drafts/`, `scripts/`, `figures/`, `data/`)
 2. Copying `CLUEWRITE.md` template for documenting findings
-3. Copying verification tools (`cluewrite-verify-stats.py`, `cluewrite-clean-ipynb.py`)
+3. Copying verification tools (`rrw-verify-stats.py`, `rrw-clean-ipynb.py`)
 4. Creating `.gitignore` for manuscript drafts
 
 #### `./install.sh local`
@@ -142,37 +142,37 @@ your-project/
 
 ### 2. Planning
 
-The `cluewrite-plan-manuscript` skill creates a detailed outline:
+The `/rrw-plan-manuscript` skill creates a detailed outline:
 - Maps each section to specific files
 - Links claims to data sources
 - Applies journal-specific structure
 
 ### 3. Drafting with Verification
 
-The `cluewrite-draft-section` skill:
+The `/rrw-draft-section` skill:
 - Reads relevant code/data files
 - Generates academic prose
-- **Verifies every number** using `cluewrite-verify-stats.py`
+- **Verifies every number** using `rrw-verify-stats.py`
 - Cites from your `references.bib`
 
 Example fact-checking:
 ```bash
 # Agent writes: "The model achieved 87% accuracy"
 # Behind the scenes:
-python scripts/cluewrite-verify-stats.py --file data/results.csv --col accuracy --op mean
+python scripts/rrw-verify-stats.py --file data/results.csv --col accuracy --op mean
 # Returns: 0.87 ✓
 ```
 
 ### 4. Review
 
-The `cluewrite-review-manuscript` skill acts as "Reviewer #2":
+The `/rrw-review-manuscript` skill acts as "Reviewer #2":
 - Checks journal-specific requirements
 - Verifies citation integrity
 - Flags missing figures or data availability statements
 
 ## 🎓 Skills Included
 
-### `cluewrite-plan-manuscript`
+### `/rrw-plan-manuscript`
 Maps your repository to a manuscript outline for your target journal.
 
 **Supports**:
@@ -180,7 +180,7 @@ Maps your repository to a manuscript outline for your target journal.
 - PLOS Computational Biology
 - Bioinformatics
 
-### `cluewrite-draft-section`
+### `/rrw-draft-section`
 Writes individual sections with fact-checking.
 
 **Features**:
@@ -189,7 +189,7 @@ Writes individual sections with fact-checking.
 - Generates LaTeX equations from code
 - Maintains variable name consistency
 
-### `cluewrite-review-manuscript`
+### `/rrw-review-manuscript`
 Reviews drafts for compliance and accuracy.
 
 **Checks**:
@@ -204,7 +204,7 @@ Your research project should have:
 
 ```
 your-research-project/
-├── .claude/skills/        # ClueWrite skills (symlinked)
+├── .claude/skills/        # RRW skills (symlinked)
 ├── CLUEWRITE.md            # Your project context
 ├── manuscript/            # All manuscript outputs (schema-validated)
 │   ├── outline.md        # Manuscript plan
@@ -228,48 +228,48 @@ See [MANUSCRIPT_SCHEMA.md](MANUSCRIPT_SCHEMA.md) for detailed naming conventions
 
 ## 🛠️ Verification Tools
 
-ClueWrite includes Python tools to ensure accuracy:
+RRW includes Python tools to ensure accuracy:
 
-### `cluewrite-verify-stats.py`
+### `rrw-verify-stats.py`
 Verifies numerical claims against source data:
 ```bash
-python scripts/cluewrite-verify-stats.py \
+python scripts/rrw-verify-stats.py \
   --file data/results.csv \
   --col accuracy \
   --op mean
 # Output: 0.8734
 ```
 
-### `cluewrite-clean-ipynb.py`
+### `rrw-clean-ipynb.py`
 Converts Jupyter notebooks to clean markdown:
 ```bash
-python scripts/cluewrite-clean-ipynb.py notebook.ipynb -o clean.md
+python scripts/rrw-clean-ipynb.py notebook.ipynb -o clean.md
 # Removes base64 images, keeps code and markdown
 ```
 
-### `cluewrite-validate-manuscript.py`
+### `rrw-validate-manuscript.py`
 Validates manuscript outputs against LinkML schema:
 ```bash
 # Validate outline
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/outline.md \
   --type outline
 
 # Validate section
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/methods.md \
   --type section
 
 # Validate full manuscript
-python scripts/cluewrite-validate-manuscript.py \
+python scripts/rrw-validate-manuscript.py \
   --file manuscript/full_manuscript.md \
   --type manuscript
 ```
 
-### `cluewrite-assemble-manuscript.py`
+### `rrw-assemble-manuscript.py`
 Assembles individual sections into full manuscript:
 ```bash
-python scripts/cluewrite-assemble-manuscript.py
+python scripts/rrw-assemble-manuscript.py
 # Creates manuscript/full_manuscript.md from sections
 ```
 
@@ -289,13 +289,13 @@ Skills automatically validate outputs after generation. See [MANUSCRIPT_SCHEMA.m
 
 ```mermaid
 graph LR
-    A[Research Code] --> B[cluewrite-plan-manuscript]
+    A[Research Code] --> B[/rrw-plan-manuscript]
     B --> C[manuscript/outline.md]
-    C --> D[cluewrite-draft-section]
+    C --> D[/rrw-draft-section]
     D --> E[manuscript/*.md sections]
     E --> F[Assemble]
     F --> G[manuscript/full_manuscript.md]
-    G --> H[cluewrite-review-manuscript]
+    G --> H[/rrw-review-manuscript]
     H --> I[manuscript/review_manuscript_v1.md]
     I --> J[Revise & Finalize]
 ```
@@ -350,7 +350,7 @@ optimizer = torch.optim.AdamW(
 ## 🤝 Contributing
 
 We welcome contributions! To add:
-- **New journal templates**: Add to skills/cluewrite-plan-manuscript
+- **New journal templates**: Add to skills/rrw-plan-manuscript
 - **New verification tools**: Add to scripts/
 - **Documentation improvements**: Update README or USAGE_GUIDE
 
@@ -364,14 +364,14 @@ MIT License - see [LICENSE](LICENSE)
 
 ## 🙏 Citation
 
-If ClueWrite helps your research, please cite:
+If RRW helps your research, please cite:
 
 ```bibtex
-@software{cluewrite2026,
-  title={ClueWrite: Repository-Driven Scientific Manuscript Generation},
-  author={ClueWrite Contributors},
+@software{rrw2026,
+  title={Repo Research Writer (RRW): Repository-Driven Scientific Manuscript Generation},
+  author={RRW Contributors},
   year={2026},
-  url={https://github.com/realmarcin/research-writer}
+  url={https://github.com/realmarcin/repo-research-writer}
 }
 ```
 
@@ -403,32 +403,32 @@ A: No! The verification loop ensures every number comes from your data files.
 2. **Try the example**: `cd example/` and explore
 3. **Install globally**:
    ```bash
-   cd /path/where/you/cloned/cluewrite
+   cd /path/where/you/cloned/repo-research-writer
    ./install.sh global
    ```
 4. **Setup your project**:
    ```bash
    cd /your/research/project
-   /path/to/cluewrite/install.sh setup-project
+   /path/to/repo-research-writer/install.sh setup-project
    ```
-5. **Start writing**: In your AI agent, type `/cluewrite-workflow` for guided assistance
+5. **Start writing**: In your AI agent, type `/rrw-workflow` for guided assistance
 
 ## 🔍 Installation Troubleshooting
 
 **"Skills not found"?**
 - Check if skills are linked: `ls -la ~/.claude/skills/`
-- Verify symlinks point to correct location: `readlink ~/.claude/skills/cluewrite-plan-manuscript`
-- If path is wrong, re-run: `./install.sh global` from the correct ClueWrite directory
+- Verify symlinks point to correct location: `readlink ~/.claude/skills/rrw-plan-manuscript`
+- If path is wrong, re-run: `./install.sh global` from the correct RRW directory
 
 **"Can't find install.sh"?**
-- Make sure you're in the ClueWrite repository directory
-- Check: `pwd` should show the path where you cloned ClueWrite
+- Make sure you're in the RRW repository directory
+- Check: `pwd` should show the path where you cloned RRW
 - The directory should contain: `.claude/`, `scripts/`, `README.md`, `install.sh`
 
-**Want to move ClueWrite?**
+**Want to move RRW?**
 ```bash
 # If you move the repo, re-run global install
-cd /new/location/of/research-writer
+cd /new/location/of/repo-research-writer
 ./install.sh global
 # This will update the symlinks
 ```

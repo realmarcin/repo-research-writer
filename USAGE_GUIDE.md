@@ -8,18 +8,18 @@ Let's say you have a research project at `/Users/yourname/research/my-awesome-pr
 
 ```bash
 # Clone this repo to a permanent location (adjust path as needed)
-git clone https://github.com/realmarcin/research-writer.git ~/research-writer
+git clone https://github.com/realmarcin/repo-research-writer.git ~/repo-research-writer
 # OR clone to wherever you prefer:
-# git clone https://github.com/realmarcin/research-writer.git /your/preferred/path
+# git clone https://github.com/realmarcin/repo-research-writer.git /your/preferred/path
 
 # Run the installer (automatically creates symlinks)
-cd ~/research-writer  # or cd /your/preferred/path
+cd ~/repo-research-writer  # or cd /your/preferred/path
 ./install.sh global
 ```
 
 **What this does:**
 - Creates `~/.claude/skills/` directory
-- Creates symbolic links pointing to ClueWrite skills
+- Creates symbolic links pointing to RRW skills
 - Skills are now available in all AI agent sessions
 
 **Benefits**: Skills are available to ALL your projects. Update once, use everywhere.
@@ -31,8 +31,8 @@ cd ~/research-writer  # or cd /your/preferred/path
 cd /Users/yourname/research/my-awesome-project
 
 # Run the project setup script
-~/research-writer/install.sh setup-project
-# OR if you cloned elsewhere: /your/path/to/research-writer/install.sh setup-project
+~/repo-research-writer/install.sh setup-project
+# OR if you cloned elsewhere: /your/path/to/repo-research-writer/install.sh setup-project
 
 # Edit CLUEWRITE.md with your project details
 nano CLUEWRITE.md  # or use your preferred editor
@@ -71,9 +71,9 @@ cd /Users/yourname/research/my-awesome-project
 In the agent, invoke the skills:
 
 ```
-"Use the cluewrite-plan-manuscript skill to create an outline targeting Nature Methods"
+"Use the /rrw-plan-manuscript skill to create an outline targeting Nature Methods"
 
-"Use the cluewrite-draft-section skill to write the Methods section"
+"Use the /rrw-draft-section skill to write the Methods section"
 
 "Use the cluewrite-review-manuscript skill to check the draft"
 ```
@@ -185,9 +185,9 @@ Claude: Agent: [Analyzes repo, creates manuscript_plan.md]
 
 User: "Use cluewrite-draft-section to write the Results section"
 
-Claude: Agent: [Reads relevant data files, generates cluewrite-cluewrite-drafts/results.md]
+Claude: Agent: [Reads relevant data files, generates rrw-drafts/results.md]
 
-User: "Use cluewrite-review-manuscript to check it"
+User: "Use /rrw-review-manuscript to check it"
 
 Claude: Agent: [Reviews for PLOS compliance, generates review_round_1.md]
 ```
@@ -213,7 +213,7 @@ claude  # start session
 ### If using global symlinks:
 
 ```bash
-cd ~/research-writer
+cd ~/repo-research-writer
 git pull origin main
 # All projects automatically get updates
 ```
@@ -230,9 +230,9 @@ git submodule update --remote
 ```bash
 # Re-copy the updated skills
 cd /path/to/project
-rm -rf .claude/skills/research-writer-plan-manuscript
-rm -rf .claude/skills/research-writer-draft-section
-rm -rf .claude/skills/research-writer-review-manuscript
+rm -rf .claude/skills/rrw-plan-manuscript
+rm -rf .claude/skills/rrw-draft-section
+rm -rf .claude/skills/rrw-review-manuscript
 
 git clone <this-repo-url> temp-skills
 cp -r temp-skills/.claude/skills/* .claude/skills/
@@ -243,7 +243,7 @@ rm -rf temp-skills
 
 **Skills not found?**
 - Check symlinks: `ls -la ~/.claude/skills/`
-- Verify SKILL.md exists: `cat ~/.claude/skills/research-writer-plan-manuscript/SKILL.md`
+- Verify SKILL.md exists: `cat ~/.claude/skills/rrw-plan-manuscript/SKILL.md`
 
 **Verification scripts failing?**
 - Ensure scripts are executable: `chmod +x scripts/*.py`

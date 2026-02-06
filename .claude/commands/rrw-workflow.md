@@ -1,9 +1,9 @@
 ---
-name: cluewrite-workflow
-description: Guide through the complete ClueWrite manuscript generation workflow
+name: rrw-workflow
+description: Guide through the complete RRW manuscript generation workflow
 ---
 
-# ClueWrite Workflow Assistant
+# RRW Workflow Assistant
 
 I'll guide you through the complete manuscript generation workflow. Let me first check what stage you're at.
 
@@ -14,26 +14,26 @@ Let me check your project structure:
 **Files to check:**
 - `CLUEWRITE.md` - Your documented findings
 - `manuscript_plan.md` - Manuscript outline
-- `cluewrite-drafts/literature_review.md` - Literature research
-- `cluewrite-drafts/*.md` - Drafted sections
+- `rrw-drafts/literature_review.md` - Literature research
+- `rrw-drafts/*.md` - Drafted sections
 - `references.bib` - Citations
 
 ## Complete Workflow
 
 ### Stage 1: Project Setup ✓/✗
 **Prerequisites:**
-- [ ] ClueWrite installed globally
+- [ ] RRW installed globally
 - [ ] Project directory initialized
 - [ ] CLUEWRITE.md created and filled out
 
 **If not done:**
 ```bash
-# Install ClueWrite (one time)
-cd /path/to/research-writer && ./install.sh global
+# Install RRW (one time)
+cd /path/to/repo-research-writer && ./install.sh global
 
 # Setup this project
 cd /your/research/project
-/path/to/research-writer/install.sh setup-project
+/path/to/repo-research-writer/install.sh setup-project
 
 # Edit CLUEWRITE.md with your findings
 ```
@@ -45,19 +45,19 @@ cd /your/research/project
 
 **Run:**
 ```
-Use cluewrite-plan-manuscript to create an outline for [Your Target Journal]
+Use /rrw-plan-manuscript to create an outline for [Your Target Journal]
 ```
 
 **Examples:**
-- "Use cluewrite-plan-manuscript for Nature Methods"
-- "Use cluewrite-plan-manuscript for PLOS Computational Biology"
-- "Use cluewrite-plan-manuscript for Bioinformatics"
+- "Use /rrw-plan-manuscript for Nature Methods"
+- "Use /rrw-plan-manuscript for PLOS Computational Biology"
+- "Use /rrw-plan-manuscript for Bioinformatics"
 
 **Output:** `manuscript_plan.md`
 
 **Then review:**
 ```
-Use cluewrite-review-manuscript to review manuscript_plan.md
+Use /rrw-review-manuscript to review manuscript_plan.md
 ```
 
 ---
@@ -67,7 +67,7 @@ Use cluewrite-review-manuscript to review manuscript_plan.md
 
 **Run:**
 ```
-Use cluewrite-research-literature to research background for [your topic]
+Use /rrw-research-literature to research background for [your topic]
 ```
 
 **Example:**
@@ -76,13 +76,13 @@ Use cluewrite-research-literature for transformer-based protein structure predic
 ```
 
 **Outputs:**
-- `cluewrite-drafts/literature_review.md` (summary)
+- `rrw-drafts/literature_review.md` (summary)
 - `bib_additions.bib` (new citations with DOIs)
 - `literature_evidence.csv` (quotes for verification)
 
 **Then review:**
 ```
-Use cluewrite-review-manuscript to review cluewrite-drafts/literature_review.md
+Use /rrw-review-manuscript to review cluewrite-drafts/literature_review.md
 ```
 
 **Manual step:**
@@ -100,33 +100,33 @@ cat bib_additions.bib >> references.bib
 
 1. **Methods** (most straightforward)
    ```
-   Use cluewrite-draft-section to write the Methods section
+   Use /rrw-draft-section to write the Methods section
    ```
 
 2. **Results** (based on data)
    ```
-   Use cluewrite-draft-section to write the Results section
+   Use /rrw-draft-section to write the Results section
    ```
 
 3. **Introduction** (with literature context)
    ```
-   Use cluewrite-draft-section to write the Introduction section
+   Use /rrw-draft-section to write the Introduction section
    ```
 
 4. **Discussion** (synthesize everything)
    ```
-   Use cluewrite-draft-section to write the Discussion section
+   Use /rrw-draft-section to write the Discussion section
    ```
 
 5. **Abstract** (summarize complete work)
    ```
-   Use cluewrite-draft-section to write the Abstract
+   Use /rrw-draft-section to write the Abstract
    ```
 
 **After each section, verify numbers:**
 ```bash
 # Example: Check accuracy claim
-python scripts/research-writer-verify-stats.py \
+python scripts/rrw-verify-stats.py \
   --file data/results.csv \
   --col accuracy \
   --op mean
@@ -139,12 +139,12 @@ python scripts/research-writer-verify-stats.py \
 
 **Run:**
 ```
-Use cluewrite-review-manuscript to review the complete manuscript
+Use /rrw-review-manuscript to review the complete manuscript
 ```
 
 **Specify file:**
 ```
-Use cluewrite-review-manuscript to review cluewrite-drafts/full_manuscript.md
+Use /rrw-review-manuscript to review rrw-drafts/full_manuscript.md
 ```
 
 **Output:** `review_manuscript_round_1.md`
@@ -166,12 +166,12 @@ cat cluewrite-drafts/abstract.md \
     cluewrite-drafts/methods.md \
     cluewrite-drafts/results.md \
     cluewrite-drafts/discussion.md \
-    > cluewrite-drafts/full_manuscript.md
+    > rrw-drafts/full_manuscript.md
 ```
 
 **Compile to PDF (if pandoc installed):**
 ```bash
-pandoc cluewrite-drafts/full_manuscript.md \
+pandoc rrw-drafts/full_manuscript.md \
   -o manuscript.pdf \
   --bibliography references.bib \
   --csl styles/nature.csl
@@ -190,27 +190,27 @@ pandoc cluewrite-drafts/full_manuscript.md \
 
 ```bash
 # Planning
-"Use cluewrite-plan-manuscript for [Journal]"
+"Use /rrw-plan-manuscript for [Journal]"
 
 # Literature
 "Use cluewrite-research-literature for [topic]"
 
 # Drafting (one at a time)
-"Use cluewrite-draft-section to write the Methods section"
-"Use cluewrite-draft-section to write the Results section"
-"Use cluewrite-draft-section to write the Introduction section"
-"Use cluewrite-draft-section to write the Discussion section"
-"Use cluewrite-draft-section to write the Abstract"
+"Use /rrw-draft-section to write the Methods section"
+"Use /rrw-draft-section to write the Results section"
+"Use /rrw-draft-section to write the Introduction section"
+"Use /rrw-draft-section to write the Discussion section"
+"Use /rrw-draft-section to write the Abstract"
 
 # Reviewing
-"Use cluewrite-review-manuscript to review [file]"
+"Use /rrw-review-manuscript to review [file]"
 ```
 
 ---
 
 ## Need Help?
 
-- **Detailed workflow:** See `WORKFLOW.md` in ClueWrite repository
+- **Detailed workflow:** See `WORKFLOW.md` in RRW repository
 - **Example project:** See `example/` directory
 - **Installation issues:** See `INSTALL.md`
 - **Usage scenarios:** See `USAGE_GUIDE.md`

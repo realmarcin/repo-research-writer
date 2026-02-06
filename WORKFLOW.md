@@ -1,4 +1,4 @@
-# ClueWrite Workflow Guide
+# Repo Research Writer (RRW) Workflow Guide
 
 Complete step-by-step workflow for generating a scientific manuscript from your research repository.
 
@@ -14,21 +14,21 @@ Research Repository → Manuscript Outline → Literature Review → Draft Secti
 
 **Goal**: Set up your project structure and document your findings.
 
-#### Step 1.1: Install ClueWrite (One-time)
+#### Step 1.1: Install RRW (One-time)
 ```bash
-cd /path/to/research-writer
+cd /path/to/repo-research-writer
 ./install.sh global
 ```
 
 #### Step 1.2: Setup Your Research Project
 ```bash
 cd /path/to/your/research/project
-/path/to/research-writer/install.sh setup-project
+/path/to/repo-research-writer/install.sh setup-project
 ```
 
 **Creates:**
 - `CLUEWRITE.md` (template)
-- `cluewrite-drafts/`, `scripts/`, `figures/`, `data/` directories
+- `rrw-drafts/`, `scripts/`, `figures/`, `data/` directories
 - Verification scripts
 
 #### Step 1.3: Document Your Findings
@@ -57,7 +57,7 @@ Edit `CLUEWRITE.md` with:
 
 #### Step 2.1: Generate Outline
 ```
-Use cluewrite-plan-manuscript to create an outline for [Target Journal]
+Use /rrw-plan-manuscript to create an outline for [Target Journal]
 ```
 
 **Example:**
@@ -73,7 +73,7 @@ Use cluewrite-plan-manuscript to create an outline for [Target Journal]
 
 #### Step 2.2: Review Outline (Optional but Recommended)
 ```
-Use cluewrite-review-manuscript to review the outline in manuscript_plan.md
+Use /rrw-review-manuscript to review the outline in manuscript_plan.md
 ```
 
 **Checks:**
@@ -97,12 +97,12 @@ Use cluewrite-review-manuscript to review the outline in manuscript_plan.md
 
 #### Step 3.1: Research Background and Related Work
 ```
-Use cluewrite-research-literature to find relevant papers for my [topic] manuscript
+Use /rrw-research-literature to find relevant papers for my [topic] manuscript
 ```
 
 **Example:**
 ```
-"Use cluewrite-research-literature to research background for transformer-based protein structure prediction"
+"Use /rrw-research-literature to research background for transformer-based protein structure prediction"
 ```
 
 **What happens:**
@@ -114,14 +114,14 @@ Use cluewrite-research-literature to find relevant papers for my [topic] manuscr
 6. Extracts direct quotes from each paper
 
 **Outputs:**
-- `cluewrite-drafts/literature_review.md` (structured summary, ~1000 words)
+- `rrw-drafts/literature_review.md` (structured summary, ~1000 words)
 - `bib_additions.bib` (BibTeX entries with DOIs)
 - `literature_evidence.csv` (DOIs + direct quotes)
 - `literature_integration_notes.md` (where to cite)
 
 #### Step 3.2: Review Literature Coverage
 ```
-Use cluewrite-review-manuscript to review the literature review in cluewrite-drafts/literature_review.md
+Use /rrw-review-manuscript to review the literature review in rrw-drafts/literature_review.md
 ```
 
 **Checks:**
@@ -154,16 +154,16 @@ Use cluewrite-review-manuscript to review the literature review in cluewrite-dra
 
 **For each section:**
 ```
-Use cluewrite-draft-section to write the [Section Name] section
+Use /rrw-draft-section to write the [Section Name] section
 ```
 
 **Examples:**
 ```
-"Use cluewrite-draft-section to write the Methods section"
-"Use cluewrite-draft-section to write the Results section"
-"Use cluewrite-draft-section to write the Introduction section"
-"Use cluewrite-draft-section to write the Discussion section"
-"Use cluewrite-draft-section to write the Abstract"
+"Use /rrw-draft-section to write the Methods section"
+"Use /rrw-draft-section to write the Results section"
+"Use /rrw-draft-section to write the Introduction section"
+"Use /rrw-draft-section to write the Discussion section"
+"Use /rrw-draft-section to write the Abstract"
 ```
 
 **What happens:**
@@ -178,7 +178,7 @@ Use cluewrite-draft-section to write the [Section Name] section
 After drafting, manually verify key claims:
 ```bash
 # Check a specific statistic
-python scripts/research-writer-verify-stats.py \
+python scripts/rrw-verify-stats.py \
   --file data/results.csv \
   --col accuracy \
   --op mean
@@ -204,12 +204,12 @@ grep "alphafold2021" literature_evidence.csv
 
 #### Step 5.1: Review Complete Draft
 ```
-Use cluewrite-review-manuscript to review the complete manuscript draft
+Use /rrw-review-manuscript to review the complete manuscript draft
 ```
 
 **Point to main manuscript file or specify sections:**
 ```
-"Use cluewrite-review-manuscript to review cluewrite-drafts/full_manuscript.md"
+"Use /rrw-review-manuscript to review rrw-drafts/full_manuscript.md"
 ```
 
 **Checks:**
@@ -231,7 +231,7 @@ Work through review report systematically:
 
 **Revise sections:**
 ```
-"Use cluewrite-draft-section to revise the Methods section addressing [specific issue]"
+"Use /rrw-draft-section to revise the Methods section addressing [specific issue]"
 ```
 
 #### Step 5.3: Iterate
@@ -247,19 +247,19 @@ Work through review report systematically:
 #### Step 6.1: Combine Sections
 ```bash
 # Manually combine all sections
-cat cluewrite-drafts/abstract.md \
-    cluewrite-drafts/introduction.md \
-    cluewrite-drafts/methods.md \
-    cluewrite-drafts/results.md \
-    cluewrite-drafts/discussion.md \
-    > cluewrite-drafts/full_manuscript.md
+cat rrw-drafts/abstract.md \
+    rrw-drafts/introduction.md \
+    rrw-drafts/methods.md \
+    rrw-drafts/results.md \
+    rrw-drafts/discussion.md \
+    > rrw-drafts/full_manuscript.md
 ```
 
 #### Step 6.2: Compile to PDF (Optional)
 
 Using Pandoc (if installed):
 ```bash
-pandoc cluewrite-drafts/full_manuscript.md \
+pandoc rrw-drafts/full_manuscript.md \
   -o manuscript.pdf \
   --bibliography references.bib \
   --csl styles/[journal].csl \
@@ -285,28 +285,28 @@ pandoc cluewrite-drafts/full_manuscript.md \
 
 ```bash
 # 1. Plan
-"Use cluewrite-plan-manuscript for [Journal]"
+"Use /rrw-plan-manuscript for [Journal]"
 
 # 2. Research
-"Use cluewrite-research-literature for background"
+"Use /rrw-research-literature for background"
 
 # 3. Review outline and literature
-"Use cluewrite-review-manuscript to review manuscript_plan.md"
-"Use cluewrite-review-manuscript to review literature_review.md"
+"Use /rrw-review-manuscript to review manuscript_plan.md"
+"Use /rrw-review-manuscript to review literature_review.md"
 
 # 4. Draft sections (in order)
-"Use cluewrite-draft-section to write Methods"
-"Use cluewrite-draft-section to write Results"
-"Use cluewrite-draft-section to write Introduction"
-"Use cluewrite-draft-section to write Discussion"
-"Use cluewrite-draft-section to write Abstract"
+"Use /rrw-draft-section to write Methods"
+"Use /rrw-draft-section to write Results"
+"Use /rrw-draft-section to write Introduction"
+"Use /rrw-draft-section to write Discussion"
+"Use /rrw-draft-section to write Abstract"
 
 # 5. Review and revise
-"Use cluewrite-review-manuscript to review the complete draft"
+"Use /rrw-review-manuscript to review the complete draft"
 # Address feedback, iterate
 
 # 6. Compile
-cat cluewrite-drafts/*.md > cluewrite-drafts/full_manuscript.md
+cat rrw-drafts/*.md > rrw-drafts/full_manuscript.md
 ```
 
 ---
@@ -318,7 +318,7 @@ cat cluewrite-drafts/*.md > cluewrite-drafts/full_manuscript.md
 your-research-project/
 ├── CLUEWRITE.md                          # Your documented findings
 ├── manuscript_plan.md                   # Generated outline
-├── cluewrite-drafts/
+├── rrw-drafts/
 │   ├── literature_review.md            # Literature summary
 │   ├── abstract.md                     # Drafted sections
 │   ├── introduction.md
@@ -335,7 +335,7 @@ your-research-project/
 ├── data/
 │   └── *.csv                           # Your research data
 ├── scripts/
-│   ├── cluewrite-verify-stats.py       # Verification tools
+│   ├── rrw-verify-stats.py       # Verification tools
 │   └── *.py                            # Your analysis scripts
 └── figures/
     └── *.png                           # Your figures
@@ -363,7 +363,7 @@ your-research-project/
 
 ### During Drafting
 - ✅ Draft one section at a time
-- ✅ Verify every number with cluewrite-verify-stats.py
+- ✅ Verify every number with rrw-verify-stats.py
 - ✅ Use exact citation keys from bib_index.md
 
 ### During Review
@@ -388,7 +388,7 @@ your-research-project/
 ls -la ~/.claude/skills/
 
 # Re-install if needed
-cd /path/to/research-writer
+cd /path/to/repo-research-writer
 ./install.sh global
 ```
 
@@ -451,4 +451,4 @@ grep "alphafold2021" references.bib
 
 ---
 
-**Ready to start?** Run: `/research-writer-workflow` in your research project to begin!
+**Ready to start?** Run: `/rrw-workflow` in your research project to begin!

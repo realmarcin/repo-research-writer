@@ -1,5 +1,5 @@
 ---
-name: cluewrite-draft-section
+name: rrw-draft-section
 description: Drafts a specific manuscript section using repository data and citation indices. Enforces fact-checking via Python tools.
 allowed-tools:
 context: fork
@@ -23,7 +23,7 @@ context: fork
 **CRITICAL:** You must verify all numerical claims.
 *   Before finalizing a sentence containing a number, locate that number in the source file (`*.csv` or `*.log`).
 *   If the number involves a calculation (e.g., mean, p-value), generate a temporary Python script to compute it from the raw data and verify your claim.
-*   **Command:** `python scripts/cluewrite-verify-stats.py --file <PATH> --col [NAME] --op [mean/max/min]`
+*   **Command:** `python scripts/rrw-verify-stats.py --file <PATH> --col [NAME] --op [mean/max/min]`
 
 ## Figure referencing
 *   Ensure every Figure mentioned is referenced as "Figure X" (capitalized).
@@ -43,7 +43,7 @@ Write the section to `manuscript/SECTIONNAME.md` where SECTIONNAME is:
 
 After drafting, validate the section:
 ```bash
-python scripts/cluewrite-validate-manuscript.py --file manuscript/SECTIONNAME.md --type section
+python scripts/rrw-validate-manuscript.py --file manuscript/SECTIONNAME.md --type section
 ```
 
 Report validation status. If validation fails, fix issues and re-validate.

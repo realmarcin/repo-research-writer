@@ -1,5 +1,5 @@
 ---
-name: cluewrite-research-literature
+name: rrw-research-literature
 description: Performs deep literature research on manuscript topics and generates a comprehensive one-page summary of background and related work with citations.
 allowed-tools:
 context: fork
@@ -28,7 +28,7 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 1. **Read Context Documents:**
    - Read `CLUEWRITE.md` to understand the research domain
    - Read `manuscript_plan.md` if available (for detailed topics)
-   - Read `cluewrite-cluewrite-drafts/introduction.md` or `cluewrite-cluewrite-drafts/abstract.md` if available
+   - Read `manuscript/introduction.md` or `manuscript/abstract.md` if available
    - Read `references.bib` to see what's already cited
 
 2. **Extract Key Research Topics:**
@@ -234,7 +234,7 @@ Generate **three files** in the `manuscript/` directory (per schema: schemas/man
 
 After generating files, validate the literature review:
 ```bash
-python scripts/cluewrite-validate-manuscript.py --file manuscript/literature.md --type literature
+python scripts/rrw-validate-manuscript.py --file manuscript/literature.md --type literature
 ```
 
 If validation passes, confirm completion. If it fails, fix issues and re-validate.
@@ -301,7 +301,7 @@ After generating the literature review:
 ## Example Usage
 
 ```
-User: "Use cluewrite-research-literature to research the background for my protein structure prediction paper"
+User: "Use /rrw-research-literature to research the background for my protein structure prediction paper"
 
 Agent:
 1. Reads CLUEWRITE.md and manuscript_plan.md
@@ -320,7 +320,7 @@ Agent:
    - literature_integration_notes.md
 7. Provides integration guidance
 
-Output: "✓ Literature review complete. Found 20 relevant papers (5 foundational, 8 related work, 7 recent). Generated cluewrite-drafts/literature_review.md (950 words), bib_additions.bib (20 entries with DOIs), and literature_evidence.csv (20 evidence quotes)."
+Output: "✓ Literature review complete. Found 20 relevant papers (5 foundational, 8 related work, 7 recent). Generated manuscript/literature.md (950 words), manuscript/literature_citations.bib (20 entries with DOIs), and manuscript/literature_evidence.csv (20 evidence quotes)."
 ```
 
 ## Evidence File Example
