@@ -242,7 +242,7 @@ graph LR
     A[Research Code] --> B[cluewrite-plan-manuscript]
     B --> C[manuscript_plan.md]
     C --> D[cluewrite-draft-section]
-    D --> E[drafts/*.md]
+    D --> E[cluewrite-drafts/*.md]
     E --> F[cluewrite-review-manuscript]
     F --> G[review_report.md]
     G --> H[Revise & Compile]

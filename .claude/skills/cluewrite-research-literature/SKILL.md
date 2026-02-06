@@ -28,7 +28,7 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 1. **Read Context Documents:**
    - Read `CLUEWRITE.md` to understand the research domain
    - Read `manuscript_plan.md` if available (for detailed topics)
-   - Read `cluewrite-drafts/introduction.md` or `cluewrite-drafts/abstract.md` if available
+   - Read `cluewrite-cluewrite-drafts/introduction.md` or `cluewrite-cluewrite-drafts/abstract.md` if available
    - Read `references.bib` to see what's already cited
 
 2. **Extract Key Research Topics:**
@@ -72,7 +72,7 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 
 ### Phase 3: Synthesis
 
-Generate a structured summary in `cluewrite-drafts/literature_review.md`:
+Generate a structured summary in `cluewrite-cluewrite-drafts/literature_review.md`:
 
 ```markdown
 # Literature Review: [Manuscript Topic]
@@ -212,7 +212,7 @@ doi,citation_key,evidence
 
 Generate **four files**:
 
-1. **`cluewrite-drafts/literature_review.md`**
+1. **`cluewrite-cluewrite-drafts/literature_review.md`**
    - One-page structured summary (800-1000 words)
    - Organized by themes, not chronologically
    - Includes citation keys in [author2024] format
@@ -315,7 +315,7 @@ Agent:
    - literature_integration_notes.md
 7. Provides integration guidance
 
-Output: "✓ Literature review complete. Found 20 relevant papers (5 foundational, 8 related work, 7 recent). Generated drafts/literature_review.md (950 words), bib_additions.bib (20 entries with DOIs), and literature_evidence.csv (20 evidence quotes)."
+Output: "✓ Literature review complete. Found 20 relevant papers (5 foundational, 8 related work, 7 recent). Generated cluewrite-drafts/literature_review.md (950 words), bib_additions.bib (20 entries with DOIs), and literature_evidence.csv (20 evidence quotes)."
 ```
 
 ## Evidence File Example

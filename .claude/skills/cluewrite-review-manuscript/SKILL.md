@@ -27,7 +27,7 @@ Focus on:
 - Missing sections or components
 - Target journal structure compliance
 
-### If reviewing `cluewrite-drafts/literature_review.md`:
+### If reviewing `cluewrite-cluewrite-drafts/literature_review.md`:
 Focus on:
 - Coverage completeness (foundational, related, recent)
 - Citation accuracy and verifiability
@@ -35,7 +35,7 @@ Focus on:
 - Integration guidance quality
 - Balance between domains/approaches
 
-### If reviewing manuscript drafts (`cluewrite-drafts/*.md`):
+### If reviewing manuscript drafts (`cluewrite-cluewrite-drafts/*.md`):
 Focus on:
 - Technical accuracy and reproducibility
 - Journal-specific compliance
@@ -108,7 +108,7 @@ Focus on:
 ## Prose Linting (For Manuscript Drafts)
 
 Run the prose linter:
-`python scripts/cluewrite-lint-manuscript.py drafts/full_manuscript.md`
+`python scripts/cluewrite-lint-manuscript.py cluewrite-drafts/full_manuscript.md`
 
 ## Output Format
 

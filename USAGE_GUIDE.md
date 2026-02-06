@@ -39,7 +39,7 @@ nano CLUEWRITE.md  # or use your preferred editor
 ```
 
 **What this does:**
-- Creates directory structure (drafts/, scripts/, figures/, data/)
+- Creates directory structure (cluewrite-drafts/, scripts/, figures/, data/)
 - Copies CLUEWRITE.md template
 - Copies verification scripts
 - Creates .gitignore
@@ -185,7 +185,7 @@ Claude: Agent: [Analyzes repo, creates manuscript_plan.md]
 
 User: "Use cluewrite-draft-section to write the Results section"
 
-Claude: Agent: [Reads relevant data files, generates cluewrite-drafts/results.md]
+Claude: Agent: [Reads relevant data files, generates cluewrite-cluewrite-drafts/results.md]
 
 User: "Use cluewrite-review-manuscript to check it"
 

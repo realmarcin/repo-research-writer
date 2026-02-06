@@ -21,7 +21,7 @@ example/
 │   └── training_curve.png      # Figure 2
 ├── notebooks/
 │   └── exploratory_analysis.ipynb
-├── PROJECT.md                   # Project context for ClueWrite
+├── CLUEWRITE.md                   # Project context for ClueWrite
 └── references.bib              # Citations
 
 ```
@@ -30,14 +30,14 @@ example/
 
 ### Step 1: Initialize Project Context
 
-See `PROJECT.md` for the project context that guides the AI agent.
+See `CLUEWRITE.md` for the project context that guides the AI agent.
 
 ### Step 2: Plan the Manuscript
 
 ```
 User: "Use cluewrite-plan-manuscript to create an outline for Bioinformatics journal"
 
-Agent: [Reads PROJECT.md, scans data/ and scripts/]
+Agent: [Reads CLUEWRITE.md, scans data/ and scripts/]
        [Creates manuscript_plan.md with sections mapped to files]
 ```
 
@@ -50,10 +50,10 @@ User: "Use cluewrite-draft-section to write the Methods section"
 
 Agent: [Reads scripts/train_model.py and scripts/evaluate.py]
        [References data files to understand pipeline]
-       [Generates drafts/methods.md]
+       [Generates cluewrite-drafts/methods.md]
 ```
 
-Output: `drafts/methods.md`
+Output: `cluewrite-drafts/methods.md`
 
 ```
 User: "Use cluewrite-draft-section to write the Results section"
@@ -61,17 +61,17 @@ User: "Use cluewrite-draft-section to write the Results section"
 Agent: [Reads data/benchmark_results.csv]
        [Verifies numbers using cluewrite-verify-stats.py]
        [References figures/accuracy_comparison.png]
-       [Generates drafts/results.md]
+       [Generates cluewrite-drafts/results.md]
 ```
 
-Output: `drafts/results.md`
+Output: `cluewrite-drafts/results.md`
 
 ### Step 4: Review for Compliance
 
 ```
 User: "Use cluewrite-review-manuscript to check the draft"
 
-Agent: [Reads all drafts/*]
+Agent: [Reads all cluewrite-drafts/*]
        [Checks Bioinformatics journal requirements]
        [Verifies citation integrity]
        [Generates review_round_1.md]
@@ -86,7 +86,7 @@ After running the full workflow:
 ```
 example/
 ├── manuscript_plan.md          # Detailed outline
-├── drafts/
+├── cluewrite-drafts/
 │   ├── abstract.md
 │   ├── introduction.md
 │   ├── methods.md
