@@ -7,18 +7,20 @@ Let's say you have a research project at `/Users/yourname/research/my-awesome-pr
 ### Step 1: Install the Skills Globally (Do Once)
 
 ```bash
-# Clone this repo to a permanent location
-cd ~
-git clone <this-repo-url> cluewrite
+# Clone this repo to a permanent location (adjust path as needed)
+git clone https://github.com/realmarcin/cluewrite.git ~/cluewrite
+# OR clone to wherever you prefer:
+# git clone https://github.com/realmarcin/cluewrite.git /your/preferred/path
 
-# Create global skills directory
-mkdir -p ~/.claude/skills
-
-# Create symlinks
-ln -s ~/cluewrite/.claude/skills/plan-manuscript ~/.claude/skills/
-ln -s ~/cluewrite/.claude/skills/draft-section ~/.claude/skills/
-ln -s ~/cluewrite/.claude/skills/review-manuscript ~/.claude/skills/
+# Run the installer (automatically creates symlinks)
+cd ~/cluewrite  # or cd /your/preferred/path
+./install.sh global
 ```
+
+**What this does:**
+- Creates `~/.claude/skills/` directory
+- Creates symbolic links pointing to ClueWrite skills
+- Skills are now available in all AI agent sessions
 
 **Benefits**: Skills are available to ALL your projects. Update once, use everywhere.
 
@@ -28,24 +30,33 @@ ln -s ~/cluewrite/.claude/skills/review-manuscript ~/.claude/skills/
 # Navigate to your project
 cd /Users/yourname/research/my-awesome-project
 
-# Create required directories
-mkdir -p drafts scripts
-
-# Copy PROJECT.md template
-cp ~/cluewrite/PROJECT.md.template ./PROJECT.md
+# Run the project setup script
+~/cluewrite/install.sh setup-project
+# OR if you cloned elsewhere: /your/path/to/cluewrite/install.sh setup-project
 
 # Edit PROJECT.md with your project details
 nano PROJECT.md  # or use your preferred editor
 ```
 
-### Step 3: Add Supporting Scripts (Optional but Recommended)
+**What this does:**
+- Creates directory structure (drafts/, scripts/, figures/, data/)
+- Copies PROJECT.md template
+- Copies verification scripts
+- Creates .gitignore
 
+### Step 3: Add Supporting Scripts
+
+**Note:** If you used `install.sh setup-project`, the scripts are already copied!
+
+The setup script automatically:
+- Copies `verify_stats.py` to `scripts/`
+- Copies `clean_ipynb.py` to `scripts/`
+- Makes them executable
+
+**Manual copy (if needed):**
 ```bash
-# Copy verification scripts to your project
 cp ~/cluewrite/scripts/verify_stats.py ./scripts/
 cp ~/cluewrite/scripts/clean_ipynb.py ./scripts/
-
-# Make them executable
 chmod +x scripts/*.py
 ```
 

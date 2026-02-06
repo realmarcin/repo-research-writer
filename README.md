@@ -73,11 +73,12 @@ The `example/` directory contains a complete demonstration:
 
 ## 🔧 Installation
 
-### Global Installation (Use Across All Projects)
+### Global Installation (Recommended - Use Across All Projects)
 
 ```bash
-# 1. Clone ClueWrite
+# 1. Clone ClueWrite to a permanent location
 git clone https://github.com/realmarcin/cluewrite.git ~/cluewrite
+# Note: You can clone anywhere, just remember the path!
 
 # 2. Install globally
 cd ~/cluewrite
@@ -88,14 +89,40 @@ cd /path/to/your/research/project
 ~/cluewrite/install.sh setup-project
 ```
 
-### What This Does
+**If you cloned to a different location:**
+```bash
+# Replace ~/cluewrite with your actual path
+cd /your/actual/path/to/cluewrite
+./install.sh global
 
-- Creates `~/.claude/skills/` with symbolic links to ClueWrite skills
-- Skills become available in all your AI agent sessions
-- Each project gets:
-  - `PROJECT.md` template for documenting your findings
-  - `scripts/` with verification tools
-  - `drafts/` for manuscript sections
+# Then use the full path when setting up projects
+cd /path/to/your/research/project
+/your/actual/path/to/cluewrite/install.sh setup-project
+```
+
+### What install.sh Does
+
+#### `./install.sh global`
+- Creates `~/.claude/skills/` directory
+- Creates **symbolic links** (not copies) pointing to ClueWrite skills:
+  ```
+  ~/.claude/skills/plan-manuscript → /path/to/cluewrite/.claude/skills/plan-manuscript
+  ~/.claude/skills/draft-section → /path/to/cluewrite/.claude/skills/draft-section
+  ~/.claude/skills/review-manuscript → /path/to/cluewrite/.claude/skills/review-manuscript
+  ```
+- **Benefit**: Update ClueWrite once (`git pull`), all projects get updates automatically
+
+#### `./install.sh setup-project`
+Prepares your research project by:
+1. Creating directory structure (`drafts/`, `scripts/`, `figures/`, `data/`)
+2. Copying `PROJECT.md` template for documenting findings
+3. Copying verification tools (`verify_stats.py`, `clean_ipynb.py`)
+4. Creating `.gitignore` for manuscript drafts
+
+#### `./install.sh local`
+- Copies (not symlinks) skills directly to current project's `.claude/skills/`
+- Use when you want project-specific skill customization
+- Updates require re-copying to each project
 
 ## 📖 How It Works
 
@@ -317,9 +344,37 @@ A: No! The verification loop ensures every number comes from your data files.
 ## 🎯 Next Steps
 
 1. **Try the example**: `cd example/` and explore
-2. **Install globally**: `./install.sh global`
-3. **Setup your project**: Use `setup-project` in your research directory
+2. **Install globally**:
+   ```bash
+   cd /path/where/you/cloned/cluewrite
+   ./install.sh global
+   ```
+3. **Setup your project**:
+   ```bash
+   cd /your/research/project
+   /path/to/cluewrite/install.sh setup-project
+   ```
 4. **Start writing**: Use the skills with your AI agent
+
+## 🔍 Installation Troubleshooting
+
+**"Skills not found"?**
+- Check if skills are linked: `ls -la ~/.claude/skills/`
+- Verify symlinks point to correct location: `readlink ~/.claude/skills/plan-manuscript`
+- If path is wrong, re-run: `./install.sh global` from the correct ClueWrite directory
+
+**"Can't find install.sh"?**
+- Make sure you're in the ClueWrite repository directory
+- Check: `pwd` should show the path where you cloned ClueWrite
+- The directory should contain: `.claude/`, `scripts/`, `README.md`, `install.sh`
+
+**Want to move ClueWrite?**
+```bash
+# If you move the repo, re-run global install
+cd /new/location/of/cluewrite
+./install.sh global
+# This will update the symlinks
+```
 
 ---
 
