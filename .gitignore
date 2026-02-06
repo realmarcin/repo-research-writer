@@ -8,31 +8,27 @@ env/
 venv/
 ENV/
 
-# Drafts and outputs (project-specific)
+# Self-generated manuscripts (when running RRWrite on itself)
+# Examples in examples/ are committed; self-docs in manuscript/ are gitignored
+manuscript/repo-research-writer_*/
+manuscript/archives/
+
+# Keep manuscript directory structure in git
+!manuscript/.gitkeep
+
+# Legacy drafts and outputs (project-specific)
 drafts/
 manuscript_plan.md
 critique_round_*.md
 repo_map.md
 bib_index.md
 
-# State tracking (Note: state.json should be committed for collaboration)
-# manuscript/.rrwrite/state.json should be included in Git
-
-# Data files (users should manage their own)
+# Data files (examples use committed data; users manage their own)
 data/raw/
 data/processed/
-*.csv
-*.xlsx
 
-# Figures (users should manage their own)
+# Figures (examples use committed figures; users manage their own)
 figures/
-
-# Generated PDFs
-*.pdf
-
-# Jupyter Notebooks
-.ipynb_checkpoints/
-*.ipynb
 
 # OS
 .DS_Store

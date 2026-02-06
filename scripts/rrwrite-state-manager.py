@@ -17,14 +17,29 @@ import subprocess
 class StateManager:
     """Manages the RRWrite workflow state file."""
 
-    def __init__(self, project_root: str = "."):
+    def __init__(self, project_root: str = ".", output_dir: Optional[str] = None):
         """Initialize state manager.
 
         Args:
-            project_root: Root directory of the research project
+            project_root: Root directory of the research project (for legacy mode)
+            output_dir: Explicit output directory for manuscript files (new model).
+                       If provided, this overrides the default manuscript/ location.
+                       Example: "manuscript/repo_v1"
         """
         self.project_root = Path(project_root).resolve()
-        self.manuscript_dir = self.project_root / "manuscript"
+
+        if output_dir:
+            # New model: output_dir is explicit (e.g., "manuscript/repo_v1")
+            # Support both absolute and relative paths
+            output_path = Path(output_dir)
+            if output_path.is_absolute():
+                self.manuscript_dir = output_path
+            else:
+                self.manuscript_dir = self.project_root / output_path
+        else:
+            # Legacy model: for backward compatibility
+            self.manuscript_dir = self.project_root / "manuscript"
+
         self.state_dir = self.manuscript_dir / ".rrwrite"
         self.state_file = self.state_dir / "state.json"
 
@@ -504,6 +519,47 @@ class StateManager:
 
         return history
 
+    @staticmethod
+    def get_next_version(repo_name: str, base_dir: str = "manuscript",
+                        project_root: str = ".") -> int:
+        """Scan for existing <repo_name>_v* directories and return next version.
+
+        Args:
+            repo_name: Normalized repository name
+            base_dir: Base directory to scan for versions (default: "manuscript")
+            project_root: Root directory of the project (default: ".")
+
+        Returns:
+            Next version number (integer)
+
+        Example:
+            If manuscript/my-repo_v1/ and manuscript/my-repo_v3/ exist,
+            returns 4 (next available version).
+        """
+        import re
+
+        root = Path(project_root).resolve()
+        base = root / base_dir
+
+        if not base.exists():
+            return 1
+
+        # Find all directories matching <repo_name>_v*
+        existing = list(base.glob(f"{repo_name}_v*"))
+        versions = []
+
+        for d in existing:
+            if not d.is_dir():
+                continue
+
+            # Extract version number
+            match = re.match(rf"{re.escape(repo_name)}_v(\d+)$", d.name)
+            if match:
+                versions.append(int(match.group(1)))
+
+        # Return next version (max + 1, or 1 if no versions exist)
+        return max(versions, default=0) + 1
+
 
 def main():
     """Command-line interface for state manager."""
@@ -514,7 +570,7 @@ def main():
     )
     parser.add_argument(
         "action",
-        choices=["init", "show"],
+        choices=["init", "show", "next-version"],
         help="Action to perform"
     )
     parser.add_argument(
@@ -525,10 +581,36 @@ def main():
         "--journal",
         help="Target journal (for init)"
     )
+    parser.add_argument(
+        "--output-dir",
+        help="Output directory for manuscript files (e.g., manuscript/repo_v1)"
+    )
+    parser.add_argument(
+        "--repo-name",
+        help="Repository name (for next-version)"
+    )
+    parser.add_argument(
+        "--base-dir",
+        default="manuscript",
+        help="Base directory for version scanning (default: manuscript)"
+    )
 
     args = parser.parse_args()
 
-    manager = StateManager()
+    if args.action == "next-version":
+        if not args.repo_name:
+            print("Error: --repo-name required for next-version action")
+            return 1
+
+        next_ver = StateManager.get_next_version(
+            args.repo_name,
+            base_dir=args.base_dir
+        )
+        print(next_ver)
+        return 0
+
+    # For init and show, create manager
+    manager = StateManager(output_dir=args.output_dir)
 
     if args.action == "init":
         state = manager.initialize_state(
@@ -547,6 +629,9 @@ def main():
         else:
             print(json.dumps(state, indent=2))
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())

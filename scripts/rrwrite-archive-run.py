@@ -70,19 +70,20 @@ def create_run_metadata(run_dir: Path, state: dict, journal: str = None) -> dict
     return metadata
 
 
-def archive_run(description: str = None, journal: str = None) -> None:
-    """Archive current manuscript state as a run.
+def archive_run(source_dir: str = None, description: str = None, journal: str = None) -> None:
+    """Archive manuscript state as a run.
 
     Args:
-        description: Optional description for run directory name
+        source_dir: Source directory to archive (e.g., manuscript/repo_v1)
+        description: Optional description for archive directory name
         journal: Target journal for this run
     """
-    # Initialize state manager
-    manager = StateManager()
+    # Initialize state manager with source_dir
+    manager = StateManager(output_dir=source_dir) if source_dir else StateManager()
 
     # Check manuscript directory exists
     if not manager.manuscript_dir.exists():
-        print(f"Error: manuscript/ directory not found in {manager.project_root}")
+        print(f"Error: {manager.manuscript_dir} directory not found")
         sys.exit(1)
 
     # Read current state
@@ -98,12 +99,13 @@ def archive_run(description: str = None, journal: str = None) -> None:
     else:
         run_id = timestamp
 
-    # Create runs directory if needed
-    runs_dir = manager.manuscript_dir / "runs"
-    runs_dir.mkdir(exist_ok=True)
+    # Create archives directory at manuscript/ level (not inside versioned dir)
+    # New model: manuscript/archives/ instead of manuscript/runs/
+    archives_dir = manager.project_root / "manuscript" / "archives"
+    archives_dir.mkdir(parents=True, exist_ok=True)
 
-    # Create run directory
-    run_dir = runs_dir / run_id
+    # Create archive directory
+    run_dir = archives_dir / run_id
     if run_dir.exists():
         print(f"Error: Run directory already exists: {run_dir}")
         sys.exit(1)
@@ -166,7 +168,7 @@ def archive_run(description: str = None, journal: str = None) -> None:
     print()
 
     # Update state with run info
-    outputs = {filename: f"runs/{run_id}/{filename}" for filename in copied_files}
+    outputs = {filename: f"archives/{run_id}/{filename}" for filename in copied_files}
     manager.add_run(run_id, target_journal=journal, outputs=outputs)
     manager.complete_run(run_id, outputs=outputs)
 
@@ -200,21 +202,26 @@ def archive_run(description: str = None, journal: str = None) -> None:
     print()
 
     print("Next steps:")
-    print("  1. Active workspace remains in manuscript/")
+    print(f"  1. Active workspace remains in {manager.manuscript_dir.relative_to(manager.project_root)}/")
     print("  2. Continue refining current version, or")
-    print("  3. Start new run for different journal/approach")
+    print("  3. Create new version for different approach")
     print()
 
 
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Archive current manuscript state as a workflow run"
+        description="Archive manuscript state as a workflow run"
+    )
+    parser.add_argument(
+        "--source-dir",
+        "-s",
+        help="Source directory to archive (e.g., manuscript/repo_v1). Defaults to manuscript/"
     )
     parser.add_argument(
         "--description",
         "-d",
-        help="Short description for run (e.g., 'nature-methods-v1')"
+        help="Short description for archive (e.g., 'final-submission')"
     )
     parser.add_argument(
         "--journal",
@@ -224,7 +231,7 @@ def main():
 
     args = parser.parse_args()
 
-    archive_run(description=args.description, journal=args.journal)
+    archive_run(source_dir=args.source_dir, description=args.description, journal=args.journal)
 
 
 if __name__ == "__main__":

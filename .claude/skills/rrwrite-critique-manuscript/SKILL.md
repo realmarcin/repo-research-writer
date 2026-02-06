@@ -1,6 +1,10 @@
 ---
 name: rrwrite-critique-manuscript
 description: Performs adversarial critique of manuscripts, outlines, literature reviews, or other academic content against journal requirements and quality standards.
+arguments:
+  - name: target_dir
+    description: Output directory for manuscript files (e.g., manuscript/repo_v1)
+    default: manuscript
 allowed-tools:
 ---
 # Academic Critique Protocol
@@ -27,7 +31,7 @@ Focus on:
 - Missing sections or components
 - Target journal structure compliance
 
-### If critiquing `manuscript/literature.md`:
+### If critiquing `{target_dir}/literature.md`:
 Focus on:
 - Coverage completeness (foundational, related, recent)
 - Citation accuracy and verifiability
@@ -35,7 +39,7 @@ Focus on:
 - Integration guidance quality
 - Balance between domains/approaches
 
-### If critiquing manuscript drafts (`manuscript/*.md`):
+### If critiquing manuscript drafts (`{target_dir}/*.md`):
 Focus on:
 - Technical accuracy and reproducibility
 - Journal-specific compliance
@@ -108,15 +112,15 @@ Focus on:
 ## Prose Linting (For Manuscript Drafts)
 
 Run the prose linter:
-`python scripts/rrwrite-lint-manuscript.py manuscript/full_manuscript.md`
+`python scripts/rrwrite-lint-manuscript.py {target_dir}/full_manuscript.md`
 
 ## Output Format (per schema: schemas/manuscript.yaml)
 
-Generate a critique report in `manuscript/` directory with naming convention:
-- Manuscript: `manuscript/critique_manuscript_v1.md` (increment version number for subsequent critiques)
-- Outline: `manuscript/critique_outline_v1.md`
-- Literature: `manuscript/critique_literature_v1.md`
-- Section: `manuscript/critique_section_v1.md`
+Generate a critique report in `{target_dir}/` directory with naming convention:
+- Manuscript: `{target_dir}/critique_manuscript_v1.md` (increment version number for subsequent critiques)
+- Outline: `{target_dir}/critique_outline_v1.md`
+- Literature: `{target_dir}/critique_literature_v1.md`
+- Section: `{target_dir}/critique_section_v1.md`
 
 **Filename pattern:** `critique_TYPE_vN.md` where TYPE is (outline|literature|section|manuscript) and N is version number
 
@@ -175,7 +179,7 @@ Generate a critique report in `manuscript/` directory with naming convention:
 
 After generating the critique, validate it:
 ```bash
-python scripts/rrwrite-validate-manuscript.py --file manuscript/critique_TYPE_vN.md --type critique
+python scripts/rrwrite-validate-manuscript.py --file {target_dir}/critique_TYPE_vN.md --type critique
 ```
 
 ## State Update
@@ -187,7 +191,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path('scripts').resolve()))
 from rrwrite_state_manager import StateManager
 
-manager = StateManager()
+manager = StateManager(output_dir="{target_dir}")
 
 # Get version number from filename or use manager method
 critique_type = "manuscript"  # or "outline", "literature", "section"
@@ -201,7 +205,7 @@ recommendation = "MAJOR_REVISIONS"  # Extract from recommendation section
 manager.add_critique_iteration(
     critique_type=critique_type,
     version=version,
-    file_path=f"manuscript/critique_{critique_type}_v{version}.md",
+    file_path=f"{target_dir}/critique_{critique_type}_v{version}.md",
     recommendation=recommendation,
     major_issues=major_issues,
     minor_issues=minor_issues
@@ -210,7 +214,7 @@ manager.add_critique_iteration(
 
 Display updated progress:
 ```bash
-python scripts/rrwrite-status.py
+python scripts/rrwrite-status.py --output-dir {target_dir}
 ```
 
 Report validation status, critique iteration, and updated workflow progress. If validation passes, confirm critique completion.

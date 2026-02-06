@@ -1,6 +1,10 @@
 ---
 name: rrwrite-plan-manuscript
 description: Analyzes the repository structure and generates a detailed manuscript outline based on target journal guidelines (Nature, PLOS, Bioinformatics).
+arguments:
+  - name: target_dir
+    description: Output directory for manuscript files (e.g., manuscript/repo_v1)
+    default: manuscript
 allowed-tools:
 ---
 # Manuscript Planning Protocol
@@ -12,6 +16,20 @@ allowed-tools:
     *   Find all analysis notebooks (`*.ipynb`) and scripts (`*.py`).
     *   Find all figures (`*.png`, `*.pdf`).
 3.  **Read Context:** Read `README.md` and `PROJECT.md` to understand the project goals.
+
+## Phase 1.5: Load Word Limit Configuration
+Before planning sections, load the word limit configuration for the target journal:
+
+```bash
+python scripts/rrwrite-config-manager.py --journal {journal} --export
+```
+
+This returns:
+- Total manuscript word limit
+- Per-section word targets (min, target, max)
+- Journal-specific formatting requirements
+
+**IMPORTANT**: Use these limits when specifying word counts in the outline. The default 6000-word total ensures concise, focused manuscripts.
 
 ## Phase 2: Journal Template Selection
 Ask the user for the target journal. Based on the response, adopt the corresponding structure:
@@ -31,16 +49,16 @@ Ask the user for the target journal. Based on the response, adopt the correspond
 *   **Focus:** Software utility, Performance benchmarks.
 
 ## Phase 3: Outline Synthesis
-Generate a file named `manuscript/outline.md`. For each section in the template:
+Generate a file named `{target_dir}/outline.md` (where {target_dir} is the output directory specified when calling this skill, default: manuscript). For each section in the template:
 1.  **Write a Description:** What represents the core argument of this section?
 2.  **Link Files:** Explicitly list the relative paths of the code/data files that support this section.
     *   *Example:* "Results > Section 2.1: Performance. Supports: `results/accuracy_table.csv`, `figures/fig2_roc.png`."
-3.  **Word Count Target:** Specify estimated word count for each section.
+3.  **Word Count Target:** Use the word limits from Phase 1.5 configuration. Include min, target, and max for each section.
 
 ## Required Structure (per schema: schemas/manuscript.yaml)
 
 The outline MUST include:
-- Filename: `manuscript/outline.md`
+- Filename: `{target_dir}/outline.md`
 - Target journal specification
 - Sections with:
   - Section name (Abstract, Introduction, Methods, Results, Discussion)
@@ -50,10 +68,10 @@ The outline MUST include:
 
 ## Output and Validation
 
-1. Create `manuscript/outline.md` with the structured plan
+1. Create `{target_dir}/outline.md` with the structured plan
 2. Validate the outline:
    ```bash
-   python scripts/rrwrite-validate-manuscript.py --file manuscript/outline.md --type outline
+   python scripts/rrwrite-validate-manuscript.py --file {target_dir}/outline.md --type outline
    ```
 3. Update workflow state (mark planning stage as completed):
    ```python
@@ -62,14 +80,14 @@ The outline MUST include:
    sys.path.insert(0, str(Path('scripts').resolve()))
    from rrwrite_state_manager import StateManager
 
-   manager = StateManager()
-   manager.update_workflow_stage("plan", status="completed", file_path="manuscript/outline.md")
+   manager = StateManager(output_dir="{target_dir}")
+   manager.update_workflow_stage("plan", status="completed", file_path="{target_dir}/outline.md")
    ```
 4. Display progress:
    ```bash
-   python scripts/rrwrite-status.py
+   python scripts/rrwrite-status.py --output-dir {target_dir}
    ```
 5. If validation passes, confirm creation and ask user to review
 6. If validation fails, fix issues and re-validate
 
-Confirm the creation of `manuscript/outline.md` and validation status. Show the updated workflow status.
+Confirm the creation of `{target_dir}/outline.md` and validation status. Show the updated workflow status.

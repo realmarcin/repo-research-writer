@@ -199,15 +199,19 @@ def display_status(state: dict, detailed: bool = False, manager: StateManager = 
 
         has_history = False
         for filename in key_files:
-            file_path = f"manuscript/{filename}"
-            history = manager.get_file_history(file_path, limit=1)
-            if history:
-                if not has_history:
-                    print("Recent File Changes:")
-                    print("-" * 60)
-                    has_history = True
-                h = history[0]
-                print(f"  • {filename}: {h['date']} - {h['message'][:50]}")
+            # Use manager's manuscript_dir for path
+            file_path = manager.manuscript_dir / filename
+            if file_path.exists():
+                # Get relative path from project root
+                rel_path = file_path.relative_to(manager.project_root)
+                history = manager.get_file_history(str(rel_path), limit=1)
+                if history:
+                    if not has_history:
+                        print("Recent File Changes:")
+                        print("-" * 60)
+                        has_history = True
+                    h = history[0]
+                    print(f"  • {filename}: {h['date']} - {h['message'][:50]}")
 
         if has_history:
             print()
@@ -216,10 +220,10 @@ def display_status(state: dict, detailed: bool = False, manager: StateManager = 
     if manager and manager.check_uncommitted_changes():
         print("⚠️  Uncommitted Changes Detected")
         print("-" * 60)
-        print("You have uncommitted changes in manuscript/")
+        print(f"You have uncommitted changes in {manager.manuscript_dir.relative_to(manager.project_root)}/")
         print()
         print("Recommendation: Commit before running skills")
-        print("  git add manuscript/")
+        print(f"  git add {manager.manuscript_dir.relative_to(manager.project_root)}/")
         print('  git commit -m "Work in progress"')
         print()
 
@@ -304,11 +308,15 @@ def main():
         default=".",
         help="Project directory (default: current directory)"
     )
+    parser.add_argument(
+        "--output-dir",
+        help="Output directory for manuscript files (e.g., manuscript/repo_v1)"
+    )
 
     args = parser.parse_args()
 
     # Initialize state manager
-    manager = StateManager(args.project_dir)
+    manager = StateManager(args.project_dir, output_dir=args.output_dir)
 
     # Read state
     state = manager.read_state()

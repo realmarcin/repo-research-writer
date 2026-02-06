@@ -1,6 +1,10 @@
 ---
 name: rrwrite-research-literature
 description: Performs deep literature research on manuscript topics and generates a comprehensive one-page summary of background and related work with citations.
+arguments:
+  - name: target_dir
+    description: Output directory for manuscript files (e.g., manuscript/repo_v1)
+    default: manuscript
 allowed-tools:
 context: fork
 ---
@@ -28,7 +32,7 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 1. **Read Context Documents:**
    - Read `PROJECT.md` to understand the research domain
    - Read `manuscript_plan.md` if available (for detailed topics)
-   - Read `manuscript/introduction.md` or `manuscript/abstract.md` if available
+   - Read `{target_dir}/introduction.md` or `{target_dir}/abstract.md` if available
    - Read `references.bib` to see what's already cited
 
 2. **Extract Key Research Topics:**
@@ -72,7 +76,7 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 
 ### Phase 3: Synthesis
 
-Generate a structured summary in `manuscript/literature.md`:
+Generate a structured summary in `{target_dir}/literature.md`:
 
 ```markdown
 # Literature Review: [Manuscript Topic]
@@ -210,21 +214,21 @@ doi,citation_key,evidence
 
 ## Output Files
 
-Generate **three files** in the `manuscript/` directory (per schema: schemas/manuscript.yaml):
+Generate **three files** in the `{target_dir}/` directory (per schema: schemas/manuscript.yaml):
 
-1. **`manuscript/literature.md`**
+1. **`{target_dir}/literature.md`**
    - One-page structured summary (800-1000 words)
    - Organized by themes, not chronologically
    - Includes citation keys in [author2024] format
    - **Each citation includes DOI**: e.g., [jumper2021, DOI:10.1038/...]
    - Required sections: Background, Related Work, Recent Advances, Research Gaps
 
-2. **`manuscript/literature_citations.bib`**
+2. **`{target_dir}/literature_citations.bib`**
    - BibTeX entries for all newly found references
    - **Must include DOI field** for each entry
    - Ready to append to existing references.bib
 
-3. **`manuscript/literature_evidence.csv`**
+3. **`{target_dir}/literature_evidence.csv`**
    - **Three columns**: doi, citation_key, evidence
    - Direct quotes from each cited paper
    - Enables verification and evidence chains
@@ -234,7 +238,7 @@ Generate **three files** in the `manuscript/` directory (per schema: schemas/man
 
 After generating files, validate the literature review:
 ```bash
-python scripts/rrwrite-validate-manuscript.py --file manuscript/literature.md --type literature
+python scripts/rrwrite-validate-manuscript.py --file {target_dir}/literature.md --type literature
 ```
 
 ## State Update
@@ -246,20 +250,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path('scripts').resolve()))
 from rrwrite_state_manager import StateManager
 
-manager = StateManager()
+manager = StateManager(output_dir="{target_dir}")
 # Count papers from literature_citations.bib
 import re
-with open('manuscript/literature_citations.bib', 'r') as f:
+with open('{target_dir}/literature_citations.bib', 'r') as f:
     papers_found = len(re.findall(r'^@\w+{', f.read(), re.MULTILINE))
 
 manager.update_workflow_stage("research", status="completed",
-                              file_path="manuscript/literature.md",
+                              file_path="{target_dir}/literature.md",
                               papers_found=papers_found)
 ```
 
 Display updated progress:
 ```bash
-python scripts/rrwrite-status.py
+python scripts/rrwrite-status.py --output-dir {target_dir}
 ```
 
 If validation passes, confirm completion and show progress. If it fails, fix issues and re-validate.

@@ -100,7 +100,8 @@ def assemble_manuscript(manuscript_dir="manuscript", output_file=None):
         sys.path.insert(0, str(Path(__file__).parent))
         from rrwrite_state_manager import StateManager
 
-        manager = StateManager()
+        # Use manuscript_dir as output_dir for state manager
+        manager = StateManager(output_dir=str(manuscript_dir))
         manager.update_workflow_stage(
             "assembly",
             status="completed",
@@ -125,17 +126,24 @@ def main():
     parser.add_argument(
         '--manuscript-dir',
         default='manuscript',
-        help='Directory containing section files (default: manuscript)'
+        help='Directory containing section files (default: manuscript). Deprecated, use --output-dir instead.'
+    )
+    parser.add_argument(
+        '--output-dir',
+        help='Output directory for manuscript files (e.g., manuscript/repo_v1). Takes precedence over --manuscript-dir.'
     )
     parser.add_argument(
         '--output',
         default=None,
-        help='Output file path (default: manuscript/full_manuscript.md)'
+        help='Output file path (default: <output-dir>/full_manuscript.md)'
     )
 
     args = parser.parse_args()
 
-    success = assemble_manuscript(args.manuscript_dir, args.output)
+    # Prefer --output-dir over --manuscript-dir
+    manuscript_dir = args.output_dir if args.output_dir else args.manuscript_dir
+
+    success = assemble_manuscript(manuscript_dir, args.output)
 
     if not success:
         exit(1)

@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """
-Compare two workflow runs.
+Compare two workflow runs or manuscript versions.
 
 Usage:
-    python scripts/rrwrite-compare-runs.py run1 run2
+    python scripts/rrwrite-compare-runs.py dir1 dir2
+
+Examples:
+    # Compare two versioned manuscripts
+    python scripts/rrwrite-compare-runs.py manuscript/repo_v1 manuscript/repo_v2
+
+    # Compare archived runs
     python scripts/rrwrite-compare-runs.py \
-        manuscript/runs/2026-02-05_143022_nature-methods \
-        manuscript/runs/2026-02-08_091530_plos-revised
+        manuscript/archives/2026-02-05_143022_final \
+        manuscript/archives/2026-02-08_091530_revised
 """
 
 import argparse

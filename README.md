@@ -36,8 +36,8 @@ See a real example: [example/](example/) - A complete protein structure predicti
 # In your research project directory
 cd my-research-project
 
-# Step 1: Tell ClueWrite about your project
-# Edit PROJECT.md with your findings and data sources
+# Step 1: Use RRWrite to analyze your repository
+# No PROJECT.md needed - analyzes repo automatically!
 
 # Step 2: Plan the manuscript
 "Use /rrwrite-plan-manuscript to create an outline for Bioinformatics journal"
@@ -76,62 +76,60 @@ The `example/` directory contains a complete demonstration:
 
 ## 🔧 Installation
 
-### Global Installation (Recommended - Use Across All Projects)
-
 ```bash
 # 1. Clone RRWrite to a permanent location
 git clone https://github.com/realmarcin/repo-research-writer.git ~/repo-research-writer
-# Note: You can clone anywhere, just remember the path!
 
 # 2. Install globally
 cd ~/repo-research-writer
-./install.sh global
+./install.sh
 
-# 3. Setup any research project
-cd /path/to/your/research/project
-~/repo-research-writer/install.sh setup-project
-```
-
-**If you cloned to a different location:**
-```bash
-# Replace ~/repo-research-writer with your actual path
-cd /your/actual/path/to/repo-research-writer
-./install.sh global
-
-# Then use the full path when setting up projects
-cd /path/to/your/research/project
-/your/actual/path/to/repo-research-writer/install.sh setup-project
+# That's it! RRWrite is now available globally.
 ```
 
 ### What install.sh Does
 
-#### `./install.sh global`
 - Creates `~/.claude/skills/` directory
-- Creates **symbolic links** (not copies) pointing to RRWrite skills:
+- Creates **symbolic links** pointing to RRWrite skills:
   ```
-  ~/.claude/skills/rrwrite-plan-manuscript → /path/to/repo-research-writer/.claude/skills/rrwrite-plan-manuscript
-  ~/.claude/skills/rrwrite-draft-section → /path/to/repo-research-writer/.claude/skills/rrwrite-draft-section
-  ~/.claude/skills/rrwrite-critique-manuscript → /path/to/repo-research-writer/.claude/skills/rrwrite-critique-manuscript
+  ~/.claude/skills/rrwrite-plan-manuscript
+  ~/.claude/skills/rrwrite-draft-section
+  ~/.claude/skills/rrwrite-research-literature
+  ~/.claude/skills/rrwrite-critique-manuscript
   ```
 - **Benefit**: Update RRWrite once (`git pull`), all projects get updates automatically
 
-#### `./install.sh setup-project`
-Prepares your research project by:
-1. Creating directory structure (`rrwrite-drafts/`, `scripts/`, `figures/`, `data/`)
-2. Copying `PROJECT.md` template for documenting findings
-3. Copying verification tools (`rrwrite-verify-stats.py`, `rrwrite-clean-ipynb.py`)
-4. Creating `.gitignore` for manuscript drafts
+### New Architecture: External Repository Model
 
-#### `./install.sh local`
-- Copies (not symlinks) skills directly to current project's `.claude/skills/`
-- Use when you want project-specific skill customization
-- Updates require re-copying to each project
+RRWrite now works with **external repositories** - you don't install it into your research projects!
+
+```bash
+# Analyze any repository (GitHub URL or local path)
+/rrwrite https://github.com/user/research-project --journal bioinformatics
+
+# Or analyze a local directory
+/rrwrite /path/to/my-research --journal nature
+
+# Or the current directory
+/rrwrite . --journal plos
+```
+
+All manuscripts are generated in versioned directories within RRWrite:
+```
+~/repo-research-writer/
+├── manuscript/
+│   ├── my-research_v1/    # First iteration
+│   ├── my-research_v2/    # After critique
+│   └── my-research_v3/    # Final version
+└── examples/
+    └── repo-research-writer_v1/  # Reference example
+```
 
 ## 📖 How It Works
 
 ### 1. Repository Ingestion
 
-ClueWrite reads your project structure:
+RRWrite reads your project structure:
 ```
 your-project/
 ├── data/processed/results.csv    → Numerical evidence
@@ -198,33 +196,33 @@ Critiques drafts for compliance and accuracy.
 - Figure references
 - Data availability statements
 
-## 📁 Project Structure
+## 📁 Output Structure
 
-Your research project should have:
+RRWrite generates manuscripts in versioned directories:
 
 ```
-your-research-project/
-├── .claude/skills/        # RRWrite skills (symlinked)
-├── PROJECT.md              # Your project context
-├── manuscript/            # All manuscript outputs (schema-validated)
-│   ├── outline.md        # Manuscript plan
-│   ├── literature.md     # Literature review
-│   ├── abstract.md       # Section files
-│   ├── introduction.md
-│   ├── methods.md
-│   ├── results.md
-│   ├── discussion.md
-│   └── full_manuscript.md
-├── schemas/
-│   └── manuscript.yaml   # LinkML schema definition
-├── scripts/              # Verification and validation tools
-├── data/
-│   └── processed/        # Data files with results
-├── figures/              # Generated plots
-└── references.bib        # Citations
+manuscript/
+└── <your-repo>_v1/       # First version
+    ├── outline.md        # Manuscript plan
+    ├── literature.md     # Literature review
+    ├── abstract.md       # Section files
+    ├── introduction.md
+    ├── methods.md
+    ├── results.md
+    ├── discussion.md
+    ├── literature_citations.bib  # BibTeX citations
+    ├── literature_evidence.csv   # Citation evidence
+    ├── critique_manuscript_v1.md # Quality review
+    └── .rrwrite/
+        └── state.json    # Progress tracking
 ```
 
-See [MANUSCRIPT_SCHEMA.md](MANUSCRIPT_SCHEMA.md) for detailed naming conventions and validation.
+After addressing critique feedback, create v2:
+```bash
+/rrwrite . --version v2  # Creates manuscript/<your-repo>_v2/
+```
+
+See [MANUSCRIPT_SCHEMA.md](MANUSCRIPT_SCHEMA.md) for detailed naming conventions.
 
 ## 🛠️ Verification Tools
 
@@ -289,13 +287,13 @@ Skills automatically validate outputs after generation. See [MANUSCRIPT_SCHEMA.m
 
 ```mermaid
 graph LR
-    A[Research Code] --> B[/rrwrite-plan-manuscript]
+    A[Research Code] --> B[Plan Manuscript]
     B --> C[manuscript/outline.md]
-    C --> D[/rrwrite-draft-section]
+    C --> D[Draft Sections]
     D --> E[manuscript/*.md sections]
     E --> F[Assemble]
     F --> G[manuscript/full_manuscript.md]
-    G --> H[/rrwrite-critique-manuscript]
+    G --> H[Critique]
     H --> I[manuscript/critique_manuscript_v1.md]
     I --> J[Revise & Finalize]
 ```
@@ -421,19 +419,24 @@ A: No! The verification loop ensures every number comes from your data files.
 
 ## 🎯 Next Steps
 
-1. **Read the workflow**: See [WORKFLOW.md](WORKFLOW.md) for complete guide
-2. **Try the example**: `cd example/` and explore
-3. **Install globally**:
+1. **Install RRWrite**:
    ```bash
-   cd /path/where/you/cloned/repo-research-writer
-   ./install.sh global
+   git clone https://github.com/realmarcin/repo-research-writer.git ~/repo-research-writer
+   cd ~/repo-research-writer
+   ./install.sh
    ```
-4. **Setup your project**:
+
+2. **View the example**:
    ```bash
-   cd /your/research/project
-   /path/to/repo-research-writer/install.sh setup-project
+   cat ~/repo-research-writer/examples/repo-research-writer_v1/README.md
    ```
-5. **Start writing**: In your AI agent, type `/rrwrite-workflow` for guided assistance
+
+3. **Generate your first manuscript**:
+   ```bash
+   /rrwrite /path/to/your/research --journal bioinformatics
+   ```
+
+4. **Get help**: Type `/rrwrite-workflow` in your AI agent for guided assistance
 
 ## 🔍 Installation Troubleshooting
 

@@ -1,6 +1,10 @@
 ---
 name: rrwrite-draft-section
 description: Drafts a specific manuscript section using repository data and citation indices. Enforces fact-checking via Python tools.
+arguments:
+  - name: target_dir
+    description: Output directory for manuscript files (e.g., manuscript/repo_v1)
+    default: manuscript
 allowed-tools:
 context: fork
 ---
@@ -8,13 +12,19 @@ context: fork
 
 ## Inputs
 *   **Section Name:** (e.g., "Methods", "Results", "Introduction") provided by the user or plan.
-*   **Context Files:** The list of code/data files identified in `manuscript/outline.md`.
+*   **Target Directory:** Output directory for manuscript files (e.g., manuscript/repo_v1), default: manuscript
+*   **Context Files:** The list of code/data files identified in `{target_dir}/outline.md`.
 
 ## Workflow
-1.  **Read Outline:** Read `manuscript/outline.md` to understand section requirements and evidence files.
-2.  **Load Context:** Read the specified code/data files. DO NOT read unrelated files to save tokens.
-3.  **Load Citations:** Read `references.bib` or `manuscript/literature_citations.bib` to find relevant citation keys.
-4.  **Drafting:** Write the text in Markdown.
+1.  **Read Outline:** Read `{target_dir}/outline.md` to understand section requirements and evidence files.
+2.  **Load Word Limits:** Check section-specific word limits:
+    ```bash
+    python scripts/rrwrite-config-manager.py --section {section_name}
+    ```
+    This ensures the draft meets the target word count (±20% variance allowed).
+3.  **Load Context:** Read the specified code/data files. DO NOT read unrelated files to save tokens.
+4.  **Load Citations:** Read `references.bib` or `{target_dir}/literature_citations.bib` to find relevant citation keys.
+5.  **Drafting:** Write the text in Markdown, adhering to word limits from step 2.
     *   Use **LaTeX** for math (e.g., `$x^2$`).
     *   Use **[Key]** format for citations (e.g., `[smith2020]`).
     *   **Style:** Formal academic prose. Passive voice for Methods; Active voice for Results.
@@ -31,7 +41,7 @@ context: fork
 
 ## Output and Naming (per schema: schemas/manuscript.yaml)
 
-Write the section to `manuscript/SECTIONNAME.md` where SECTIONNAME is:
+Write the section to `{target_dir}/SECTIONNAME.md` where SECTIONNAME is:
 - `abstract.md` for Abstract
 - `introduction.md` for Introduction
 - `methods.md` for Methods
@@ -43,7 +53,7 @@ Write the section to `manuscript/SECTIONNAME.md` where SECTIONNAME is:
 
 After drafting, validate the section:
 ```bash
-python scripts/rrwrite-validate-manuscript.py --file manuscript/SECTIONNAME.md --type section
+python scripts/rrwrite-validate-manuscript.py --file {target_dir}/SECTIONNAME.md --type section
 ```
 
 ## State Update
@@ -55,13 +65,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path('scripts').resolve()))
 from rrwrite_state_manager import StateManager
 
-manager = StateManager()
+manager = StateManager(output_dir="{target_dir}")
 manager.add_section_completed("SECTIONNAME")  # e.g., "methods", "results"
 ```
 
 Display updated progress:
 ```bash
-python scripts/rrwrite-status.py
+python scripts/rrwrite-status.py --output-dir {target_dir}
 ```
 
 Report validation status and updated workflow progress. If validation fails, fix issues and re-validate.
