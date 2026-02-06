@@ -55,9 +55,9 @@ Use /rrwrite-plan-manuscript to create an outline for [Your Target Journal]
 
 **Output:** `manuscript_plan.md`
 
-**Then review:**
+**Then critique:**
 ```
-Use /rrwrite-review-manuscript to review manuscript_plan.md
+Use /rrwrite-critique-manuscript to critique manuscript_plan.md
 ```
 
 ---
@@ -80,9 +80,9 @@ Use /rrwrite-research-literature for transformer-based protein structure predict
 - `bib_additions.bib` (new citations with DOIs)
 - `literature_evidence.csv` (quotes for verification)
 
-**Then review:**
+**Then critique:**
 ```
-Use /rrwrite-review-manuscript to review rrwrite-drafts/literature_review.md
+Use /rrwrite-critique-manuscript to critique rrwrite-drafts/literature_review.md
 ```
 
 **Manual step:**
@@ -134,25 +134,25 @@ python scripts/rrwrite-verify-stats.py \
 
 ---
 
-### Stage 5: Manuscript Review ✓/✗
+### Stage 5: Manuscript Critique ✓/✗
 **Goal:** Ensure quality and compliance
 
 **Run:**
 ```
-Use /rrwrite-review-manuscript to review the complete manuscript
+Use /rrwrite-critique-manuscript to critique the complete manuscript
 ```
 
 **Specify file:**
 ```
-Use /rrwrite-review-manuscript to review rrwrite-drafts/full_manuscript.md
+Use /rrwrite-critique-manuscript to critique rrwrite-drafts/full_manuscript.md
 ```
 
-**Output:** `review_manuscript_round_1.md`
+**Output:** `critique_manuscript_round_1.md`
 
 **Address feedback and iterate:**
 1. Fix major issues (scientific gaps, missing data)
 2. Fix minor issues (formatting, typos)
-3. Re-review until "accept with minor revisions"
+3. Re-critique until "accept with minor revisions"
 
 ---
 
@@ -202,8 +202,8 @@ pandoc rrwrite-drafts/full_manuscript.md \
 "Use /rrwrite-draft-section to write the Discussion section"
 "Use /rrwrite-draft-section to write the Abstract"
 
-# Reviewing
-"Use /rrwrite-review-manuscript to review [file]"
+# Critiquing
+"Use /rrwrite-critique-manuscript to critique [file]"
 ```
 
 ---

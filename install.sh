@@ -17,7 +17,7 @@ install_global() {
     mkdir -p ~/.claude/skills
 
     # Create symlinks
-    for skill in rrwrite-plan-manuscript rrwrite-draft-section rrwrite-review-manuscript rrwrite-research-literature; do
+    for skill in rrwrite-plan-manuscript rrwrite-draft-section rrwrite-critique-manuscript rrwrite-research-literature; do
         target=~/.claude/skills/$skill
         if [ -L "$target" ] || [ -e "$target" ]; then
             echo "  ⚠️  Removing existing $skill"
@@ -110,7 +110,7 @@ install_local() {
     mkdir -p .claude/skills
 
     # Copy skills to project
-    for skill in rrwrite-plan-manuscript rrwrite-draft-section rrwrite-review-manuscript rrwrite-research-literature; do
+    for skill in rrwrite-plan-manuscript rrwrite-draft-section rrwrite-critique-manuscript rrwrite-research-literature; do
         target=.claude/skills/$skill
         if [ -e "$target" ]; then
             echo "  ⚠️  Removing existing $skill"

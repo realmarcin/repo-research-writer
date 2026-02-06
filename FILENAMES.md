@@ -15,7 +15,7 @@ All RRWrite files use `rrwrite-` prefix or `CLUEWRITE` name to avoid conflicts.
 - `rrwrite-literature-review.md`
 - `rrwrite-literature-evidence.csv`
 - `rrwrite-bib-additions.bib`
-- `rrwrite-review-*.md`
+- `rrwrite-critique-*.md`
 
 ## New Schema-Based Structure
 
@@ -25,7 +25,7 @@ All new manuscript outputs go in `manuscript/` directory:
 - `manuscript/literature_citations.bib`
 - `manuscript/literature_evidence.csv`
 - `manuscript/abstract.md`, `manuscript/introduction.md`, etc.
-- `manuscript/review_TYPE_vN.md`
+- `manuscript/critique_TYPE_vN.md`
 
 ## Why?
 

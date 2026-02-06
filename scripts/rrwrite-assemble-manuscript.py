@@ -95,9 +95,9 @@ def assemble_manuscript(manuscript_dir="manuscript", output_file=None):
         print(f"  Estimated words: {words}")
 
     print("\nNext steps:")
-    print(f"1. Review the manuscript: {output_file}")
+    print(f"1. Read the manuscript: {output_file}")
     print(f"2. Validate: python scripts/rrwrite-validate-manuscript.py --file {output_file} --type manuscript")
-    print(f"3. Review: Use /rrwrite-review-manuscript skill")
+    print(f"3. Critique: Use /rrwrite-critique-manuscript skill")
 
     return True
 

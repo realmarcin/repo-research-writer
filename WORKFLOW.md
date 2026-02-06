@@ -71,9 +71,9 @@ Use /rrwrite-plan-manuscript to create an outline for [Target Journal]
 - Word count guidance
 - Journal-specific structure
 
-#### Step 2.2: Review Outline (Optional but Recommended)
+#### Step 2.2: Critique Outline (Optional but Recommended)
 ```
-Use /rrwrite-review-manuscript to review the outline in manuscript_plan.md
+Use /rrwrite-critique-manuscript to critique the outline in manuscript_plan.md
 ```
 
 **Checks:**
@@ -82,10 +82,10 @@ Use /rrwrite-review-manuscript to review the outline in manuscript_plan.md
 - Missing sections
 - Journal compliance
 
-**Output**: `review_outline.md`
+**Output**: `critique_outline.md`
 
 #### Step 2.3: Refine Outline
-- Address review feedback
+- Address critique feedback
 - Adjust section organization
 - Verify file mappings
 
@@ -119,9 +119,9 @@ Use /rrwrite-research-literature to find relevant papers for my [topic] manuscri
 - `literature_evidence.csv` (DOIs + direct quotes)
 - `literature_integration_notes.md` (where to cite)
 
-#### Step 3.2: Review Literature Coverage
+#### Step 3.2: Critique Literature Coverage
 ```
-Use /rrwrite-review-manuscript to review the literature review in rrwrite-drafts/literature_review.md
+Use /rrwrite-critique-manuscript to critique the literature review in rrwrite-drafts/literature_review.md
 ```
 
 **Checks:**
@@ -130,7 +130,7 @@ Use /rrwrite-review-manuscript to review the literature review in rrwrite-drafts
 - Balance across approaches
 - Integration guidance quality
 
-**Output**: `review_literature.md`
+**Output**: `critique_literature.md`
 
 #### Step 3.3: Integrate Citations
 - Append `bib_additions.bib` to `references.bib`
@@ -198,18 +198,18 @@ grep "alphafold2021" literature_evidence.csv
 
 ---
 
-### Phase 5: Manuscript Review
+### Phase 5: Manuscript Critique
 
 **Goal**: Identify issues and ensure journal compliance.
 
-#### Step 5.1: Review Complete Draft
+#### Step 5.1: Critique Complete Draft
 ```
-Use /rrwrite-review-manuscript to review the complete manuscript draft
+Use /rrwrite-critique-manuscript to critique the complete manuscript draft
 ```
 
 **Point to main manuscript file or specify sections:**
 ```
-"Use /rrwrite-review-manuscript to review rrwrite-drafts/full_manuscript.md"
+"Use /rrwrite-critique-manuscript to critique rrwrite-drafts/full_manuscript.md"
 ```
 
 **Checks:**
@@ -220,11 +220,11 @@ Use /rrwrite-review-manuscript to review the complete manuscript draft
 - Data availability statements
 - Word counts
 
-**Output**: `review_manuscript_round_1.md`
+**Output**: `critique_manuscript_round_1.md`
 
-#### Step 5.2: Address Review Feedback
+#### Step 5.2: Address Critique Feedback
 
-Work through review report systematically:
+Work through critique report systematically:
 - **Major Issues**: Address first (scientific gaps, missing data)
 - **Minor Issues**: Fix formatting, typos, style
 - **Action Items**: Specific fixes for each section
@@ -235,7 +235,7 @@ Work through review report systematically:
 ```
 
 #### Step 5.3: Iterate
-- Review → Revise → Review again
+- Critique → Revise → Critique again
 - Continue until "Accept with minor revisions"
 
 ---
@@ -290,9 +290,9 @@ pandoc rrwrite-drafts/full_manuscript.md \
 # 2. Research
 "Use /rrwrite-research-literature for background"
 
-# 3. Review outline and literature
-"Use /rrwrite-review-manuscript to review manuscript_plan.md"
-"Use /rrwrite-review-manuscript to review literature_review.md"
+# 3. Critique outline and literature
+"Use /rrwrite-critique-manuscript to critique manuscript_plan.md"
+"Use /rrwrite-critique-manuscript to critique literature_review.md"
 
 # 4. Draft sections (in order)
 "Use /rrwrite-draft-section to write Methods"
@@ -301,8 +301,8 @@ pandoc rrwrite-drafts/full_manuscript.md \
 "Use /rrwrite-draft-section to write Discussion"
 "Use /rrwrite-draft-section to write Abstract"
 
-# 5. Review and revise
-"Use /rrwrite-review-manuscript to review the complete draft"
+# 5. Critique and revise
+"Use /rrwrite-critique-manuscript to critique the complete draft"
 # Address feedback, iterate
 
 # 6. Compile
@@ -329,9 +329,9 @@ your-research-project/
 ├── literature_evidence.csv              # DOIs + quotes
 ├── bib_additions.bib                   # New citations
 ├── references.bib                      # All citations
-├── review_outline.md                   # Review reports
-├── review_literature.md
-├── review_manuscript_round_1.md
+├── critique_outline.md                   # Critique reports
+├── critique_literature.md
+├── critique_manuscript_round_1.md
 ├── data/
 │   └── *.csv                           # Your research data
 ├── scripts/
@@ -354,7 +354,7 @@ your-research-project/
 ### During Planning
 - ✅ Be specific in CLUEWRITE.md about key findings
 - ✅ Link every claim to a data file
-- ✅ Review outline before drafting
+- ✅ Critique outline before drafting
 
 ### During Literature Research
 - ✅ Verify all DOIs resolve
@@ -366,16 +366,16 @@ your-research-project/
 - ✅ Verify every number with rrwrite-verify-stats.py
 - ✅ Use exact citation keys from references.bib
 
-### During Review
+### During Critique
 - ✅ Address major issues before minor ones
-- ✅ Iterate until review says "accept with minor revisions"
+- ✅ Iterate until critique says "accept with minor revisions"
 - ✅ Keep evidence.csv handy for verification
 
 ### Common Pitfalls to Avoid
 - ❌ Drafting before planning (leads to poor structure)
 - ❌ Skipping literature research (weak positioning)
 - ❌ Not verifying numbers (risk of errors)
-- ❌ Ignoring review feedback (quality suffers)
+- ❌ Ignoring critique feedback (quality suffers)
 - ❌ Combining sections too early (harder to revise)
 
 ---
@@ -413,8 +413,8 @@ ls references.bib
 grep "alphafold2021" references.bib
 ```
 
-### "Review finds many issues"
-- Review the outline first (catch structure issues early)
+### "Critique finds many issues"
+- Critique the outline first (catch structure issues early)
 - Verify data → claim links in CLUEWRITE.md
 - Check evidence.csv quotes match your interpretations
 
@@ -436,7 +436,7 @@ grep "alphafold2021" references.bib
 1. **Explore the example** (`cd example/`)
    - Read CLUEWRITE.md to see how findings are documented
    - Check manuscript_plan.md to see outline structure
-   - Review literature_evidence.csv to see evidence format
+   - Read literature_evidence.csv to see evidence format
 
 2. **Try with a small project**
    - Start with 1-2 key findings
@@ -447,7 +447,7 @@ grep "alphafold2021" references.bib
    - Complete CLUEWRITE.md documentation
    - Full literature research
    - All sections drafted
-   - Multiple review rounds
+   - Multiple critique rounds
 
 ---
 

@@ -23,10 +23,10 @@ your-project/
 │   ├── discussion.md        # Discussion section
 │   ├── conclusion.md        # Conclusion section (optional)
 │   ├── full_manuscript.md   # Assembled manuscript
-│   ├── review_outline_v1.md      # Outline review
-│   ├── review_literature_v1.md   # Literature review
-│   ├── review_manuscript_v1.md   # Manuscript review
-│   └── review_manuscript_v2.md   # Subsequent review
+│   ├── critique_outline_v1.md      # Outline critique
+│   ├── critique_literature_v1.md   # Literature critique
+│   ├── critique_manuscript_v1.md   # Manuscript critique
+│   └── critique_manuscript_v2.md   # Subsequent critique
 ├── schemas/
 │   └── manuscript.yaml      # LinkML schema definition
 ├── scripts/
@@ -68,17 +68,17 @@ your-project/
 
 ### Full Manuscript
 - **Filename:** `manuscript/full_manuscript.md`
-- **Purpose:** Complete assembled manuscript ready for review/submission
+- **Purpose:** Complete assembled manuscript ready for critique/submission
 - **Contents:** All sections combined in order
 
-### Reviews
-- **Filename pattern:** `manuscript/review_TYPE_vN.md`
+### Critiques
+- **Filename pattern:** `manuscript/critique_TYPE_vN.md`
   - `TYPE`: one of `outline`, `literature`, `section`, `manuscript`
   - `N`: version number (1, 2, 3, ...)
 - **Examples:**
-  - `review_outline_v1.md`
-  - `review_manuscript_v1.md`
-  - `review_manuscript_v2.md` (after revisions)
+  - `critique_outline_v1.md`
+  - `critique_manuscript_v1.md`
+  - `critique_manuscript_v2.md` (after revisions)
 
 ## Schema Validation
 
@@ -112,10 +112,10 @@ python scripts/rrwrite-validate-manuscript.py \
   --file manuscript/full_manuscript.md \
   --type manuscript
 
-# Validate review
+# Validate critique
 python scripts/rrwrite-validate-manuscript.py \
-  --file manuscript/review_manuscript_v1.md \
-  --type review
+  --file manuscript/critique_manuscript_v1.md \
+  --type critique
 ```
 
 ## Schema Classes
@@ -146,12 +146,12 @@ Defines `full_manuscript.md`:
 - Minimum 1000 words
 - All required sections included
 - Target journal specified
-- Ready-for-review status
+- Ready-for-critique status
 
-### Review
-Defines review report structure:
+### Critique
+Defines critique report structure:
 - Correct filename pattern
-- Review type (outline, literature, section, manuscript)
+- Critique type (outline, literature, section, manuscript)
 - Version number
 - Required sections (Summary, Strengths, Issues, Recommendation)
 - Recommendation type (Accept Minor, Major Revisions, Reject)
@@ -174,8 +174,8 @@ The skills automatically use these conventions:
    - Creates `manuscript/SECTIONNAME.md`
    - Validates against schema
 
-4. **`/rrwrite-review-manuscript`**
-   - Creates `manuscript/review_TYPE_vN.md`
+4. **`/rrwrite-critique-manuscript`**
+   - Creates `manuscript/critique_TYPE_vN.md`
    - Validates against schema
 
 ## Benefits

@@ -46,7 +46,7 @@ cd ~/repo-research-writer
 Creating symbolic links:
 ~/.claude/skills/rrwrite-plan-manuscript → ~/repo-research-writer/.claude/skills/rrwrite-plan-manuscript
 ~/.claude/skills/rrwrite-draft-section → ~/repo-research-writer/.claude/skills/rrwrite-draft-section
-~/.claude/skills/rrwrite-review-manuscript → ~/repo-research-writer/.claude/skills/rrwrite-review-manuscript
+~/.claude/skills/rrwrite-critique-manuscript → ~/repo-research-writer/.claude/skills/rrwrite-critique-manuscript
 ```
 
 **Verify it worked:**
@@ -129,7 +129,7 @@ ls -la ~/.claude/skills/
 # Should see:
 # rrwrite-plan-manuscript -> /path/to/repo-research-writer/.claude/skills/rrwrite-plan-manuscript
 # rrwrite-draft-section -> /path/to/repo-research-writer/.claude/skills/rrwrite-draft-section
-# rrwrite-review-manuscript -> /path/to/repo-research-writer/.claude/skills/rrwrite-review-manuscript
+# rrwrite-critique-manuscript -> /path/to/repo-research-writer/.claude/skills/rrwrite-critique-manuscript
 ```
 
 ### Check Project Setup

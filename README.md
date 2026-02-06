@@ -49,8 +49,8 @@ cd my-research-project
 "Use /rrwrite-draft-section to write the Methods section"
 "Use /rrwrite-draft-section to write the Results section"
 
-# Step 4: Review for compliance
-"Use /rrwrite-review-manuscript to check the draft"
+# Step 4: Critique for compliance
+"Use /rrwrite-critique-manuscript to check the draft"
 ```
 
 **Result**: A complete manuscript draft where every claim is traced back to your source data.
@@ -111,7 +111,7 @@ cd /path/to/your/research/project
   ```
   ~/.claude/skills/rrwrite-plan-manuscript → /path/to/repo-research-writer/.claude/skills/rrwrite-plan-manuscript
   ~/.claude/skills/rrwrite-draft-section → /path/to/repo-research-writer/.claude/skills/rrwrite-draft-section
-  ~/.claude/skills/rrwrite-review-manuscript → /path/to/repo-research-writer/.claude/skills/rrwrite-review-manuscript
+  ~/.claude/skills/rrwrite-critique-manuscript → /path/to/repo-research-writer/.claude/skills/rrwrite-critique-manuscript
   ```
 - **Benefit**: Update RRWrite once (`git pull`), all projects get updates automatically
 
@@ -163,9 +163,9 @@ python scripts/rrwrite-verify-stats.py --file data/results.csv --col accuracy --
 # Returns: 0.87 ✓
 ```
 
-### 4. Review
+### 4. Critique
 
-The `/rrwrite-review-manuscript` skill acts as "Reviewer #2":
+The `/rrwrite-critique-manuscript` skill acts as "Reviewer #2":
 - Checks journal-specific requirements
 - Verifies citation integrity
 - Flags missing figures or data availability statements
@@ -189,8 +189,8 @@ Writes individual sections with fact-checking.
 - Generates LaTeX equations from code
 - Maintains variable name consistency
 
-### `/rrwrite-review-manuscript`
-Reviews drafts for compliance and accuracy.
+### `/rrwrite-critique-manuscript`
+Critiques drafts for compliance and accuracy.
 
 **Checks**:
 - Word counts
@@ -281,7 +281,7 @@ All manuscript outputs follow a LinkML schema (`schemas/manuscript.yaml`) that e
 - ✅ **Required sections**: All necessary parts included
 - ✅ **Word count targets**: Sections meet minimum lengths
 - ✅ **Citation integrity**: Proper citation format
-- ✅ **Review versioning**: `review_TYPE_v1.md`, `review_TYPE_v2.md`, etc.
+- ✅ **Critique versioning**: `critique_TYPE_v1.md`, `critique_TYPE_v2.md`, etc.
 
 Skills automatically validate outputs after generation. See [MANUSCRIPT_SCHEMA.md](MANUSCRIPT_SCHEMA.md) for details.
 
@@ -295,8 +295,8 @@ graph LR
     D --> E[manuscript/*.md sections]
     E --> F[Assemble]
     F --> G[manuscript/full_manuscript.md]
-    G --> H[/rrwrite-review-manuscript]
-    H --> I[manuscript/review_manuscript_v1.md]
+    G --> H[/rrwrite-critique-manuscript]
+    H --> I[manuscript/critique_manuscript_v1.md]
     I --> J[Revise & Finalize]
 ```
 

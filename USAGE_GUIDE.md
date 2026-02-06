@@ -75,7 +75,7 @@ In the agent, invoke the skills:
 
 "Use the /rrwrite-draft-section skill to write the Methods section"
 
-"Use the /rrwrite-review-manuscript skill to check the draft"
+"Use the /rrwrite-critique-manuscript skill to check the draft"
 ```
 
 ## Scenario 2: Installing Per-Project (No Global Installation)
@@ -187,9 +187,9 @@ User: "Use /rrwrite-draft-section to write the Results section"
 
 Claude: Agent: [Reads relevant data files, generates rrwrite-drafts/results.md]
 
-User: "Use /rrwrite-review-manuscript to check it"
+User: "Use /rrwrite-critique-manuscript to check it"
 
-Claude: Agent: [Reviews for PLOS compliance, generates review_round_1.md]
+Claude: Agent: [Critiques for PLOS compliance, generates critique_round_1.md]
 ```
 
 ## Checking Skill Installation
@@ -232,7 +232,7 @@ git submodule update --remote
 cd /path/to/project
 rm -rf .claude/skills/rrwrite-plan-manuscript
 rm -rf .claude/skills/rrwrite-draft-section
-rm -rf .claude/skills/rrwrite-review-manuscript
+rm -rf .claude/skills/rrwrite-critique-manuscript
 
 git clone <this-repo-url> temp-skills
 cp -r temp-skills/.claude/skills/* .claude/skills/

@@ -7,7 +7,7 @@ Usage:
     python scripts/rrwrite-validate-manuscript.py --file manuscript/literature.md --type literature
     python scripts/rrwrite-validate-manuscript.py --file manuscript/abstract.md --type section
     python scripts/rrwrite-validate-manuscript.py --file manuscript/full_manuscript.md --type manuscript
-    python scripts/rrwrite-validate-manuscript.py --file manuscript/review_manuscript_v1.md --type review
+    python scripts/rrwrite-validate-manuscript.py --file manuscript/critique_manuscript_v1.md --type critique
 """
 
 import argparse
@@ -329,10 +329,10 @@ class ManuscriptValidator:
 
         return errors, warnings, info
 
-    def validate_review(self, filepath):
-        """Validate review report."""
+    def validate_critique(self, filepath):
+        """Validate critique report."""
         print(f"\n{'='*60}")
-        print(f"Validating Review: {filepath}")
+        print(f"Validating Critique: {filepath}")
         print(f"{'='*60}\n")
 
         errors = []
@@ -342,7 +342,7 @@ class ManuscriptValidator:
         # Check filename
         valid, msg = self.validate_filename(
             filepath,
-            r'^review_(outline|literature|section|manuscript)_v[0-9]+\.md$'
+            r'^critique_(outline|literature|section|manuscript)_v[0-9]+\.md$'
         )
         if not valid:
             errors.append(msg)
@@ -373,7 +373,7 @@ class ManuscriptValidator:
         info.append(f"✓ Word count: {word_count}")
 
         if word_count < 200:
-            warnings.append(f"Review is brief ({word_count} words). Consider more detailed feedback.")
+            warnings.append(f"Critique is brief ({word_count} words). Consider more detailed feedback.")
 
         return errors, warnings, info
 
@@ -418,7 +418,7 @@ def main():
     parser.add_argument(
         '--type',
         required=True,
-        choices=['outline', 'literature', 'section', 'manuscript', 'review'],
+        choices=['outline', 'literature', 'section', 'manuscript', 'critique'],
         help='Type of document to validate'
     )
     parser.add_argument(
@@ -440,8 +440,8 @@ def main():
         errors, warnings, info = validator.validate_section(args.file)
     elif args.type == 'manuscript':
         errors, warnings, info = validator.validate_manuscript(args.file)
-    elif args.type == 'review':
-        errors, warnings, info = validator.validate_review(args.file)
+    elif args.type == 'critique':
+        errors, warnings, info = validator.validate_critique(args.file)
 
     # Print results
     success = validator.print_results(errors, warnings, info)

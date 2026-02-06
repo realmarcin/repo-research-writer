@@ -66,18 +66,18 @@ Agent: [Reads data/benchmark_results.csv]
 
 Output: `rrwrite-drafts/results.md`
 
-### Step 4: Review for Compliance
+### Step 4: Critique for Compliance
 
 ```
-User: "Use /rrwrite-review-manuscript to check the draft"
+User: "Use /rrwrite-critique-manuscript to check the draft"
 
 Agent: [Reads all rrwrite-drafts/*]
        [Checks Bioinformatics journal requirements]
        [Verifies citation integrity]
-       [Generates review_round_1.md]
+       [Generates critique_round_1.md]
 ```
 
-Output: `review_round_1.md` with actionable feedback
+Output: `critique_round_1.md` with actionable feedback
 
 ## Expected Outputs
 
@@ -92,7 +92,7 @@ example/
 │   ├── methods.md
 │   ├── results.md
 │   └── discussion.md
-└── review_round_1.md          # Review feedback
+└── critique_round_1.md          # Critique feedback
 ```
 
 ## Key Features Demonstrated

@@ -4,7 +4,7 @@ title: Repo Research Writer (RRWrite) Manuscript Schema
 description: >-
   LinkML schema defining the structure, naming conventions, and validation rules
   for manuscript generation outputs including outlines, literature research,
-  sections, and reviews.
+  sections, and critiques.
 
 license: MIT
 version: 1.0.0
@@ -42,9 +42,9 @@ classes:
         description: Assembled complete manuscript
         range: FullManuscript
         required: false
-      reviews:
-        description: Review reports
-        range: Review
+      critiques:
+        description: Critique reports
+        range: Critique
         multivalued: true
         required: false
 
@@ -202,33 +202,33 @@ classes:
       assembly_date:
         range: date
         required: true
-      ready_for_review:
+      ready_for_critique:
         range: boolean
         required: true
 
-  Review:
+  Critique:
     description: >-
-      Review report for outline, literature, section, or full manuscript
+      Critique report for outline, literature, section, or full manuscript
     attributes:
       filename:
-        description: Must follow pattern 'review_TYPE_vN.md'
+        description: Must follow pattern 'critique_TYPE_vN.md'
         range: string
-        pattern: "^review_(outline|literature|section|manuscript)_v[0-9]+\\.md$"
+        pattern: "^critique_(outline|literature|section|manuscript)_v[0-9]+\\.md$"
         required: true
-      review_type:
-        range: ReviewType
+      critique_type:
+        range: CritiqueType
         required: true
-      document_reviewed:
-        description: Path to document that was reviewed
+      document_critiqued:
+        description: Path to document that was critiqued
         range: string
         required: true
       version_number:
-        description: Review iteration number
+        description: Critique iteration number
         range: integer
         minimum_value: 1
         required: true
       recommendation:
-        range: ReviewRecommendation
+        range: CritiqueRecommendation
         required: true
       major_issues_count:
         range: integer
@@ -236,23 +236,23 @@ classes:
       minor_issues_count:
         range: integer
         minimum_value: 0
-      review_date:
+      critique_date:
         range: date
         required: true
       sections:
-        description: Review sections (Summary, Strengths, Issues, etc.)
-        range: ReviewSection
+        description: Critique sections (Summary, Strengths, Issues, etc.)
+        range: CritiqueSection
         multivalued: true
         required: true
 
-  ReviewSection:
-    description: Section within a review report
+  CritiqueSection:
+    description: Section within a critique report
     attributes:
       section_name:
-        range: ReviewSectionType
+        range: CritiqueSectionType
         required: true
       content:
-        description: Review content for this section
+        description: Critique content for this section
         range: string
         required: true
 
@@ -306,20 +306,20 @@ enums:
       INTEGRATION_GUIDE:
         description: Citation Integration Guide
 
-  ReviewType:
-    description: Type of document being reviewed
+  CritiqueType:
+    description: Type of document being critiqued
     permissible_values:
       OUTLINE:
-        description: Review of manuscript outline
+        description: Critique of manuscript outline
       LITERATURE:
-        description: Review of literature research
+        description: Critique of literature research
       SECTION:
-        description: Review of individual section
+        description: Critique of individual section
       MANUSCRIPT:
-        description: Review of full manuscript
+        description: Critique of full manuscript
 
-  ReviewRecommendation:
-    description: Review outcome recommendation
+  CritiqueRecommendation:
+    description: Critique outcome recommendation
     permissible_values:
       ACCEPT_MINOR:
         description: Accept with minor revisions
@@ -328,8 +328,8 @@ enums:
       REJECT:
         description: Reject - fundamental issues
 
-  ReviewSectionType:
-    description: Sections in review report
+  CritiqueSectionType:
+    description: Sections in critique report
     permissible_values:
       SUMMARY:
         description: Summary Assessment

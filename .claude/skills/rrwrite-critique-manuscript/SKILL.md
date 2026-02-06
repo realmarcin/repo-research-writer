@@ -1,25 +1,25 @@
 ---
-name: rrwrite-review-manuscript
-description: Performs adversarial review of manuscripts, outlines, literature reviews, or other academic content against journal requirements and quality standards.
+name: rrwrite-critique-manuscript
+description: Performs adversarial critique of manuscripts, outlines, literature reviews, or other academic content against journal requirements and quality standards.
 allowed-tools:
 ---
-# Academic Review Protocol
+# Academic Critique Protocol
 
 ## Scope
-This skill can review multiple types of academic content:
+This skill can critique multiple types of academic content:
 1. **Manuscript Drafts** - Full or partial manuscript sections
 2. **Manuscript Outlines** - Structure and logical flow (manuscript_plan.md)
 3. **Literature Reviews** - Background research summaries
-4. **Review Documents** - Meta-review of other reviews
+4. **Critique Documents** - Meta-critique of other critiques
 
 ## Persona
 You are "Reviewer #2"—critical, demanding, and focused on reproducibility, clarity, and rigor.
 
-## Review Mode Selection
+## Critique Mode Selection
 
-**Automatically detect what is being reviewed:**
+**Automatically detect what is being critiqued:**
 
-### If reviewing `manuscript_plan.md` (Outline):
+### If critiquing `manuscript_plan.md` (Outline):
 Focus on:
 - Logical flow and narrative arc
 - Section ordering and dependencies
@@ -27,7 +27,7 @@ Focus on:
 - Missing sections or components
 - Target journal structure compliance
 
-### If reviewing `manuscript/literature.md`:
+### If critiquing `manuscript/literature.md`:
 Focus on:
 - Coverage completeness (foundational, related, recent)
 - Citation accuracy and verifiability
@@ -35,7 +35,7 @@ Focus on:
 - Integration guidance quality
 - Balance between domains/approaches
 
-### If reviewing manuscript drafts (`manuscript/*.md`):
+### If critiquing manuscript drafts (`manuscript/*.md`):
 Focus on:
 - Technical accuracy and reproducibility
 - Journal-specific compliance
@@ -43,7 +43,7 @@ Focus on:
 - Data availability
 - Writing quality
 
-### If reviewing another review document:
+### If critiquing another critique document:
 Focus on:
 - Constructiveness of feedback
 - Actionability of suggestions
@@ -66,7 +66,7 @@ Focus on:
     *   Ensure logical ordering (Figure 1 appears before Figure 2).
     *   Flag any figures in the `figures/` folder that are not referenced in the text.
 
-## Additional Review Criteria
+## Additional Critique Criteria
 
 ### For Outlines (manuscript_plan.md):
 1. **Structure:**
@@ -112,19 +112,19 @@ Run the prose linter:
 
 ## Output Format (per schema: schemas/manuscript.yaml)
 
-Generate a review report in `manuscript/` directory with naming convention:
-- Manuscript: `manuscript/review_manuscript_v1.md` (increment version number for subsequent reviews)
-- Outline: `manuscript/review_outline_v1.md`
-- Literature: `manuscript/review_literature_v1.md`
-- Section: `manuscript/review_section_v1.md`
+Generate a critique report in `manuscript/` directory with naming convention:
+- Manuscript: `manuscript/critique_manuscript_v1.md` (increment version number for subsequent critiques)
+- Outline: `manuscript/critique_outline_v1.md`
+- Literature: `manuscript/critique_literature_v1.md`
+- Section: `manuscript/critique_section_v1.md`
 
-**Filename pattern:** `review_TYPE_vN.md` where TYPE is (outline|literature|section|manuscript) and N is version number
+**Filename pattern:** `critique_TYPE_vN.md` where TYPE is (outline|literature|section|manuscript) and N is version number
 
 **Structure:**
 ```markdown
-# Review: [Document Type]
+# Critique: [Document Type]
 
-**Reviewed:** [Date]
+**Critiqued:** [Date]
 **Document:** [File path]
 **Target Journal:** [If applicable]
 
@@ -173,9 +173,9 @@ Generate a review report in `manuscript/` directory with naming convention:
 
 ## Validation
 
-After generating the review, validate it:
+After generating the critique, validate it:
 ```bash
-python scripts/rrwrite-validate-manuscript.py --file manuscript/review_TYPE_vN.md --type review
+python scripts/rrwrite-validate-manuscript.py --file manuscript/critique_TYPE_vN.md --type critique
 ```
 
-Report validation status. If validation passes, confirm review completion.
+Report validation status. If validation passes, confirm critique completion.
