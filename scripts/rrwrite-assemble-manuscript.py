@@ -94,10 +94,27 @@ def assemble_manuscript(manuscript_dir="manuscript", output_file=None):
         words = len(content.split())
         print(f"  Estimated words: {words}")
 
+    # Update state
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent))
+        from rrwrite_state_manager import StateManager
+
+        manager = StateManager()
+        manager.update_workflow_stage(
+            "assembly",
+            status="completed",
+            file_path=str(output_file.relative_to(manager.project_root))
+        )
+        print(f"  ✓ Workflow state updated")
+    except Exception as e:
+        print(f"  Note: Could not update state ({e})")
+
     print("\nNext steps:")
     print(f"1. Read the manuscript: {output_file}")
     print(f"2. Validate: python scripts/rrwrite-validate-manuscript.py --file {output_file} --type manuscript")
     print(f"3. Critique: Use /rrwrite-critique-manuscript skill")
+    print(f"4. Check status: python scripts/rrwrite-status.py")
 
     return True
 

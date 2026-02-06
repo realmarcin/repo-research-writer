@@ -51,6 +51,8 @@ setup_project() {
     # Create directories
     echo "Creating directory structure..."
     mkdir -p manuscript
+    mkdir -p manuscript/.rrwrite
+    mkdir -p manuscript/runs
     mkdir -p scripts
     mkdir -p schemas
     mkdir -p figures
@@ -66,15 +68,21 @@ setup_project() {
     fi
 
     # Copy scripts
-    echo "  ✓ Copying verification scripts to scripts/"
+    echo "  ✓ Copying scripts to scripts/"
     cp "$SCRIPT_DIR/scripts/rrwrite-verify-stats.py" scripts/
     cp "$SCRIPT_DIR/scripts/rrwrite-clean-ipynb.py" scripts/
     cp "$SCRIPT_DIR/scripts/rrwrite-validate-manuscript.py" scripts/
+    cp "$SCRIPT_DIR/scripts/rrwrite-state-manager.py" scripts/
+    cp "$SCRIPT_DIR/scripts/rrwrite-status.py" scripts/
     chmod +x scripts/*.py
 
     # Copy schema
     echo "  ✓ Copying manuscript schema to schemas/"
     cp "$SCRIPT_DIR/schemas/manuscript.yaml" schemas/
+
+    # Initialize state file
+    echo "  ✓ Initializing state tracking"
+    python3 scripts/rrwrite-state-manager.py init --project-name "$(basename "$(pwd)")" > /dev/null 2>&1
 
     # Create .gitignore if it doesn't exist
     if [ ! -f ".gitignore" ]; then
@@ -84,6 +92,13 @@ setup_project() {
 manuscript/*.md
 manuscript/*.bib
 manuscript/*.csv
+
+# State tracking (keep in Git for collaboration)
+!manuscript/.rrwrite/
+!manuscript/.rrwrite/state.json
+
+# Archived runs (optional: can exclude if large)
+# manuscript/runs/
 
 # Python
 __pycache__/

@@ -178,4 +178,39 @@ After generating the critique, validate it:
 python scripts/rrwrite-validate-manuscript.py --file manuscript/critique_TYPE_vN.md --type critique
 ```
 
-Report validation status. If validation passes, confirm critique completion.
+## State Update
+
+After successful validation, update workflow state with critique iteration:
+```python
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path('scripts').resolve()))
+from rrwrite_state_manager import StateManager
+
+manager = StateManager()
+
+# Get version number from filename or use manager method
+critique_type = "manuscript"  # or "outline", "literature", "section"
+version = manager.get_next_critique_version(critique_type)
+
+# Count issues from the critique file
+major_issues = 0  # Count from "MAJOR:" sections in critique
+minor_issues = 0  # Count from "MINOR:" sections in critique
+recommendation = "MAJOR_REVISIONS"  # Extract from recommendation section
+
+manager.add_critique_iteration(
+    critique_type=critique_type,
+    version=version,
+    file_path=f"manuscript/critique_{critique_type}_v{version}.md",
+    recommendation=recommendation,
+    major_issues=major_issues,
+    minor_issues=minor_issues
+)
+```
+
+Display updated progress:
+```bash
+python scripts/rrwrite-status.py
+```
+
+Report validation status, critique iteration, and updated workflow progress. If validation passes, confirm critique completion.

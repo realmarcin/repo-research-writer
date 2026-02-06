@@ -15,6 +15,9 @@ critique_round_*.md
 repo_map.md
 bib_index.md
 
+# State tracking (Note: state.json should be committed for collaboration)
+# manuscript/.rrwrite/state.json should be included in Git
+
 # Data files (users should manage their own)
 data/raw/
 data/processed/

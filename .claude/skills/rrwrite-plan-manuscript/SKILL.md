@@ -55,7 +55,21 @@ The outline MUST include:
    ```bash
    python scripts/rrwrite-validate-manuscript.py --file manuscript/outline.md --type outline
    ```
-3. If validation passes, confirm creation and ask user to review
-4. If validation fails, fix issues and re-validate
+3. Update workflow state (mark planning stage as completed):
+   ```python
+   import sys
+   from pathlib import Path
+   sys.path.insert(0, str(Path('scripts').resolve()))
+   from rrwrite_state_manager import StateManager
 
-Confirm the creation of `manuscript/outline.md` and validation status.
+   manager = StateManager()
+   manager.update_workflow_stage("plan", status="completed", file_path="manuscript/outline.md")
+   ```
+4. Display progress:
+   ```bash
+   python scripts/rrwrite-status.py
+   ```
+5. If validation passes, confirm creation and ask user to review
+6. If validation fails, fix issues and re-validate
+
+Confirm the creation of `manuscript/outline.md` and validation status. Show the updated workflow status.

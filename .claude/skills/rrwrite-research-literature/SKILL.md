@@ -237,7 +237,32 @@ After generating files, validate the literature review:
 python scripts/rrwrite-validate-manuscript.py --file manuscript/literature.md --type literature
 ```
 
-If validation passes, confirm completion. If it fails, fix issues and re-validate.
+## State Update
+
+After successful validation, update workflow state:
+```python
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path('scripts').resolve()))
+from rrwrite_state_manager import StateManager
+
+manager = StateManager()
+# Count papers from literature_citations.bib
+import re
+with open('manuscript/literature_citations.bib', 'r') as f:
+    papers_found = len(re.findall(r'^@\w+{', f.read(), re.MULTILINE))
+
+manager.update_workflow_stage("research", status="completed",
+                              file_path="manuscript/literature.md",
+                              papers_found=papers_found)
+```
+
+Display updated progress:
+```bash
+python scripts/rrwrite-status.py
+```
+
+If validation passes, confirm completion and show progress. If it fails, fix issues and re-validate.
 
 ## Quality Criteria
 

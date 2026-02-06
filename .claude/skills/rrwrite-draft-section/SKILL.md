@@ -46,4 +46,22 @@ After drafting, validate the section:
 python scripts/rrwrite-validate-manuscript.py --file manuscript/SECTIONNAME.md --type section
 ```
 
-Report validation status. If validation fails, fix issues and re-validate.
+## State Update
+
+After successful validation, update workflow state:
+```python
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path('scripts').resolve()))
+from rrwrite_state_manager import StateManager
+
+manager = StateManager()
+manager.add_section_completed("SECTIONNAME")  # e.g., "methods", "results"
+```
+
+Display updated progress:
+```bash
+python scripts/rrwrite-status.py
+```
+
+Report validation status and updated workflow progress. If validation fails, fix issues and re-validate.
