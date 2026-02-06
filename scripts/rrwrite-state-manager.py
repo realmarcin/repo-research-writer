@@ -379,6 +379,131 @@ class StateManager:
 
         return None
 
+    def check_uncommitted_changes(self) -> bool:
+        """Check if there are uncommitted changes in the manuscript directory.
+
+        Returns:
+            True if there are uncommitted changes, False otherwise
+        """
+        try:
+            result = subprocess.run(
+                ["git", "status", "--porcelain", "manuscript/"],
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if result.returncode == 0:
+                return bool(result.stdout.strip())
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+
+        return False
+
+    def warn_uncommitted_changes(self, file_path: str) -> None:
+        """Warn user if there are uncommitted changes before overwriting.
+
+        Args:
+            file_path: File that will be overwritten
+        """
+        if not self.check_uncommitted_changes():
+            return
+
+        file_rel_path = Path(file_path).relative_to(self.project_root)
+        print()
+        print("⚠️  Warning: Uncommitted changes detected")
+        print()
+        print(f"You have uncommitted changes in manuscript/")
+        print(f"About to overwrite/modify: {file_rel_path}")
+        print()
+        print("Recommendation:")
+        print("  git add manuscript/")
+        print(f'  git commit -m "Save before regenerating {file_rel_path.name}"')
+        print()
+        print("Or create an automatic checkpoint:")
+        print("  (Previous versions can be recovered from Git history)")
+        print()
+
+    def create_checkpoint(self, message: str) -> bool:
+        """Create a Git checkpoint commit.
+
+        Args:
+            message: Commit message
+
+        Returns:
+            True if checkpoint created successfully
+        """
+        try:
+            # Check if there are changes to commit
+            result = subprocess.run(
+                ["git", "status", "--porcelain", "manuscript/"],
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+
+            if result.returncode != 0 or not result.stdout.strip():
+                # No changes to commit
+                return False
+
+            # Stage manuscript directory changes
+            subprocess.run(
+                ["git", "add", "manuscript/"],
+                cwd=self.project_root,
+                check=True,
+                timeout=5
+            )
+
+            # Create commit
+            subprocess.run(
+                ["git", "commit", "-m", f"[RRWrite Checkpoint] {message}"],
+                cwd=self.project_root,
+                check=True,
+                capture_output=True,
+                timeout=5
+            )
+
+            print(f"✓ Created Git checkpoint: {message}")
+            return True
+
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
+            return False
+
+    def get_file_history(self, file_path: str, limit: int = 5) -> list:
+        """Get Git history for a file.
+
+        Args:
+            file_path: Path to file (relative to project root)
+            limit: Number of commits to retrieve
+
+        Returns:
+            List of commit dictionaries with hash, date, message
+        """
+        history = []
+        try:
+            result = subprocess.run(
+                ["git", "log", f"-{limit}", "--pretty=format:%h|%ai|%s", "--", file_path],
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+
+            if result.returncode == 0 and result.stdout:
+                for line in result.stdout.strip().split('\n'):
+                    parts = line.split('|', 2)
+                    if len(parts) == 3:
+                        history.append({
+                            "hash": parts[0],
+                            "date": parts[1][:16],  # YYYY-MM-DD HH:MM
+                            "message": parts[2]
+                        })
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+
+        return history
+
 
 def main():
     """Command-line interface for state manager."""

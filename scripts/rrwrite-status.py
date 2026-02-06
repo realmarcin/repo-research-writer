@@ -60,12 +60,13 @@ def get_status_symbol(status: str) -> str:
     return symbols.get(status, "?")
 
 
-def display_status(state: dict, detailed: bool = False) -> None:
+def display_status(state: dict, detailed: bool = False, manager: StateManager = None) -> None:
     """Display workflow status.
 
     Args:
         state: State dictionary
         detailed: Show detailed information
+        manager: StateManager instance (for detailed mode)
     """
     print("=" * 60)
     print("RRWrite Project Status")
@@ -192,6 +193,36 @@ def display_status(state: dict, detailed: bool = False) -> None:
                 print(f"    File: {ver.get('file')}, Result: {ver.get('result')}")
             print()
 
+    # File history (if detailed and Git available)
+    if detailed and manager:
+        key_files = ["outline.md", "literature.md", "abstract.md", "methods.md", "results.md"]
+
+        has_history = False
+        for filename in key_files:
+            file_path = f"manuscript/{filename}"
+            history = manager.get_file_history(file_path, limit=1)
+            if history:
+                if not has_history:
+                    print("Recent File Changes:")
+                    print("-" * 60)
+                    has_history = True
+                h = history[0]
+                print(f"  • {filename}: {h['date']} - {h['message'][:50]}")
+
+        if has_history:
+            print()
+
+    # Uncommitted changes warning
+    if manager and manager.check_uncommitted_changes():
+        print("⚠️  Uncommitted Changes Detected")
+        print("-" * 60)
+        print("You have uncommitted changes in manuscript/")
+        print()
+        print("Recommendation: Commit before running skills")
+        print("  git add manuscript/")
+        print('  git commit -m "Work in progress"')
+        print()
+
 
 def get_next_steps(workflow: dict) -> list:
     """Determine next steps based on workflow status.
@@ -300,7 +331,7 @@ def main():
         sys.exit(1)
 
     # Display status
-    display_status(state, detailed=args.detailed)
+    display_status(state, detailed=args.detailed, manager=manager)
 
 
 if __name__ == "__main__":
