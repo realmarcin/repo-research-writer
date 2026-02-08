@@ -1,0 +1,283 @@
+---
+name: rrwrite-critique-manuscript
+description: Performs adversarial critique of manuscripts, outlines, literature reviews, or other academic content against journal requirements and quality standards.
+arguments:
+  - name: target_dir
+    description: Output directory for manuscript files (e.g., manuscript/repo_v1)
+    default: manuscript
+allowed-tools:
+---
+# Academic Critique Protocol
+
+## Scope
+This skill can critique multiple types of academic content:
+1. **Manuscript Drafts** - Full or partial manuscript sections
+2. **Manuscript Outlines** - Structure and logical flow (manuscript_plan.md)
+3. **Literature Reviews** - Background research summaries
+4. **Critique Documents** - Meta-critique of other critiques
+
+## Critique Style
+Apply critical, demanding critique style focused on reproducibility, clarity, and rigor.
+
+## Critique Mode Selection
+
+**Automatically detect what is being critiqued:**
+
+### If critiquing `manuscript_plan.md` (Outline):
+Focus on:
+- Logical flow and narrative arc
+- Section ordering and dependencies
+- Evidence-to-claim mapping
+- Missing sections or components
+- Target journal structure compliance
+
+### If critiquing `{target_dir}/literature.md`:
+Focus on:
+- Coverage completeness (foundational, related, recent)
+- Citation accuracy and verifiability
+- Gap analysis clarity
+- Integration guidance quality
+- Balance between domains/approaches
+
+### If critiquing manuscript drafts (`{target_dir}/*.md`):
+Focus on:
+- Technical accuracy and reproducibility
+- Journal-specific compliance
+- Citation integrity
+- Data availability
+- Writing quality
+
+### If critiquing another critique document:
+Focus on:
+- Constructiveness of feedback
+- Actionability of suggestions
+- Coverage of critical issues
+- Balance of criticism
+
+---
+
+## Compliance Checks (For Manuscript Drafts)
+
+1.  **Journal Specifics:**
+    *   *Nature Methods:* Check word count of the Abstract (max 150 words).
+    *   *PLOS Computational Biology:* Verify presence of "Data Availability Statement" and "Ethics Statement".
+    *   *Bioinformatics:* Check that the "Abstract" has structured headers.
+2.  **Citation Integrity:**
+    *   Scan text for citation keys (e.g., `[smith2020]`).
+    *   Verify they exist in `bib_index.md` or `references.bib`.
+    *   Flag any missing keys as "HALLUCINATION RISK".
+3.  **Figure Callouts:**
+    *   Ensure logical ordering (Figure 1 appears before Figure 2).
+    *   Flag any figures in the `figures/` folder that are not referenced in the text.
+4.  **Availability Section Citations:**
+    *   Check Data and Code Availability (or similar) sections for inappropriate citations.
+    *   **ACCEPTABLE citations:** Specific tools/platforms (Zenodo DOI, Docker, GitHub, data repositories).
+    *   **UNACCEPTABLE citations:** General methodology papers (FAIR principles, reproducibility frameworks, workflow standards).
+    *   **Rationale:** Availability sections should contain factual access information, not methodology justifications.
+    *   **Action if violated:** Flag as minor issue, recommend removing general citations and keeping only tool-specific ones.
+
+5.  **Methods Section Citations:**
+    *   Check Methods sections for abstract concept citations vs. specific tool citations.
+    *   **ACCEPTABLE citations:**
+        - Specific software tools actually used (e.g., LinkML for schema validation, pandas for data processing)
+        - Datasets accessed (e.g., GTDB for taxonomic data, MediaDive for media formulations)
+        - Published algorithms implemented (e.g., MaxPro for experimental design)
+        - Computational methods applied (e.g., graph embeddings, flux balance analysis)
+    *   **UNACCEPTABLE citations:**
+        - Abstract principles (FAIR data sharing [Wilkinson2016], reproducibility frameworks)
+        - General best practices papers (workflow standards, documentation guidelines)
+        - Related tools NOT used (e.g., citing Manubot when not using it)
+        - Methodological reviews unless specific method was implemented
+    *   **Rationale:** Methods describes what was done in THIS work, not general field principles. Abstract concepts belong in Introduction or Discussion.
+    *   **Action if violated:** Flag as minor issue. Recommend moving abstract principle citations to Introduction (for motivation) or Discussion (for broader context), keeping only tool-specific citations in Methods.
+
+6.  **Results Section Citations:**
+    *   Check Results sections for explanatory/justification citations vs. observational citations.
+    *   **ACCEPTABLE citations:**
+        - Papers/datasets analyzed or benchmarked (e.g., compared performance against [Smith2020])
+        - Examples of findings (e.g., "identified papers including [Example2024, Example2025]")
+        - Data sources processed (e.g., sequences from [GTDB2024])
+        - Tools whose performance was measured
+    *   **UNACCEPTABLE citations:**
+        - Explaining concepts (e.g., "establishing provenance chains [citations]")
+        - Justifying methodology (e.g., "addressing concerns about hallucination [citations]")
+        - Future possibilities (e.g., "for future integration with standards [citations]")
+        - Background context or motivation
+    *   **Rationale:** Results reports OBSERVATIONS and MEASUREMENTS. Explanations belong in Introduction; justifications and future directions belong in Discussion.
+    *   **Action if violated:** Flag as minor issue. Remove explanatory citations or move content to Discussion if it describes future directions or broader implications.
+
+7.  **Evidence Tracking Completeness:**
+    *   **Check for evidence files:**
+        - Verify `{target_dir}/literature_evidence.md` exists if manuscript cites literature
+        - Verify `{target_dir}/repo_evidence.md` exists if manuscript makes repository claims
+    *   **Validate literature evidence:**
+        - All citations in manuscript should have entries in literature_evidence.md
+        - Each entry should include: DOI, title, authors, venue, year, and verbatim quote
+        - Check that quotes are substantive (>20 characters, not just "...available at...")
+        - Flag citations missing from evidence file as "UNVERIFIED CITATION"
+    *   **Validate repository evidence:**
+        - Scan manuscript for numerical claims (e.g., "372 commits", "12 contributors", "810,418 lines")
+        - Check each claim has corresponding entry in repo_evidence.md
+        - Verify verification commands are present (bash code blocks)
+        - Check verification status (✅ ⚠ ❌)
+        - Flag claims with ❌ Unverified status as "NEEDS VERIFICATION"
+        - Flag numerical claims missing from evidence file as "UNTRACKED CLAIM"
+    *   **Verify evidence freshness:**
+        - Check commit hash in repo_evidence.md matches current repository state
+        - If mismatch: Flag as "STALE EVIDENCE - re-run verification"
+        - Recommend: `python3 scripts/rrwrite-verify-evidence.py --repo-path <path> --evidence {target_dir}/repo_evidence.md`
+    *   **Rationale:** Evidence files enable fact-checking, support reproducibility, and provide verification commands for reviewers.
+    *   **Action if violated:**
+        - MAJOR issue if evidence files missing entirely
+        - MINOR issue if individual claims missing from evidence
+        - WARNING if evidence is stale (commit mismatch)
+        - Provide specific commands to fix issues
+
+## Additional Critique Criteria
+
+### For Outlines (manuscript_plan.md):
+1. **Structure:**
+   - Does outline follow target journal format?
+   - Are sections in logical order?
+   - Is there clear progression from introduction to conclusion?
+
+2. **Evidence Mapping:**
+   - Is every claim linked to a specific data file?
+   - Are figure references appropriate for each section?
+   - Are code/script citations accurate?
+
+3. **Completeness:**
+   - Are all required sections present?
+   - Is word count guidance realistic?
+   - Are dependencies between sections clear?
+
+### For Literature Reviews:
+1. **Coverage:**
+   - Are foundational papers included?
+   - Are recent advances (last 2 years) covered?
+   - Are all major competing methods discussed?
+
+2. **Balance:**
+   - Is there appropriate coverage across different approaches?
+   - Are strengths AND limitations discussed?
+   - Is the positioning of the manuscript work clear?
+
+3. **Accuracy:**
+   - Can all citations be verified?
+   - Are author names, years, venues correct?
+   - Are paper summaries accurate (not hallucinated)?
+
+4. **Integration:**
+   - Are there clear suggestions for where to cite papers?
+   - Does it identify gaps the manuscript addresses?
+   - Is there guidance for updating existing sections?
+
+## Prose Linting (For Manuscript Drafts)
+
+Run the prose linter:
+`python scripts/rrwrite-lint-manuscript.py {target_dir}/full_manuscript.md`
+
+## Output Format (per schema: schemas/manuscript.yaml)
+
+Generate a critique report in `{target_dir}/` directory with naming convention:
+- Manuscript: `{target_dir}/critique_manuscript_v1.md` (increment version number for subsequent critiques)
+- Outline: `{target_dir}/critique_outline_v1.md`
+- Literature: `{target_dir}/critique_literature_v1.md`
+- Section: `{target_dir}/critique_section_v1.md`
+
+**Filename pattern:** `critique_TYPE_vN.md` where TYPE is (outline|literature|section|manuscript) and N is version number
+
+**Structure:**
+```markdown
+# Critique: [Document Type]
+
+**Critiqued:** [Date]
+**Document:** [File path]
+**Target Journal:** [If applicable]
+
+## Summary Assessment
+[2-3 sentence overall evaluation]
+
+## Strengths
+1. [Positive aspect 1]
+2. [Positive aspect 2]
+3. [Positive aspect 3]
+
+## Major Issues
+1. **[Issue Category]:** [Description]
+   - **Impact:** [Why this matters]
+   - **Action:** [Specific fix required]
+
+2. **[Issue Category]:** [Description]
+   - **Impact:** [Why this matters]
+   - **Action:** [Specific fix required]
+
+## Minor Issues
+1. **[Issue Category]:** [Description]
+   - **Action:** [Quick fix]
+
+2. **[Issue Category]:** [Description]
+   - **Action:** [Quick fix]
+
+## Compliance Checklist
+[For manuscripts only]
+- [ ] Abstract word count (if applicable)
+- [ ] Citations verified
+- [ ] Figures referenced
+- [ ] Data availability statement
+- [ ] Ethics statement (if needed)
+
+## Actionable Next Steps
+1. [Specific instruction for fixing issue 1]
+2. [Specific instruction for fixing issue 2]
+3. [Specific instruction for fixing issue 3]
+
+## Recommendation
+[ ] Accept with minor revisions
+[ ] Major revisions required
+[ ] Reject - fundamental issues
+```
+
+## Validation
+
+After generating the critique, validate it:
+```bash
+python scripts/rrwrite-validate-manuscript.py --file {target_dir}/critique_TYPE_vN.md --type critique
+```
+
+## State Update
+
+After successful validation, update workflow state with critique iteration:
+```python
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path('scripts').resolve()))
+from rrwrite_state_manager import StateManager
+
+manager = StateManager(output_dir="{target_dir}")
+
+# Get version number from filename or use manager method
+critique_type = "manuscript"  # or "outline", "literature", "section"
+version = manager.get_next_critique_version(critique_type)
+
+# Count issues from the critique file
+major_issues = 0  # Count from "MAJOR:" sections in critique
+minor_issues = 0  # Count from "MINOR:" sections in critique
+recommendation = "MAJOR_REVISIONS"  # Extract from recommendation section
+
+manager.add_critique_iteration(
+    critique_type=critique_type,
+    version=version,
+    file_path=f"{target_dir}/critique_{critique_type}_v{version}.md",
+    recommendation=recommendation,
+    major_issues=major_issues,
+    minor_issues=minor_issues
+)
+```
+
+Display updated progress:
+```bash
+python scripts/rrwrite-status.py --output-dir {target_dir}
+```
+
+Report validation status, critique iteration, and updated workflow progress. If validation passes, confirm critique completion.

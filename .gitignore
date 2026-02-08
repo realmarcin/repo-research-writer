@@ -1,0 +1,45 @@
+# Manuscript output directory (user workspace)
+# Each manuscript project has its own .git/ repository
+manuscript/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test outputs
+test_output/
+tmp/
+
+# IDE-specific
+.project
+.pydevproject
+.settings/
+
+# OS-specific
+Thumbs.db
+desktop.ini
