@@ -158,47 +158,52 @@ git log --all --format='%ae' | sort -u | wc -l
 
 ---
 
-## Claim: "Schema comprises 17 modular files totaling 810,418 lines"
+## Claim: "Package comprises 15 modular files totaling 12,500 lines"
 
 **Section**: Results
-**Line**: "Schema Coverage and Completeness" subsection
+**Line**: "Code Organization" subsection
 
-**Evidence Source**: Schema files in src/data_sheets_schema/schema/
+**Evidence Source**: Source code files in src/mypackage/
 
 **Verification**:
 \`\`\`bash
-# Count schema files
-find src/data_sheets_schema/schema/ -name "*.yaml" | wc -l
+# Count source files
+find src/mypackage/ -name "*.py" | wc -l
 
-# Count total lines in combined schema
-wc -l project/data_sheets_schema_all.yaml
+# Count total lines of code
+find src/mypackage/ -name "*.py" -exec wc -l {} + | tail -1
 \`\`\`
 
 **Output**:
 \`\`\`
-17
-810418 project/data_sheets_schema_all.yaml
+15
+12500 total
 \`\`\`
 
 **Status**: ✅ Verified
 
 ---
 
-## Claim: "Generated Python datamodel spans 4,365 lines"
+## Claim: "Test suite includes 234 unit tests with 95% coverage"
 
-**Section**: Results
-**Line**: "Schema Coverage and Completeness" subsection
+**Section**: Methods
+**Line**: "Testing and Validation" subsection
 
-**Evidence Source**: Generated Python code
+**Evidence Source**: Test files and coverage report
 
 **Verification**:
 \`\`\`bash
-wc -l src/data_sheets_schema/datamodel/data_sheets_schema.py
+# Count tests
+pytest --collect-only | grep "test session starts" -A 1
+
+# Check coverage
+pytest --cov=src/ --cov-report=term
 \`\`\`
 
 **Output**:
 \`\`\`
-4365 src/data_sheets_schema/datamodel/data_sheets_schema.py
+234 tests collected
+Coverage: 95%
 \`\`\`
 
 **Status**: ✅ Verified
@@ -396,6 +401,13 @@ The critique skill should check:
 
 ## Examples
 
-See complete examples:
-- `example/data_sheets_schema_v1/literature_evidence.md`
-- `example/data_sheets_schema_v1/repo_evidence.md`
+Complete example manuscripts will be available in the `example/` directory after you generate your first manuscript.
+
+To generate an example manuscript about the RRWrite tool itself:
+```bash
+/rrwrite --repo /path/to/rrwrite --output-dir example/rrwrite_v1
+```
+
+This will create:
+- `example/rrwrite_v1/literature_evidence.md` (literature citations)
+- `example/rrwrite_v1/repo_evidence.md` (repository evidence)
