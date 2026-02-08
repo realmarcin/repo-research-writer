@@ -397,5 +397,5 @@ The critique skill should check:
 ## Examples
 
 See complete examples:
-- `manuscript/data_sheets_schema_v1/literature_evidence.md` (if exists)
-- `manuscript/data_sheets_schema_v1/repo_evidence.md` (to be generated)
+- `example/data_sheets_schema_v1/literature_evidence.md`
+- `example/data_sheets_schema_v1/repo_evidence.md`
