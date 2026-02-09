@@ -1,319 +1,265 @@
 #!/usr/bin/env python3
-"""
-RRWrite Journal Scope Matcher
+"""Match manuscript outline to journal scope.
 
-Analyzes manuscript outline compatibility with journal scope and requirements.
-Scores journals based on keyword matching and structural alignment.
-
-Usage:
-    rrwrite-match-journal-scope.py --outline OUTLINE --journal JOURNAL --guidelines YAML [--verbose]
-
-Arguments:
-    --outline PATH      Path to outline file or workflow state
-    --journal NAME      Journal identifier (e.g., 'bioinformatics')
-    --guidelines PATH   Path to journal_guidelines.yaml
-    --verbose          Enable detailed scoring output
-
-Output:
-    JSON with compatibility score, missing sections, and recommendations
+This script analyzes a manuscript outline and calculates its compatibility
+with a target journal by comparing keywords, scope, and research focus.
 """
 
 import argparse
-import json
-import re
-import sys
 import yaml
 from pathlib import Path
-from typing import Dict, List, Tuple, Set
+import re
+import sys
 
 
-def load_outline(outline_path: str) -> Dict:
-    """Load outline from markdown or workflow state file."""
-    path = Path(outline_path)
+def extract_keywords(outline_text):
+    """Extract domain-specific keywords from outline text.
 
-    if not path.exists():
-        raise FileNotFoundError(f"Outline file not found: {outline_path}")
+    Args:
+        outline_text: Content of the outline markdown file
 
-    content = path.read_text()
+    Returns:
+        Set of lowercase keywords found in the outline
+    """
+    keywords = set()
 
-    # Extract outline text (handle both standalone and workflow state)
-    if "## OUTLINE" in content:
-        # Extract from workflow state
-        outline_section = re.search(r'## OUTLINE\s*\n(.*?)(?=\n## |\Z)', content, re.DOTALL)
-        if outline_section:
-            outline_text = outline_section.group(1)
-        else:
-            outline_text = content
-    else:
-        outline_text = content
+    # Convert to lowercase for case-insensitive matching
+    text_lower = outline_text.lower()
 
-    return {
-        "text": outline_text,
-        "path": str(path)
-    }
+    # Method-related patterns
+    method_patterns = [
+        r'\b(algorithm|computational method|pipeline|workflow|software|tool|database)\b',
+        r'\b(experimental|wet lab|clinical|imaging|sequencing)\b',
+        r'\b(modeling|modelling|simulation|analysis|prediction|classification)\b',
+        r'\b(machine learning|deep learning|neural network|artificial intelligence)\b',
+        r'\b(genome|genomics|transcriptome|transcriptomics|proteome|proteomics)\b',
+        r'\b(network analysis|pathway|systems biology|multi-scale)\b',
+        r'\b(sequence alignment|genome annotation|gene prediction)\b',
+        r'\b(single-cell|high-throughput|next-generation sequencing|rna-seq)\b',
+        r'\b(evolutionary|population genetics|comparative genomics)\b',
+        r'\b(structural biology|protein structure|molecular dynamics)\b',
+        r'\b(data integration|meta-analysis|benchmark|validation)\b',
+        r'\b(open source|reproducible|fair data|code availability)\b'
+    ]
 
+    for pattern in method_patterns:
+        matches = re.findall(pattern, text_lower)
+        keywords.update(matches)
 
-def load_journal_guidelines(guidelines_path: str, journal: str) -> Dict:
-    """Load journal guidelines from YAML file."""
-    path = Path(guidelines_path)
-
-    if not path.exists():
-        raise FileNotFoundError(f"Guidelines file not found: {guidelines_path}")
-
-    with open(path, 'r') as f:
-        data = yaml.safe_load(f)
-
-    if journal not in data['journals']:
-        available = ', '.join(data['journals'].keys())
-        raise ValueError(f"Journal '{journal}' not found. Available: {available}")
-
-    return data['journals'][journal]
-
-
-def extract_keywords(text: str) -> Set[str]:
-    """Extract meaningful keywords from text using regex patterns."""
-    # Convert to lowercase for matching
-    text_lower = text.lower()
-
-    # Extract words, keeping hyphenated terms and phrases
-    words = re.findall(r'\b[\w-]+\b', text_lower)
-
-    # Extract key phrases (2-3 word combinations)
-    phrases = []
-    for match in re.finditer(r'\b([\w-]+\s+[\w-]+(?:\s+[\w-]+)?)\b', text_lower):
-        phrase = match.group(1)
-        # Keep phrases that might be meaningful
-        if len(phrase.split()) >= 2:
-            phrases.append(phrase)
-
-    # Combine words and phrases
-    keywords = set(words + phrases)
-
-    # Remove common stop words
-    stop_words = {
-        'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
-        'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
-        'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she',
-        'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their',
-        'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go',
-        'me', 'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know',
-        'take', 'people', 'into', 'year', 'your', 'good', 'some', 'could', 'them',
-        'see', 'other', 'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over',
-        'think', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first',
-        'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day',
-        'most', 'us', 'is', 'was', 'are', 'been', 'has', 'had', 'were', 'said', 'did',
-        'having', 'may', 'should', 'could', 'would', 'might', 'must', 'shall', 'can'
-    }
-
-    keywords = {kw for kw in keywords if kw not in stop_words and len(kw) > 2}
+    # Look for specific tool/method mentions (preserve as-is)
+    tool_pattern = r'\b([A-Z][a-zA-Z0-9]+(?:-[A-Za-z0-9]+)*)\b'
+    tools = re.findall(tool_pattern, outline_text)
+    # Only include if mentioned multiple times (likely important)
+    from collections import Counter
+    tool_counts = Counter(tools)
+    important_tools = {tool.lower() for tool, count in tool_counts.items() if count >= 2}
+    keywords.update(important_tools)
 
     return keywords
 
 
-def score_keyword_match(outline_keywords: Set[str], journal_keywords: Dict[str, List[str]]) -> Tuple[float, Dict]:
-    """Score outline keywords against journal's positive and negative keywords."""
-    positive_keywords = set(kw.lower() for kw in journal_keywords.get('positive', []))
-    negative_keywords = set(kw.lower() for kw in journal_keywords.get('negative', []))
+def score_journal_match(outline_keywords, journal_data):
+    """Calculate compatibility score (0.0-1.0) between outline and journal.
 
-    # Find matches
-    positive_matches = outline_keywords & positive_keywords
-    negative_matches = outline_keywords & negative_keywords
+    Args:
+        outline_keywords: Set of keywords extracted from outline
+        journal_data: Journal configuration from guidelines YAML
 
-    # Calculate score
-    # Positive matches increase score, negative matches decrease it
-    if not positive_keywords:
-        keyword_score = 0.5  # Neutral if no keywords defined
+    Returns:
+        Float score between 0.0 (no match) and 1.0 (perfect match)
+    """
+    positive_keywords = set([
+        k.lower() for k in journal_data.get('suitability_keywords', {}).get('positive', [])
+    ])
+    negative_keywords = set([
+        k.lower() for k in journal_data.get('suitability_keywords', {}).get('negative', [])
+    ])
+
+    if len(positive_keywords) == 0:
+        # No keywords defined for this journal
+        return 0.5  # Neutral score
+
+    # Count matches
+    positive_matches = len(outline_keywords & positive_keywords)
+    negative_matches = len(outline_keywords & negative_keywords)
+
+    # Calculate positive ratio (what fraction of positive keywords are present)
+    positive_ratio = positive_matches / len(positive_keywords)
+
+    # Penalty for negative keywords (each reduces score)
+    negative_penalty = negative_matches * 0.15
+
+    # Bonus for multiple positive matches (indicates strong fit)
+    if positive_matches >= 5:
+        bonus = 0.1
+    elif positive_matches >= 3:
+        bonus = 0.05
     else:
-        positive_ratio = len(positive_matches) / len(positive_keywords)
-        negative_penalty = len(negative_matches) * 0.1  # Each negative match reduces score by 10%
-        keyword_score = max(0.0, min(1.0, positive_ratio - negative_penalty))
+        bonus = 0.0
 
-    details = {
-        "positive_matches": sorted(list(positive_matches)),
-        "negative_matches": sorted(list(negative_matches)),
-        "positive_ratio": len(positive_matches) / len(positive_keywords) if positive_keywords else 0,
-        "negative_count": len(negative_matches)
+    # Final score
+    score = max(0.0, min(1.0, positive_ratio + bonus - negative_penalty))
+
+    return score
+
+
+def analyze_structural_fit(outline_text, journal_data):
+    """Analyze if outline structure matches journal requirements.
+
+    Args:
+        outline_text: Content of the outline markdown file
+        journal_data: Journal configuration from guidelines YAML
+
+    Returns:
+        Dict with structural analysis results
+    """
+    results = {
+        'required_sections_present': [],
+        'required_sections_missing': [],
+        'section_order_correct': True,
+        'special_sections': []
     }
 
-    return keyword_score, details
+    # Extract section headers from outline (markdown ## headers)
+    outline_sections = re.findall(r'^##\s+(.+)$', outline_text, re.MULTILINE)
+    outline_sections_lower = [s.lower().strip() for s in outline_sections]
 
-
-def analyze_structure(outline_text: str, required_sections: List[str]) -> Tuple[float, Dict]:
-    """Analyze if outline contains required sections."""
-    outline_lower = outline_text.lower()
-
-    present = []
-    missing = []
-
-    for section in required_sections:
-        # Look for section headers in various formats
-        patterns = [
-            rf'^#+\s*{re.escape(section)}\s*$',  # Markdown header
-            rf'^\*\*{re.escape(section)}\*\*\s*$',  # Bold
-            rf'^{re.escape(section)}:\s*$',  # With colon
-            rf'\b{re.escape(section)}\b'  # Anywhere in text
+    # Check required sections
+    required = journal_data.get('structure', {}).get('required_sections', [])
+    for section in required:
+        # Normalize section name for comparison
+        section_variants = [
+            section.lower(),
+            section.replace('_', ' ').lower(),
+            section.replace('_', ' and ').lower()
         ]
 
-        found = False
-        for pattern in patterns:
-            if re.search(pattern, outline_lower, re.MULTILINE | re.IGNORECASE):
-                found = True
-                break
+        found = any(
+            any(variant in outline_sec for variant in section_variants)
+            for outline_sec in outline_sections_lower
+        )
 
         if found:
-            present.append(section)
+            results['required_sections_present'].append(section)
         else:
-            missing.append(section)
+            results['required_sections_missing'].append(section)
 
-    # Calculate structural score
-    if required_sections:
-        structure_score = len(present) / len(required_sections)
-    else:
-        structure_score = 1.0
+    # Check for special sections
+    if 'author_summary' in required and 'author_summary' not in results['required_sections_present']:
+        results['special_sections'].append('Author Summary (PLOS requirement) - MISSING')
 
-    details = {
-        "present_sections": present,
-        "missing_sections": missing,
-        "coverage": structure_score
-    }
-
-    return structure_score, details
-
-
-def calculate_compatibility_score(keyword_score: float, structure_score: float) -> float:
-    """Calculate overall compatibility score (weighted average)."""
-    # Weight: 60% keywords, 40% structure
-    return 0.6 * keyword_score + 0.4 * structure_score
-
-
-def generate_recommendations(score: float, keyword_details: Dict, structure_details: Dict,
-                            journal_name: str) -> List[str]:
-    """Generate recommendations based on analysis."""
-    recommendations = []
-
-    if score < 0.7:
-        recommendations.append(f"Compatibility score ({score:.2f}) is below recommended threshold (0.70)")
-        recommendations.append(f"Consider alternative journals or adjust manuscript scope")
-
-    if keyword_details['negative_count'] > 0:
-        recommendations.append(
-            f"Warning: {keyword_details['negative_count']} negative keywords detected: "
-            f"{', '.join(keyword_details['negative_matches'][:3])}"
-        )
-
-    if keyword_details['positive_ratio'] < 0.3:
-        recommendations.append(
-            f"Low positive keyword match ({keyword_details['positive_ratio']:.2%}). "
-            f"Consider emphasizing relevant technical aspects"
-        )
-
-    if structure_details['missing_sections']:
-        missing = ', '.join(structure_details['missing_sections'][:3])
-        recommendations.append(f"Missing required sections: {missing}")
-
-    if score >= 0.7 and not recommendations:
-        recommendations.append(f"Good compatibility with {journal_name}")
-        if keyword_details['positive_matches']:
-            top_matches = ', '.join(keyword_details['positive_matches'][:5])
-            recommendations.append(f"Strong matches: {top_matches}")
-
-    return recommendations
+    return results
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Analyze manuscript outline compatibility with journal scope"
+        description='Match manuscript outline to journal scope',
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument(
-        "--outline",
-        required=True,
-        help="Path to outline file or workflow state"
-    )
-    parser.add_argument(
-        "--journal",
-        required=True,
-        help="Journal identifier (e.g., 'bioinformatics')"
-    )
-    parser.add_argument(
-        "--guidelines",
-        required=True,
-        help="Path to journal_guidelines.yaml"
-    )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable detailed scoring output"
-    )
-
+    parser.add_argument('--outline', required=True, help='Path to outline.md')
+    parser.add_argument('--journal', required=True, help='Journal name (e.g., bioinformatics)')
+    parser.add_argument('--guidelines', required=True, help='Path to journal_guidelines.yaml')
+    parser.add_argument('--verbose', '-v', action='store_true', help='Show detailed analysis')
     args = parser.parse_args()
 
+    # Validate inputs
+    outline_path = Path(args.outline)
+    if not outline_path.exists():
+        print(f"Error: Outline file not found: {args.outline}", file=sys.stderr)
+        return 1
+
+    guidelines_path = Path(args.guidelines)
+    if not guidelines_path.exists():
+        print(f"Error: Guidelines file not found: {args.guidelines}", file=sys.stderr)
+        return 1
+
+    # Load outline
     try:
-        # Load data
-        outline = load_outline(args.outline)
-        guidelines = load_journal_guidelines(args.guidelines, args.journal)
-
-        # Extract keywords from outline
-        outline_keywords = extract_keywords(outline['text'])
-
-        # Score keyword match
-        keyword_score, keyword_details = score_keyword_match(
-            outline_keywords,
-            guidelines.get('suitability_keywords', {})
-        )
-
-        # Analyze structure
-        structure_score, structure_details = analyze_structure(
-            outline['text'],
-            guidelines['structure'].get('required_sections', [])
-        )
-
-        # Calculate overall compatibility
-        compatibility_score = calculate_compatibility_score(keyword_score, structure_score)
-
-        # Generate recommendations
-        recommendations = generate_recommendations(
-            compatibility_score,
-            keyword_details,
-            structure_details,
-            guidelines['name']
-        )
-
-        # Prepare output
-        result = {
-            "journal": args.journal,
-            "journal_name": guidelines['name'],
-            "compatibility_score": round(compatibility_score, 3),
-            "keyword_score": round(keyword_score, 3),
-            "structure_score": round(structure_score, 3),
-            "recommendations": recommendations,
-            "analysis": {
-                "keywords": keyword_details,
-                "structure": structure_details
-            }
-        }
-
-        if args.verbose:
-            result["debug"] = {
-                "outline_path": outline['path'],
-                "outline_keywords_count": len(outline_keywords),
-                "outline_keywords_sample": sorted(list(outline_keywords))[:20]
-            }
-
-        # Output JSON
-        print(json.dumps(result, indent=2))
-
-        # Exit code based on compatibility
-        sys.exit(0 if compatibility_score >= 0.7 else 1)
-
+        outline_text = outline_path.read_text()
     except Exception as e:
-        error_result = {
-            "error": str(e),
-            "journal": args.journal,
-            "compatibility_score": 0.0
-        }
-        print(json.dumps(error_result, indent=2), file=sys.stderr)
-        sys.exit(2)
+        print(f"Error reading outline: {e}", file=sys.stderr)
+        return 1
+
+    # Load guidelines
+    try:
+        with open(guidelines_path) as f:
+            guidelines = yaml.safe_load(f)
+    except Exception as e:
+        print(f"Error loading guidelines: {e}", file=sys.stderr)
+        return 1
+
+    # Get journal data
+    journal_key = args.journal.lower().replace(' ', '_')
+    journal_data = guidelines.get('journals', {}).get(journal_key)
+
+    if not journal_data:
+        print(f"Error: Journal '{args.journal}' not found in guidelines database", file=sys.stderr)
+        available = ', '.join(guidelines.get('journals', {}).keys())
+        print(f"Available journals: {available}", file=sys.stderr)
+        return 1
+
+    # Extract keywords and calculate score
+    outline_keywords = extract_keywords(outline_text)
+    compatibility_score = score_journal_match(outline_keywords, journal_data)
+
+    # Structural analysis
+    structural_analysis = analyze_structural_fit(outline_text, journal_data)
+
+    # Output results
+    print(f"Journal: {journal_data.get('full_name', args.journal)}")
+    print(f"Compatibility Score: {compatibility_score:.2f}")
+    print()
+
+    # Interpretation
+    if compatibility_score >= 0.75:
+        print("✓ EXCELLENT MATCH - Outline aligns very well with journal scope")
+    elif compatibility_score >= 0.6:
+        print("✓ GOOD MATCH - Outline fits journal scope with minor adjustments")
+    elif compatibility_score >= 0.45:
+        print("⚠ MODERATE MATCH - Consider alternative journals or revise outline")
+    else:
+        print("✗ POOR MATCH - Outline does not fit journal scope well")
+
+    print()
+
+    if args.verbose:
+        # Detailed keyword analysis
+        positive_kw = set([k.lower() for k in journal_data.get('suitability_keywords', {}).get('positive', [])])
+        negative_kw = set([k.lower() for k in journal_data.get('suitability_keywords', {}).get('negative', [])])
+
+        matched_positive = outline_keywords & positive_kw
+        matched_negative = outline_keywords & negative_kw
+
+        print("Keyword Analysis:")
+        print(f"  Outline keywords found: {len(outline_keywords)}")
+        print(f"  Positive matches: {len(matched_positive)}/{len(positive_kw)}")
+        if matched_positive:
+            print(f"    → {', '.join(sorted(matched_positive))}")
+
+        if matched_negative:
+            print(f"  Negative matches: {len(matched_negative)} (red flags)")
+            print(f"    → {', '.join(sorted(matched_negative))}")
+        print()
+
+        # Structural analysis
+        print("Structural Analysis:")
+        if structural_analysis['required_sections_present']:
+            print(f"  ✓ Required sections present: {len(structural_analysis['required_sections_present'])}")
+            for sec in structural_analysis['required_sections_present']:
+                print(f"    - {sec}")
+
+        if structural_analysis['required_sections_missing']:
+            print(f"  ✗ Required sections missing: {len(structural_analysis['required_sections_missing'])}")
+            for sec in structural_analysis['required_sections_missing']:
+                print(f"    - {sec}")
+
+        if structural_analysis['special_sections']:
+            print(f"  ⚠ Special requirements:")
+            for note in structural_analysis['special_sections']:
+                print(f"    - {note}")
+
+    return 0
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    sys.exit(main())

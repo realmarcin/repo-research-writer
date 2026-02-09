@@ -106,33 +106,6 @@ Focus on:
     *   **Rationale:** Results reports OBSERVATIONS and MEASUREMENTS. Explanations belong in Introduction; justifications and future directions belong in Discussion.
     *   **Action if violated:** Flag as minor issue. Remove explanatory citations or move content to Discussion if it describes future directions or broader implications.
 
-7.  **Evidence Tracking Completeness:**
-    *   **Check for evidence files:**
-        - Verify `{target_dir}/literature_evidence.md` exists if manuscript cites literature
-        - Verify `{target_dir}/repo_evidence.md` exists if manuscript makes repository claims
-    *   **Validate literature evidence:**
-        - All citations in manuscript should have entries in literature_evidence.md
-        - Each entry should include: DOI, title, authors, venue, year, and verbatim quote
-        - Check that quotes are substantive (>20 characters, not just "...available at...")
-        - Flag citations missing from evidence file as "UNVERIFIED CITATION"
-    *   **Validate repository evidence:**
-        - Scan manuscript for numerical claims (e.g., "372 commits", "12 contributors", "810,418 lines")
-        - Check each claim has corresponding entry in repo_evidence.md
-        - Verify verification commands are present (bash code blocks)
-        - Check verification status (✅ ⚠ ❌)
-        - Flag claims with ❌ Unverified status as "NEEDS VERIFICATION"
-        - Flag numerical claims missing from evidence file as "UNTRACKED CLAIM"
-    *   **Verify evidence freshness:**
-        - Check commit hash in repo_evidence.md matches current repository state
-        - If mismatch: Flag as "STALE EVIDENCE - re-run verification"
-        - Recommend: `python3 scripts/rrwrite-verify-evidence.py --repo-path <path> --evidence {target_dir}/repo_evidence.md`
-    *   **Rationale:** Evidence files enable fact-checking, support reproducibility, and provide verification commands for reviewers.
-    *   **Action if violated:**
-        - MAJOR issue if evidence files missing entirely
-        - MINOR issue if individual claims missing from evidence
-        - WARNING if evidence is stale (commit mismatch)
-        - Provide specific commands to fix issues
-
 ## Additional Critique Criteria
 
 ### For Outlines (manuscript_plan.md):

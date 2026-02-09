@@ -1,0 +1,124 @@
+# RRWrite Manuscript Configuration
+# This file defines word count targets and limits for manuscript generation
+
+# Global manuscript settings
+manuscript:
+  # Total word limit for entire manuscript (excluding references)
+  # Set to 0 for no limit
+  total_word_limit: 6000
+
+  # Target journal (can be overridden via command line)
+  target_journal: bioinformatics  # Options: bioinformatics, nature, plos
+
+# Section-specific word limits
+# These are targets - skills will aim for these counts but may vary by ±20%
+sections:
+  abstract:
+    min_words: 150
+    target_words: 200
+    max_words: 250
+    required: true
+
+  introduction:
+    min_words: 400
+    target_words: 600
+    max_words: 800
+    required: true
+
+  methods:
+    min_words: 800
+    target_words: 1200
+    max_words: 1600
+    required: true
+    notes: "Include algorithm details, implementation, and benchmarking methodology"
+
+  results:
+    min_words: 600
+    target_words: 900
+    max_words: 1200
+    required: true
+    notes: "Focus on key findings with figure references"
+
+  discussion:
+    min_words: 400
+    target_words: 700
+    max_words: 1000
+    required: true
+    notes: "Interpret results, compare with prior work, discuss limitations"
+
+  conclusion:
+    min_words: 100
+    target_words: 150
+    max_words: 200
+    required: false
+    notes: "Optional summary section"
+
+  availability:
+    min_words: 50
+    target_words: 100
+    max_words: 150
+    required: true
+    notes: "Data and code availability statement"
+
+# Journal-specific presets
+# These override the defaults when a specific journal is selected
+journal_presets:
+  bioinformatics:
+    manuscript:
+      total_word_limit: 6000
+    sections:
+      abstract:
+        max_words: 250
+      introduction:
+        target_words: 500
+      methods:
+        target_words: 1500
+      results:
+        target_words: 1000
+      discussion:
+        target_words: 800
+
+  nature:
+    manuscript:
+      total_word_limit: 3000  # Nature has strict limits
+    sections:
+      abstract:
+        max_words: 150
+      introduction:
+        target_words: 400
+      methods:
+        target_words: 800
+        notes: "Extensive methods go to supplementary"
+      results:
+        target_words: 800
+      discussion:
+        target_words: 600
+
+  plos:
+    manuscript:
+      total_word_limit: 0  # PLOS has no strict word limit
+    sections:
+      abstract:
+        max_words: 300
+      introduction:
+        target_words: 600
+      methods:
+        target_words: 1200
+      results:
+        target_words: 1000
+      discussion:
+        target_words: 800
+
+# Literature review settings
+literature:
+  max_papers: 25
+  min_papers: 15
+  target_summary_words: 1000
+  max_summary_words: 1500
+
+# Citation settings
+citations:
+  min_citations: 15
+  max_citations: 50
+  require_doi: true
+  require_evidence_quotes: true

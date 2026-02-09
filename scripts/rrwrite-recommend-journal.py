@@ -1,254 +1,219 @@
 #!/usr/bin/env python3
-"""
-RRWrite Journal Recommender
+"""Recommend alternative journals based on outline analysis.
 
-Scores all journals in database against manuscript outline and returns ranked recommendations.
-
-Usage:
-    rrwrite-recommend-journal.py --outline OUTLINE --guidelines YAML [--exclude JOURNAL] [--top N] [--show-scores]
-
-Arguments:
-    --outline PATH      Path to outline file or workflow state
-    --guidelines PATH   Path to journal_guidelines.yaml
-    --exclude JOURNAL   Exclude specific journal from recommendations (can be used multiple times)
-    --top N            Number of top recommendations to return (default: 3)
-    --show-scores      Include detailed scoring information in output
-
-Output:
-    JSON with ranked journal recommendations and explanations
+This script scores a manuscript outline against all journals in the
+guidelines database and returns the top recommendations.
 """
 
 import argparse
-import json
-import sys
 import yaml
 from pathlib import Path
-from typing import Dict, List
-import subprocess
+import sys
+
+# Import from sibling module
+try:
+    from rrwrite_match_journal_scope import extract_keywords, score_journal_match, analyze_structural_fit
+except ImportError:
+    # If running standalone, try adding scripts dir to path
+    scripts_dir = Path(__file__).parent
+    sys.path.insert(0, str(scripts_dir))
+    from rrwrite_match_journal_scope import extract_keywords, score_journal_match, analyze_structural_fit
 
 
-def load_all_journals(guidelines_path: str) -> Dict:
-    """Load all journals from guidelines YAML."""
-    path = Path(guidelines_path)
+def get_scope_summary(journal_data, max_items=2):
+    """Get brief summary of journal scope.
 
-    if not path.exists():
-        raise FileNotFoundError(f"Guidelines file not found: {guidelines_path}")
+    Args:
+        journal_data: Journal configuration dict
+        max_items: Maximum number of scope items to include
 
-    with open(path, 'r') as f:
-        data = yaml.safe_load(f)
+    Returns:
+        String with comma-separated scope items
+    """
+    scope = journal_data.get('scope', [])[:max_items]
+    return ', '.join(scope) if scope else 'No scope information available'
 
-    return data['journals']
+
+def explain_score(score, outline_keywords, journal_data):
+    """Generate human-readable explanation for score.
+
+    Args:
+        score: Compatibility score (0.0-1.0)
+        outline_keywords: Set of keywords from outline
+        journal_data: Journal configuration dict
+
+    Returns:
+        String explaining why the score is what it is
+    """
+    positive_kw = set([k.lower() for k in journal_data.get('suitability_keywords', {}).get('positive', [])])
+    negative_kw = set([k.lower() for k in journal_data.get('suitability_keywords', {}).get('negative', [])])
+
+    matched_positive = outline_keywords & positive_kw
+    matched_negative = outline_keywords & negative_kw
+
+    reasons = []
+
+    if score >= 0.75:
+        reasons.append(f"Strong keyword alignment ({len(matched_positive)} positive matches)")
+    elif score >= 0.6:
+        reasons.append(f"Good keyword coverage ({len(matched_positive)} positive matches)")
+    elif score >= 0.45:
+        reasons.append(f"Moderate fit ({len(matched_positive)} positive matches)")
+    else:
+        reasons.append(f"Limited keyword overlap ({len(matched_positive)} positive matches)")
+
+    if matched_negative:
+        reasons.append(f"Contains {len(matched_negative)} scope mismatch keywords")
+
+    # Check for special journal features
+    if 'author_summary' in journal_data.get('structure', {}).get('required_sections', []):
+        reasons.append("Requires non-technical Author Summary")
+
+    word_limit = journal_data.get('word_limits', {}).get('total', 0)
+    if word_limit > 0 and word_limit <= 3000:
+        reasons.append(f"Strict {word_limit}-word limit")
+
+    return '; '.join(reasons)
 
 
-def score_journal(outline_path: str, journal_id: str, guidelines_path: str) -> Dict:
-    """Score a single journal using the matcher script."""
-    matcher_script = Path(__file__).parent / "rrwrite-match-journal-scope.py"
+def recommend_journals(outline_text, guidelines, exclude=None, top_n=3):
+    """Score all journals and return top recommendations.
 
-    if not matcher_script.exists():
-        raise FileNotFoundError(f"Matcher script not found: {matcher_script}")
+    Args:
+        outline_text: Content of outline.md
+        guidelines: Full guidelines database dict
+        exclude: Journal key to exclude from recommendations
+        top_n: Number of top journals to return
 
-    try:
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(matcher_script),
-                "--outline", outline_path,
-                "--journal", journal_id,
-                "--guidelines", guidelines_path
-            ],
-            capture_output=True,
-            text=True,
-            check=False  # Don't raise exception on non-zero exit
-        )
+    Returns:
+        List of tuples: (journal_key, journal_data_with_score)
+    """
+    outline_keywords = extract_keywords(outline_text)
 
-        # Parse output
-        output = result.stdout.strip()
-        if output:
-            return json.loads(output)
-        else:
-            # Matcher failed, return minimal data
-            return {
-                "journal": journal_id,
-                "compatibility_score": 0.0,
-                "error": result.stderr or "Unknown error"
-            }
+    scores = {}
+    for journal_key, journal_data in guidelines.get('journals', {}).items():
+        # Skip excluded journal
+        if exclude and journal_key == exclude.lower().replace(' ', '_'):
+            continue
 
-    except Exception as e:
-        return {
-            "journal": journal_id,
-            "compatibility_score": 0.0,
-            "error": str(e)
+        # Calculate compatibility score
+        score = score_journal_match(outline_keywords, journal_data)
+
+        # Get structural analysis
+        structural = analyze_structural_fit(outline_text, journal_data)
+
+        # Store results
+        scores[journal_key] = {
+            'score': score,
+            'name': journal_data.get('full_name', journal_key),
+            'scope_summary': get_scope_summary(journal_data),
+            'explanation': explain_score(score, outline_keywords, journal_data),
+            'missing_sections': len(structural.get('required_sections_missing', [])),
+            'word_limit': journal_data.get('word_limits', {}).get('total', 0)
         }
 
+    # Sort by score descending
+    ranked = sorted(scores.items(), key=lambda x: x[1]['score'], reverse=True)
 
-def generate_explanation(score_data: Dict) -> str:
-    """Generate human-readable explanation for journal recommendation."""
-    score = score_data.get('compatibility_score', 0.0)
-    journal_name = score_data.get('journal_name', score_data.get('journal', 'Unknown'))
-
-    explanation_parts = []
-
-    # Score interpretation
-    if score >= 0.9:
-        explanation_parts.append("Excellent match")
-    elif score >= 0.8:
-        explanation_parts.append("Strong match")
-    elif score >= 0.7:
-        explanation_parts.append("Good match")
-    elif score >= 0.5:
-        explanation_parts.append("Moderate match")
-    else:
-        explanation_parts.append("Weak match")
-
-    # Add specific reasons
-    analysis = score_data.get('analysis', {})
-
-    # Positive keywords
-    keyword_analysis = analysis.get('keywords', {})
-    positive_matches = keyword_analysis.get('positive_matches', [])
-    if positive_matches:
-        explanation_parts.append(
-            f"aligns with scope ({', '.join(positive_matches[:3])})"
-        )
-
-    # Negative keywords warning
-    negative_matches = keyword_analysis.get('negative_matches', [])
-    if negative_matches:
-        explanation_parts.append(
-            f"but contains discouraged elements ({', '.join(negative_matches[:2])})"
-        )
-
-    # Structure
-    structure_analysis = analysis.get('structure', {})
-    missing = structure_analysis.get('missing_sections', [])
-    if missing:
-        if len(missing) == 1:
-            explanation_parts.append(f"missing required section: {missing[0]}")
-        elif len(missing) <= 3:
-            explanation_parts.append(f"missing sections: {', '.join(missing)}")
-        else:
-            explanation_parts.append(f"missing {len(missing)} required sections")
-    else:
-        explanation_parts.append("has all required sections")
-
-    return f"{journal_name}: {'; '.join(explanation_parts)}"
-
-
-def rank_journals(scores: List[Dict], top_n: int) -> List[Dict]:
-    """Rank journals by compatibility score."""
-    # Sort by score (descending)
-    sorted_scores = sorted(
-        scores,
-        key=lambda x: x.get('compatibility_score', 0.0),
-        reverse=True
-    )
-
-    return sorted_scores[:top_n]
-
-
-def format_recommendation(rank: int, score_data: Dict, show_scores: bool) -> Dict:
-    """Format a single recommendation."""
-    rec = {
-        "rank": rank,
-        "journal": score_data.get('journal'),
-        "journal_name": score_data.get('journal_name', score_data.get('journal')),
-        "explanation": generate_explanation(score_data)
-    }
-
-    if show_scores:
-        rec["scores"] = {
-            "compatibility": score_data.get('compatibility_score', 0.0),
-            "keyword": score_data.get('keyword_score', 0.0),
-            "structure": score_data.get('structure_score', 0.0)
-        }
-        rec["analysis"] = score_data.get('analysis', {})
-
-    return rec
+    return ranked[:top_n]
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Recommend journals based on manuscript outline analysis"
+        description='Recommend journals for manuscript outline',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s --outline manuscript/repo_v1/outline.md --guidelines templates/journal_guidelines.yaml
+  %(prog)s --outline outline.md --guidelines guidelines.yaml --exclude bioinformatics --top 5
+        """
     )
-    parser.add_argument(
-        "--outline",
-        required=True,
-        help="Path to outline file or workflow state"
-    )
-    parser.add_argument(
-        "--guidelines",
-        required=True,
-        help="Path to journal_guidelines.yaml"
-    )
-    parser.add_argument(
-        "--exclude",
-        action="append",
-        default=[],
-        help="Exclude specific journal from recommendations (can be repeated)"
-    )
-    parser.add_argument(
-        "--top",
-        type=int,
-        default=3,
-        help="Number of top recommendations to return (default: 3)"
-    )
-    parser.add_argument(
-        "--show-scores",
-        action="store_true",
-        help="Include detailed scoring information"
-    )
-
+    parser.add_argument('--outline', required=True, help='Path to outline.md')
+    parser.add_argument('--guidelines', required=True, help='Path to journal_guidelines.yaml')
+    parser.add_argument('--exclude', help='Exclude this journal from recommendations')
+    parser.add_argument('--top', type=int, default=3, help='Number of recommendations (default: 3)')
+    parser.add_argument('--show-scores', action='store_true', help='Show detailed scoring breakdown')
     args = parser.parse_args()
 
+    # Validate inputs
+    outline_path = Path(args.outline)
+    if not outline_path.exists():
+        print(f"Error: Outline file not found: {args.outline}", file=sys.stderr)
+        return 1
+
+    guidelines_path = Path(args.guidelines)
+    if not guidelines_path.exists():
+        print(f"Error: Guidelines file not found: {args.guidelines}", file=sys.stderr)
+        return 1
+
+    # Load data
     try:
-        # Load all journals
-        journals = load_all_journals(args.guidelines)
-
-        # Filter excluded journals
-        journal_ids = [jid for jid in journals.keys() if jid not in args.exclude]
-
-        if not journal_ids:
-            raise ValueError("No journals available after exclusions")
-
-        # Score all journals
-        scores = []
-        for journal_id in journal_ids:
-            score_data = score_journal(args.outline, journal_id, args.guidelines)
-            if 'error' not in score_data:
-                scores.append(score_data)
-
-        if not scores:
-            raise ValueError("Failed to score any journals")
-
-        # Rank journals
-        ranked = rank_journals(scores, args.top)
-
-        # Format recommendations
-        recommendations = []
-        for i, score_data in enumerate(ranked, start=1):
-            recommendations.append(
-                format_recommendation(i, score_data, args.show_scores)
-            )
-
-        # Prepare output
-        result = {
-            "total_journals_evaluated": len(scores),
-            "recommendations": recommendations
-        }
-
-        # Output JSON
-        print(json.dumps(result, indent=2))
-
-        sys.exit(0)
-
+        outline_text = outline_path.read_text()
     except Exception as e:
-        error_result = {
-            "error": str(e),
-            "recommendations": []
-        }
-        print(json.dumps(error_result, indent=2), file=sys.stderr)
-        sys.exit(1)
+        print(f"Error reading outline: {e}", file=sys.stderr)
+        return 1
+
+    try:
+        with open(guidelines_path) as f:
+            guidelines = yaml.safe_load(f)
+    except Exception as e:
+        print(f"Error loading guidelines: {e}", file=sys.stderr)
+        return 1
+
+    # Get recommendations
+    recommendations = recommend_journals(outline_text, guidelines, args.exclude, args.top)
+
+    if not recommendations:
+        print("No journal recommendations available.", file=sys.stderr)
+        return 1
+
+    # Print results
+    print("Journal Recommendations")
+    print("=" * 80)
+
+    if args.exclude:
+        print(f"(Excluding: {args.exclude})")
+        print()
+
+    for i, (journal_key, data) in enumerate(recommendations, 1):
+        print(f"\n{i}. {data['name']}")
+        print(f"   Compatibility Score: {data['score']:.2f}/1.00", end='')
+
+        # Add visual indicator
+        if data['score'] >= 0.75:
+            print(" ✓ EXCELLENT")
+        elif data['score'] >= 0.6:
+            print(" ✓ GOOD")
+        elif data['score'] >= 0.45:
+            print(" ⚠ MODERATE")
+        else:
+            print(" ✗ POOR")
+
+        print(f"   Scope: {data['scope_summary']}")
+        print(f"   Reason: {data['explanation']}")
+
+        if data['word_limit'] > 0:
+            print(f"   Word Limit: {data['word_limit']} words")
+        else:
+            print(f"   Word Limit: No strict limit")
+
+        if data['missing_sections'] > 0:
+            print(f"   ⚠ {data['missing_sections']} required section(s) missing from outline")
+
+    print()
+    print("=" * 80)
+
+    # Suggest action
+    top_score = recommendations[0][1]['score']
+    if top_score >= 0.75:
+        print(f"Recommendation: Proceed with {recommendations[0][1]['name']} (excellent match)")
+    elif top_score >= 0.6:
+        print(f"Recommendation: {recommendations[0][1]['name']} is a good fit")
+    else:
+        print(f"Recommendation: Consider revising outline to better match target journal")
+
+    return 0
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    sys.exit(main())

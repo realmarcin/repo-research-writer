@@ -1,281 +1,270 @@
 #!/usr/bin/env python3
-"""
-RRWrite Guidelines Fetcher
+"""Fetch comprehensive author guidelines for a journal.
 
-Loads journal guidelines from YAML database and formats comprehensive markdown document.
-
-Usage:
-    rrwrite-fetch-guidelines.py --journal JOURNAL --guidelines YAML [--output PATH]
-
-Arguments:
-    --journal NAME      Journal identifier (e.g., 'bioinformatics')
-    --guidelines PATH   Path to journal_guidelines.yaml
-    --output PATH      Output path for markdown file (optional, prints to stdout if not provided)
-
-Output:
-    Markdown document with comprehensive journal guidelines and compliance checklist
+This script extracts journal-specific requirements from the guidelines
+database and formats them as a comprehensive markdown document.
 """
 
 import argparse
-import sys
 import yaml
 from pathlib import Path
-from typing import Dict, List, Any
+from datetime import datetime
+import sys
 
 
-def load_journal_guidelines(guidelines_path: str, journal: str) -> Dict:
-    """Load journal guidelines from YAML file."""
-    path = Path(guidelines_path)
+def format_word_limit(limit_value):
+    """Format word limit for display.
 
-    if not path.exists():
-        raise FileNotFoundError(f"Guidelines file not found: {guidelines_path}")
+    Args:
+        limit_value: Int (specific limit) or 0 (no limit)
 
-    with open(path, 'r') as f:
-        data = yaml.safe_load(f)
-
-    if journal not in data['journals']:
-        available = ', '.join(data['journals'].keys())
-        raise ValueError(f"Journal '{journal}' not found. Available: {available}")
-
-    return data['journals'][journal]
-
-
-def format_section_list(items: List[str], indent: int = 0) -> str:
-    """Format a list of items as markdown."""
-    prefix = "  " * indent
-    return "\n".join([f"{prefix}- {item}" for item in items])
+    Returns:
+        Formatted string
+    """
+    if isinstance(limit_value, int):
+        return f"{limit_value} words" if limit_value > 0 else "No strict limit"
+    elif isinstance(limit_value, dict):
+        min_val = limit_value.get('min', 0)
+        max_val = limit_value.get('max', 'unlimited')
+        if max_val == 'unlimited' or max_val == 0:
+            return f"At least {min_val} words" if min_val > 0 else "No strict limit"
+        return f"{min_val}-{max_val} words"
+    return "Not specified"
 
 
-def format_word_limits(limits: Dict[str, Any]) -> str:
-    """Format word limits section."""
-    lines = []
+def fetch_guidelines(journal_name, guidelines_yaml_path):
+    """Fetch and format guidelines from YAML database.
 
-    for section, limit in limits.items():
-        if isinstance(limit, dict):
-            min_words = limit.get('min', 'N/A')
-            max_words = limit.get('max', 'N/A')
-            lines.append(f"- **{section.replace('_', ' ').title()}**: {min_words}-{max_words} words")
+    Args:
+        journal_name: Name or key of the journal
+        guidelines_yaml_path: Path to journal_guidelines.yaml
+
+    Returns:
+        Formatted markdown string with comprehensive guidelines
+
+    Raises:
+        ValueError: If journal not found in database
+    """
+    # Load guidelines database
+    try:
+        with open(guidelines_yaml_path) as f:
+            all_guidelines = yaml.safe_load(f)
+    except Exception as e:
+        raise ValueError(f"Error loading guidelines database: {e}")
+
+    # Find journal (case-insensitive, handle spaces/underscores)
+    journal_key = journal_name.lower().replace(' ', '_')
+    journal_data = all_guidelines.get('journals', {}).get(journal_key)
+
+    if not journal_data:
+        available = ', '.join(all_guidelines.get('journals', {}).keys())
+        raise ValueError(
+            f"Journal '{journal_name}' not found in guidelines database. "
+            f"Available journals: {available}"
+        )
+
+    # Build markdown document
+    md = f"""# Author Guidelines: {journal_data['full_name']}
+
+**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+**Source**: {journal_data.get('author_guidelines_url', 'Internal database')}
+
+---
+
+## Journal Scope
+
+{journal_data.get('full_name')} publishes research in the following areas:
+
+"""
+
+    for scope_item in journal_data.get('scope', []):
+        md += f"- {scope_item}\n"
+
+    # Required Structure
+    md += """
+
+## Manuscript Structure
+
+"""
+
+    # Section order
+    section_order = journal_data.get('structure', {}).get('section_order', [])
+    if section_order:
+        md += "### Required Section Order:\n\n"
+        for i, section in enumerate(section_order, 1):
+            section_display = section.replace('_', ' ').title()
+            md += f"{i}. **{section_display}**\n"
+        md += "\n"
+
+    # Required vs optional sections
+    required_sections = journal_data.get('structure', {}).get('required_sections', [])
+    optional_sections = journal_data.get('structure', {}).get('optional_sections', [])
+
+    if required_sections:
+        md += "### Required Sections:\n\n"
+        for section in required_sections:
+            section_display = section.replace('_', ' ').title()
+            md += f"- {section_display}\n"
+        md += "\n"
+
+    if optional_sections:
+        md += "### Optional Sections:\n\n"
+        for section in optional_sections:
+            section_display = section.replace('_', ' ').title()
+            md += f"- {section_display}\n"
+        md += "\n"
+
+    # Word Limits
+    word_limits = journal_data.get('word_limits', {})
+    if word_limits:
+        md += "## Word Limits\n\n"
+
+        total_limit = word_limits.get('total', 0)
+        md += f"**Total manuscript**: {format_word_limit(total_limit)}\n\n"
+
+        md += "### Section-Specific Limits:\n\n"
+        for section, limits in word_limits.items():
+            if section == 'total':
+                continue
+            section_display = section.replace('_', ' ').title()
+            md += f"- **{section_display}**: {format_word_limit(limits)}\n"
+
+        md += "\n"
+
+    # Formatting Requirements
+    formatting = journal_data.get('formatting', {})
+    if formatting:
+        md += "## Formatting Requirements\n\n"
+
+        citation_style = formatting.get('citation_style', 'Not specified')
+        md += f"- **Citation style**: {citation_style}\n"
+
+        ref_limit = formatting.get('reference_limit', 0)
+        if ref_limit > 0:
+            md += f"- **Reference limit**: {ref_limit} references maximum\n"
         else:
-            lines.append(f"- **{section.replace('_', ' ').title()}**: {limit}")
+            md += f"- **Reference limit**: No formal limit\n"
 
-    return "\n".join(lines)
+        fig_limit = formatting.get('figure_limit', 0)
+        if fig_limit > 0:
+            md += f"- **Figure limit**: {fig_limit} figures maximum\n"
 
+        table_limit = formatting.get('table_limit', 0)
+        if table_limit > 0:
+            md += f"- **Table limit**: {table_limit} tables maximum\n"
 
-def format_citation_rules(rules: Dict[str, List[str]]) -> str:
-    """Format citation rules by section."""
-    lines = []
+        if formatting.get('line_spacing'):
+            md += f"- **Line spacing**: {formatting['line_spacing']}\n"
 
-    for section, guidelines in rules.items():
-        lines.append(f"\n**{section.title()}:**")
-        lines.append(format_section_list(guidelines))
+        if formatting.get('font'):
+            md += f"- **Font**: {formatting['font']}\n"
 
-    return "\n".join(lines)
+        md += "\n"
 
-
-def generate_compliance_checklist(guidelines: Dict) -> str:
-    """Generate a compliance checklist for the journal."""
-    checklist = ["## Compliance Checklist", ""]
-
-    # Structure requirements
-    checklist.append("### Structure")
-    required = guidelines['structure'].get('required_sections', [])
-    for section in required:
-        checklist.append(f"- [ ] {section} section included")
-    checklist.append("")
-
-    # Word limits
-    checklist.append("### Word Limits")
-    word_limits = guidelines.get('word_limits', {})
-    for section, limit in word_limits.items():
-        if isinstance(limit, dict):
-            min_words = limit.get('min', 'N/A')
-            max_words = limit.get('max', 'N/A')
-            checklist.append(f"- [ ] {section.replace('_', ' ').title()}: {min_words}-{max_words} words")
-    checklist.append("")
-
-    # Formatting
-    checklist.append("### Formatting")
-    formatting = guidelines.get('formatting', {})
-    if 'citation_style' in formatting:
-        checklist.append(f"- [ ] Citations formatted as {formatting['citation_style']}")
-    if 'reference_limit' in formatting:
-        checklist.append(f"- [ ] References ≤ {formatting['reference_limit']}")
-    if 'figure_limit' in formatting:
-        checklist.append(f"- [ ] Figures ≤ {formatting['figure_limit']}")
-    if 'table_limit' in formatting:
-        checklist.append(f"- [ ] Tables ≤ {formatting['table_limit']}")
-    checklist.append("")
-
-    # Special requirements
-    special_reqs = guidelines.get('special_requirements', [])
+    # Special Requirements
+    special_reqs = journal_data.get('special_requirements', [])
     if special_reqs:
-        checklist.append("### Special Requirements")
+        md += "## Special Requirements\n\n"
         for req in special_reqs:
-            checklist.append(f"- [ ] {req}")
-        checklist.append("")
+            md += f"- {req}\n"
+        md += "\n"
 
-    # Citation rules
-    citation_rules = guidelines.get('citation_rules', {})
+    # Section-Specific Citation Rules
+    citation_rules = journal_data.get('citation_rules', {})
     if citation_rules:
-        checklist.append("### Citation Guidelines")
-        for section in citation_rules.keys():
-            checklist.append(f"- [ ] {section.title()} citations follow guidelines")
-        checklist.append("")
+        md += "## Section-Specific Citation Guidelines\n\n"
+        for section, rule in citation_rules.items():
+            section_display = section.replace('_', ' ').title()
+            md += f"**{section_display}**: {rule}\n\n"
 
-    return "\n".join(checklist)
+    # Compliance Checklist
+    md += "## Pre-Submission Compliance Checklist\n\n"
+    md += "Before submitting your manuscript, verify the following:\n\n"
 
+    # General checks
+    md += "### Structure and Format:\n"
+    md += f"- [ ] All required sections present and in correct order\n"
 
-def generate_markdown(guidelines: Dict, journal_id: str) -> str:
-    """Generate comprehensive markdown guidelines document."""
-    lines = []
+    total_limit = word_limits.get('total', 0)
+    if total_limit > 0:
+        md += f"- [ ] Total word count ≤ {total_limit} words\n"
 
-    # Title
-    lines.append(f"# {guidelines['name']} - Author Guidelines")
-    lines.append("")
-    lines.append(f"**Publisher:** {guidelines['publisher']}")
-    lines.append(f"**Journal ID:** {journal_id}")
-    lines.append("")
+    for section, limits in word_limits.items():
+        if section == 'total':
+            continue
+        section_display = section.replace('_', ' ').title()
+        if isinstance(limits, dict):
+            min_val = limits.get('min', 0)
+            max_val = limits.get('max', 0)
+            if max_val > 0:
+                md += f"- [ ] {section_display}: {min_val}-{max_val} words\n"
 
-    # Official guidelines link
-    if 'author_guidelines_url' in guidelines:
-        lines.append(f"**Official Guidelines:** {guidelines['author_guidelines_url']}")
-        lines.append("")
+    md += "\n### Citations and References:\n"
+    md += f"- [ ] Citations formatted in {formatting.get('citation_style', 'required')} style\n"
 
-    # Scope
-    lines.append("## Scope")
-    lines.append("")
-    lines.append("This journal publishes research in:")
-    lines.append(format_section_list(guidelines['scope']))
-    lines.append("")
+    if formatting.get('reference_limit', 0) > 0:
+        md += f"- [ ] References ≤ {formatting['reference_limit']}\n"
 
-    # Structure
-    lines.append("## Manuscript Structure")
-    lines.append("")
+    md += "\n### Figures and Tables:\n"
+    if formatting.get('figure_limit', 0) > 0:
+        md += f"- [ ] Figures ≤ {formatting['figure_limit']}\n"
+    if formatting.get('table_limit', 0) > 0:
+        md += f"- [ ] Tables ≤ {formatting['table_limit']}\n"
+    md += "- [ ] All figures and tables referenced in text\n"
+    md += "- [ ] Figures referenced in numerical order\n"
 
-    structure = guidelines['structure']
+    md += "\n### Journal-Specific Requirements:\n"
+    for req in special_reqs[:10]:  # Limit to top 10 for checklist
+        md += f"- [ ] {req}\n"
 
-    if 'required_sections' in structure:
-        lines.append("### Required Sections")
-        lines.append(format_section_list(structure['required_sections']))
-        lines.append("")
+    md += f"\n### Additional Resources:\n\n"
+    md += f"For complete submission guidelines, visit:\n{journal_data.get('author_guidelines_url', 'N/A')}\n"
 
-    if 'optional_sections' in structure:
-        lines.append("### Optional Sections")
-        lines.append(format_section_list(structure['optional_sections']))
-        lines.append("")
-
-    if 'section_order' in structure:
-        lines.append("### Recommended Section Order")
-        for i, section in enumerate(structure['section_order'], start=1):
-            lines.append(f"{i}. {section}")
-        lines.append("")
-
-    # Word limits
-    if 'word_limits' in guidelines:
-        lines.append("## Word Limits")
-        lines.append("")
-        lines.append(format_word_limits(guidelines['word_limits']))
-        lines.append("")
-
-    # Formatting
-    if 'formatting' in guidelines:
-        lines.append("## Formatting Requirements")
-        lines.append("")
-        formatting = guidelines['formatting']
-
-        if 'citation_style' in formatting:
-            lines.append(f"- **Citation Style:** {formatting['citation_style']}")
-        if 'reference_limit' in formatting:
-            lines.append(f"- **Reference Limit:** {formatting['reference_limit']}")
-        if 'figure_limit' in formatting:
-            lines.append(f"- **Figure Limit:** {formatting['figure_limit']}")
-        if 'table_limit' in formatting:
-            lines.append(f"- **Table Limit:** {formatting['table_limit']}")
-        if 'supplementary_limit' in formatting:
-            lines.append(f"- **Supplementary Items Limit:** {formatting['supplementary_limit']}")
-        lines.append("")
-
-    # Special requirements
-    if 'special_requirements' in guidelines:
-        lines.append("## Special Requirements")
-        lines.append("")
-        lines.append(format_section_list(guidelines['special_requirements']))
-        lines.append("")
-
-    # Citation rules
-    if 'citation_rules' in guidelines:
-        lines.append("## Citation Guidelines by Section")
-        lines.append("")
-        lines.append(format_citation_rules(guidelines['citation_rules']))
-        lines.append("")
-
-    # Suitability keywords
-    if 'suitability_keywords' in guidelines:
-        lines.append("## Suitability Keywords")
-        lines.append("")
-        keywords = guidelines['suitability_keywords']
-
-        if 'positive' in keywords:
-            lines.append("### Positive Indicators")
-            lines.append("Manuscripts focusing on these topics are typically suitable:")
-            lines.append(format_section_list(keywords['positive']))
-            lines.append("")
-
-        if 'negative' in keywords:
-            lines.append("### Negative Indicators")
-            lines.append("Manuscripts primarily focused on these topics may not be suitable:")
-            lines.append(format_section_list(keywords['negative']))
-            lines.append("")
-
-    # Compliance checklist
-    lines.append(generate_compliance_checklist(guidelines))
-
-    return "\n".join(lines)
+    return md
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Fetch and format journal author guidelines"
+        description='Fetch and format journal author guidelines',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s --journal bioinformatics --guidelines templates/journal_guidelines.yaml --output author_guidelines.md
+  %(prog)s --journal "Nature Methods" --guidelines guidelines.yaml --output guidelines.md
+        """
     )
-    parser.add_argument(
-        "--journal",
-        required=True,
-        help="Journal identifier (e.g., 'bioinformatics')"
-    )
-    parser.add_argument(
-        "--guidelines",
-        required=True,
-        help="Path to journal_guidelines.yaml"
-    )
-    parser.add_argument(
-        "--output",
-        help="Output path for markdown file (prints to stdout if not provided)"
-    )
-
+    parser.add_argument('--journal', required=True, help='Journal name (e.g., bioinformatics, "Nature Methods")')
+    parser.add_argument('--guidelines', required=True, help='Path to journal_guidelines.yaml')
+    parser.add_argument('--output', required=True, help='Output markdown file path')
     args = parser.parse_args()
 
+    # Validate guidelines file
+    guidelines_path = Path(args.guidelines)
+    if not guidelines_path.exists():
+        print(f"Error: Guidelines file not found: {args.guidelines}", file=sys.stderr)
+        return 1
+
+    # Fetch and format guidelines
     try:
-        # Load guidelines
-        guidelines = load_journal_guidelines(args.guidelines, args.journal)
-
-        # Generate markdown
-        markdown = generate_markdown(guidelines, args.journal)
-
-        # Output
-        if args.output:
-            output_path = Path(args.output)
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_text(markdown)
-            print(f"Guidelines written to: {output_path}", file=sys.stderr)
-        else:
-            print(markdown)
-
-        sys.exit(0)
-
-    except Exception as e:
+        guidelines_md = fetch_guidelines(args.journal, args.guidelines)
+    except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
+        return 1
+    except Exception as e:
+        print(f"Unexpected error: {e}", file=sys.stderr)
+        return 1
+
+    # Write output
+    try:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(guidelines_md)
+        print(f"✓ Author guidelines written to: {args.output}")
+        return 0
+    except Exception as e:
+        print(f"Error writing output: {e}", file=sys.stderr)
+        return 1
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    sys.exit(main())

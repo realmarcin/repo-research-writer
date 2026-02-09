@@ -2,670 +2,527 @@
 """
 RRWrite Repository Analyzer
 
-Analyzes a research software repository to extract key information for manuscript generation.
-Examines repository structure, documentation, code, and generates a comprehensive analysis.
+Analyzes a GitHub repository or local directory to extract information
+for manuscript generation. Populates a template with repository structure,
+key files, and inferred research context.
 
 Usage:
-    rrwrite-analyze-repo.py --repo-path PATH --output-dir DIR [--branch BRANCH]
+    python rrwrite-analyze-repo.py <github-url-or-local-path> [--output FILE]
 
-Output:
-    {output_dir}/repository_analysis.md - Comprehensive repository analysis
+Examples:
+    python rrwrite-analyze-repo.py https://github.com/user/research-repo
+    python rrwrite-analyze-repo.py /path/to/local/repo --output analysis.md
 """
 
 import argparse
-import json
+import os
 import re
+import shutil
 import subprocess
 import sys
-from pathlib import Path
+import tempfile
 from datetime import datetime
-from typing import Dict, List, Optional, Set, Tuple
-from collections import Counter
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+from rrwrite_table_generator import TableGenerator
 
 
-class RepositoryAnalyzer:
-    """Analyzes research software repositories."""
+class RepoAnalyzer:
+    """Analyzes repository structure and content for manuscript generation."""
 
-    def __init__(self, repo_path: str, output_dir: str, branch: str = "main"):
-        """Initialize analyzer.
+    # File patterns for different categories
+    DATA_PATTERNS = ['*.csv', '*.tsv', '*.xlsx', '*.xls', '*.json', '*.xml', '*.h5', '*.hdf5', '*.parquet']
+    SCRIPT_PATTERNS = ['*.py', '*.ipynb', '*.r', '*.R', '*.jl', '*.m', '*.sh']
+    FIGURE_PATTERNS = ['*.png', '*.jpg', '*.jpeg', '*.pdf', '*.svg', '*.eps']
+    CONFIG_PATTERNS = ['requirements.txt', 'environment.yml', 'setup.py', 'pyproject.toml', 'Pipfile', 'package.json']
+    DOC_PATTERNS = ['README.md', 'README.txt', 'README.rst', 'README', 'DOCUMENTATION.md', 'NOTES.md']
 
-        Args:
-            repo_path: Path to repository
-            output_dir: Directory for output files
-            branch: Git branch to analyze (default: main)
+    # Directories to skip
+    SKIP_DIRS = {'.git', '__pycache__', '.ipynb_checkpoints', 'node_modules', '.venv', 'venv',
+                 'env', '.env', 'dist', 'build', '.pytest_cache', '.mypy_cache', '.tox'}
+
+    def __init__(self, repo_input: str, max_depth: int = 5):
         """
-        self.repo_path = Path(repo_path).resolve()
-        self.output_dir = Path(output_dir).resolve()
-        self.branch = branch
-
-        if not self.repo_path.exists():
-            raise ValueError(f"Repository path does not exist: {repo_path}")
-
-        self.analysis = {
-            "repository_path": str(self.repo_path),
-            "repository_name": self.repo_path.name,
-            "analyzed_at": datetime.now().isoformat(),
-            "branch": branch
-        }
-
-    def run_git_command(self, *args) -> Optional[str]:
-        """Run a git command and return output.
+        Initialize analyzer.
 
         Args:
-            *args: Git command arguments
+            repo_input: GitHub URL or local path
+            max_depth: Maximum directory depth to scan
+        """
+        self.repo_input = repo_input
+        self.max_depth = max_depth
+        self.temp_dir: Optional[Path] = None
+        self.repo_path: Optional[Path] = None
+        self.repo_name: str = ""
+
+    def __enter__(self):
+        """Context manager entry."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - cleanup temp directory."""
+        if self.temp_dir and self.temp_dir.exists():
+            shutil.rmtree(self.temp_dir)
+
+    def is_github_url(self, input_str: str) -> bool:
+        """Check if input is a GitHub URL."""
+        return input_str.startswith('http://') or input_str.startswith('https://')
+
+    def clone_repo(self, url: str) -> Path:
+        """
+        Clone GitHub repository to temporary directory.
+
+        Args:
+            url: GitHub repository URL
 
         Returns:
-            Command output or None if failed
+            Path to cloned repository
         """
+        self.temp_dir = Path(tempfile.mkdtemp(prefix='rrwrite_'))
+
         try:
+            print(f"Cloning repository: {url}", file=sys.stderr)
             result = subprocess.run(
-                ["git", "-C", str(self.repo_path)] + list(args),
+                ['git', 'clone', '--depth', '1', url, str(self.temp_dir / 'repo')],
                 capture_output=True,
                 text=True,
                 check=True
             )
-            return result.stdout.strip()
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            return None
+            return self.temp_dir / 'repo'
+        except subprocess.CalledProcessError as e:
+            print(f"Error cloning repository: {e.stderr}", file=sys.stderr)
+            raise
 
-    def analyze_git_info(self):
-        """Extract git repository information."""
-        git_info = {}
+    def setup_repo_path(self) -> Tuple[Path, str]:
+        """
+        Setup repository path and extract repository name.
 
-        # Get remote URL
-        remote_url = self.run_git_command("config", "--get", "remote.origin.url")
-        if remote_url:
-            git_info["remote_url"] = remote_url
+        Returns:
+            Tuple of (repo_path, repo_name)
+        """
+        if self.is_github_url(self.repo_input):
+            # Extract repo name from URL: https://github.com/user/repo -> repo
+            match = re.search(r'github\.com/[^/]+/([^/\.]+)', self.repo_input)
+            repo_name = match.group(1) if match else 'unknown-repo'
+            repo_path = self.clone_repo(self.repo_input)
+        else:
+            # Local path
+            repo_path = Path(self.repo_input).resolve()
+            if not repo_path.exists():
+                raise FileNotFoundError(f"Path does not exist: {repo_path}")
+            repo_name = repo_path.name
 
-        # Get current commit
-        commit = self.run_git_command("rev-parse", "HEAD")
-        if commit:
-            git_info["commit_hash"] = commit[:8]
+        return repo_path, repo_name
 
-        # Get commit count
-        commit_count = self.run_git_command("rev-list", "--count", "HEAD")
-        if commit_count:
-            git_info["total_commits"] = int(commit_count)
+    def scan_directory_tree(self, max_lines: int = 100) -> str:
+        """
+        Generate directory tree structure.
 
-        # Get contributors
-        contributors = self.run_git_command("shortlog", "-sn", "--all")
-        if contributors:
-            git_info["contributors_count"] = len(contributors.split('\n'))
+        Args:
+            max_lines: Maximum number of lines to include
 
-        self.analysis["git_info"] = git_info
+        Returns:
+            Tree structure as string
+        """
+        lines = []
 
-    def analyze_structure(self):
-        """Analyze repository directory structure."""
-        structure = {
-            "total_files": 0,
-            "total_directories": 0,
-            "key_directories": [],
-            "documentation_files": [],
-            "configuration_files": []
-        }
+        def walk_tree(path: Path, prefix: str = "", depth: int = 0):
+            if depth > self.max_depth or len(lines) >= max_lines:
+                return
 
-        # Common important directories
-        important_dirs = {
-            "src", "source", "lib", "tests", "test", "docs", "documentation",
-            "examples", "scripts", "data", "notebooks", "schemas", "models",
-            "project", "tools", "utils", "bin"
-        }
-
-        # Documentation files
-        doc_patterns = ["README*", "CONTRIBUTING*", "LICENSE*", "CHANGELOG*", "*.md"]
-
-        # Configuration files
-        config_patterns = [
-            "pyproject.toml", "setup.py", "setup.cfg", "requirements*.txt",
-            "Makefile", "CMakeLists.txt", "package.json", "pom.xml",
-            "Dockerfile", "docker-compose.yml", "*.yaml", "*.yml", "*.json"
-        ]
-
-        for item in self.repo_path.rglob("*"):
-            # Skip hidden and common ignore patterns
-            if any(part.startswith('.') for part in item.parts):
-                if not any(part in ['.github', '.gitlab'] for part in item.parts):
-                    continue
-
-            relative_path = item.relative_to(self.repo_path)
-
-            if item.is_dir():
-                structure["total_directories"] += 1
-                if item.name in important_dirs:
-                    structure["key_directories"].append(str(relative_path))
-            else:
-                structure["total_files"] += 1
-
-                # Check for documentation
-                if any(item.match(pattern) for pattern in doc_patterns):
-                    structure["documentation_files"].append(str(relative_path))
-
-                # Check for configuration
-                if any(item.match(pattern) for pattern in config_patterns):
-                    if len(structure["configuration_files"]) < 20:  # Limit list
-                        structure["configuration_files"].append(str(relative_path))
-
-        self.analysis["structure"] = structure
-
-    def analyze_programming_languages(self):
-        """Detect programming languages used."""
-        language_extensions = {
-            '.py': 'Python',
-            '.java': 'Java',
-            '.cpp': 'C++',
-            '.c': 'C',
-            '.h': 'C/C++ Header',
-            '.js': 'JavaScript',
-            '.ts': 'TypeScript',
-            '.r': 'R',
-            '.R': 'R',
-            '.sh': 'Shell',
-            '.bash': 'Bash',
-            '.yaml': 'YAML',
-            '.yml': 'YAML',
-            '.json': 'JSON',
-            '.xml': 'XML',
-            '.sql': 'SQL',
-            '.go': 'Go',
-            '.rs': 'Rust',
-            '.jl': 'Julia',
-            '.scala': 'Scala'
-        }
-
-        language_counts = Counter()
-        total_lines = Counter()
-
-        for item in self.repo_path.rglob("*"):
-            if item.is_file() and item.suffix in language_extensions:
-                # Skip hidden files and common ignore directories
-                if any(part.startswith('.') for part in item.parts):
-                    continue
-                if any(part in ['venv', 'node_modules', '__pycache__', 'build', 'dist'] for part in item.parts):
-                    continue
-
-                lang = language_extensions[item.suffix]
-                language_counts[lang] += 1
-
-                # Count lines (for major languages)
-                if lang in ['Python', 'Java', 'C++', 'C', 'JavaScript', 'R']:
-                    try:
-                        lines = len(item.read_text(errors='ignore').split('\n'))
-                        total_lines[lang] += lines
-                    except:
-                        pass
-
-        languages = {
-            "file_counts": dict(language_counts.most_common()),
-            "line_counts": dict(total_lines.most_common()),
-            "primary_language": language_counts.most_common(1)[0][0] if language_counts else None
-        }
-
-        self.analysis["languages"] = languages
-
-    def extract_readme_content(self) -> Optional[str]:
-        """Extract and return README content."""
-        readme_files = list(self.repo_path.glob("README*"))
-        if readme_files:
             try:
-                return readme_files[0].read_text(errors='ignore')
-            except:
-                pass
-        return None
+                items = sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name))
+            except PermissionError:
+                return
 
-    def analyze_documentation(self):
-        """Analyze repository documentation."""
-        doc_info = {
-            "has_readme": False,
-            "readme_sections": [],
-            "description": None,
-            "key_features": [],
-            "installation_instructions": False,
-            "usage_examples": False,
-            "has_docs_directory": False
-        }
+            # Filter out skip directories
+            items = [item for item in items if item.name not in self.SKIP_DIRS]
 
-        # Check for README
-        readme_content = self.extract_readme_content()
-        if readme_content:
-            doc_info["has_readme"] = True
-
-            # Extract title/description (first paragraph)
-            lines = readme_content.split('\n')
-            for i, line in enumerate(lines[:20]):
-                if line.strip() and not line.startswith('#'):
-                    doc_info["description"] = line.strip()
+            for i, item in enumerate(items):
+                if len(lines) >= max_lines:
                     break
 
-            # Extract section headers
-            sections = re.findall(r'^#+\s+(.+)$', readme_content, re.MULTILINE)
-            doc_info["readme_sections"] = sections[:10]  # First 10 sections
+                is_last = i == len(items) - 1
+                current_prefix = "└── " if is_last else "├── "
+                lines.append(f"{prefix}{current_prefix}{item.name}")
 
-            # Check for installation
-            if re.search(r'(?i)(install|setup|getting started)', readme_content):
-                doc_info["installation_instructions"] = True
+                if item.is_dir():
+                    extension = "    " if is_last else "│   "
+                    walk_tree(item, prefix + extension, depth + 1)
 
-            # Check for usage examples
-            if re.search(r'(?i)(usage|example|tutorial|quick\s*start)', readme_content):
-                doc_info["usage_examples"] = True
+        lines.append(self.repo_name + "/")
+        walk_tree(self.repo_path)
 
-            # Extract bullet points that might be features
-            features = re.findall(r'^\s*[\*\-]\s+(.+)$', readme_content, re.MULTILINE)
-            doc_info["key_features"] = [f.strip() for f in features[:10]]  # First 10
+        if len(lines) >= max_lines:
+            lines.append("... (truncated)")
 
-        # Check for docs directory
-        docs_dirs = ['docs', 'documentation', 'doc']
-        for dirname in docs_dirs:
-            if (self.repo_path / dirname).is_dir():
-                doc_info["has_docs_directory"] = True
+        return "\n".join(lines)
+
+    def find_files_by_pattern(self, patterns: List[str]) -> List[Path]:
+        """
+        Find files matching given patterns.
+
+        Args:
+            patterns: List of glob patterns
+
+        Returns:
+            List of matching file paths
+        """
+        files = []
+        for pattern in patterns:
+            files.extend(self.repo_path.rglob(pattern))
+
+        # Filter out files in skip directories
+        files = [f for f in files if not any(skip in f.parts for skip in self.SKIP_DIRS)]
+        return sorted(files)
+
+    def format_file_list(self, files: List[Path], max_files: int = 20) -> str:
+        """
+        Format file list for display.
+
+        Args:
+            files: List of file paths
+            max_files: Maximum number of files to display
+
+        Returns:
+            Formatted string
+        """
+        if not files:
+            return "No files found."
+
+        lines = []
+        for i, f in enumerate(files[:max_files]):
+            rel_path = f.relative_to(self.repo_path)
+            size = f.stat().st_size
+            size_str = self._format_size(size)
+            lines.append(f"- `{rel_path}` ({size_str})")
+
+        if len(files) > max_files:
+            lines.append(f"- ... and {len(files) - max_files} more files")
+
+        return "\n".join(lines)
+
+    def _format_size(self, size: int) -> str:
+        """Format file size in human-readable format."""
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size < 1024.0:
+                return f"{size:.1f} {unit}"
+            size /= 1024.0
+        return f"{size:.1f} TB"
+
+    def extract_readme_summary(self, max_chars: int = 2000) -> str:
+        """
+        Extract summary from README file.
+
+        Args:
+            max_chars: Maximum characters to extract
+
+        Returns:
+            README summary or message if not found
+        """
+        readme_files = self.find_files_by_pattern(self.DOC_PATTERNS)
+
+        if not readme_files:
+            return "No README file found."
+
+        # Prefer README.md
+        readme = readme_files[0]
+        for f in readme_files:
+            if f.name.lower() == 'readme.md':
+                readme = f
                 break
 
-        self.analysis["documentation"] = doc_info
+        try:
+            content = readme.read_text(encoding='utf-8', errors='ignore')
+            if len(content) > max_chars:
+                content = content[:max_chars] + "\n\n... (truncated)"
+            return f"**File**: `{readme.name}`\n\n{content}"
+        except Exception as e:
+            return f"Error reading README: {e}"
 
-    def detect_research_domain(self):
-        """Detect research domain from repository content."""
-        readme_content = self.extract_readme_content() or ""
-
-        # Domain keywords
-        domain_keywords = {
-            "bioinformatics": [
-                "genomics", "proteomics", "sequence", "genome", "gene",
-                "protein", "biological", "bioinformatics", "computational biology"
-            ],
-            "machine_learning": [
-                "machine learning", "deep learning", "neural network",
-                "ai", "artificial intelligence", "model training", "classification"
-            ],
-            "data_science": [
-                "data analysis", "data science", "statistics", "visualization",
-                "pandas", "numpy", "data processing"
-            ],
-            "systems_biology": [
-                "systems biology", "pathway", "network", "metabolic",
-                "cellular", "signaling"
-            ],
-            "medical_informatics": [
-                "medical", "clinical", "patient", "healthcare", "disease",
-                "diagnosis", "treatment"
-            ],
-            "database_schema": [
-                "schema", "database", "data model", "metadata",
-                "ontology", "vocabulary", "linkml", "rdf"
-            ]
-        }
-
-        domain_scores = {}
-        content_lower = readme_content.lower()
-
-        for domain, keywords in domain_keywords.items():
-            score = sum(1 for kw in keywords if kw in content_lower)
-            if score > 0:
-                domain_scores[domain] = score
-
-        # Sort by score
-        sorted_domains = sorted(domain_scores.items(), key=lambda x: x[1], reverse=True)
-
-        self.analysis["research_domain"] = {
-            "detected_domains": [d[0] for d in sorted_domains[:3]],
-            "primary_domain": sorted_domains[0][0] if sorted_domains else "unknown",
-            "domain_scores": dict(sorted_domains)
-        }
-
-    def detect_tools_and_frameworks(self):
-        """Detect tools, frameworks, and technologies used."""
-        tools = {
-            "python_packages": [],
-            "r_packages": [],
-            "frameworks": [],
-            "databases": [],
-            "schemas": []
-        }
-
-        # Check Python requirements/setup files
-        requirements_files = [
-            "requirements.txt", "requirements-dev.txt",
-            "setup.py", "pyproject.toml", "poetry.lock"
-        ]
-
-        for req_file in requirements_files:
-            req_path = self.repo_path / req_file
-            if req_path.exists():
-                try:
-                    content = req_path.read_text(errors='ignore')
-
-                    # Extract package names
-                    if req_file.endswith('.txt'):
-                        packages = re.findall(r'^([a-zA-Z0-9\-_]+)', content, re.MULTILINE)
-                        tools["python_packages"].extend(packages[:20])
-                    elif req_file == 'pyproject.toml':
-                        packages = re.findall(r'"([a-zA-Z0-9\-_]+)[>=<]', content)
-                        tools["python_packages"].extend(packages[:20])
-                except:
-                    pass
-
-        # Look for schema files
-        schema_patterns = ["*.yaml", "*.json", "*.linkml", "*.owl", "*.ttl"]
-        for pattern in schema_patterns:
-            schemas = list(self.repo_path.glob(f"**/{pattern}"))[:10]
-            if schemas and pattern in ["*.linkml", "*.owl", "*.ttl"]:
-                tools["schemas"].extend([s.name for s in schemas])
-
-        # Detect frameworks from README
-        readme_content = self.extract_readme_content() or ""
-        framework_keywords = {
-            "LinkML", "OWL", "RDF", "SPARQL", "SQLAlchemy", "FastAPI",
-            "Flask", "Django", "React", "Vue", "Docker", "Kubernetes",
-            "Apache Spark", "Airflow", "Snakemake"
-        }
-
-        for framework in framework_keywords:
-            if framework in readme_content:
-                tools["frameworks"].append(framework)
-
-        self.analysis["tools"] = tools
-
-    def identify_key_contributions(self):
-        """Identify key research contributions."""
-        contributions = {
-            "type": None,
-            "artifacts": [],
-            "novelty_claims": [],
-            "applications": []
-        }
-
-        readme_content = self.extract_readme_content() or ""
-
-        # Determine contribution type
-        type_indicators = {
-            "database": ["database", "data repository", "data collection"],
-            "schema": ["schema", "data model", "ontology", "vocabulary"],
-            "tool": ["tool", "software", "application", "pipeline"],
-            "algorithm": ["algorithm", "method", "approach"],
-            "framework": ["framework", "library", "package"],
-            "analysis": ["analysis", "study", "investigation"]
-        }
-
-        type_scores = {}
-        content_lower = readme_content.lower()
-
-        for contrib_type, indicators in type_indicators.items():
-            score = sum(1 for ind in indicators if ind in content_lower)
-            if score > 0:
-                type_scores[contrib_type] = score
-
-        if type_scores:
-            contributions["type"] = max(type_scores, key=type_scores.get)
-
-        # Identify artifacts (schemas, tools, datasets)
-        structure = self.analysis.get("structure", {})
-        key_dirs = structure.get("key_directories", [])
-
-        if any("schema" in d for d in key_dirs):
-            contributions["artifacts"].append("Schema definitions")
-        if any("data" in d for d in key_dirs):
-            contributions["artifacts"].append("Dataset or data collection")
-        if any("src" in d or "source" in d for d in key_dirs):
-            contributions["artifacts"].append("Source code implementation")
-        if any("examples" in d for d in key_dirs):
-            contributions["artifacts"].append("Usage examples")
-
-        # Extract novelty claims (sentences with "first", "novel", "new")
-        novelty_patterns = [
-            r'(?i)(first|novel|new|innovative|unique).{0,100}',
-            r'(?i)we (present|introduce|propose|develop).{0,100}'
-        ]
-
-        for pattern in novelty_patterns:
-            matches = re.findall(pattern, readme_content)
-            contributions["novelty_claims"].extend(matches[:3])
-
-        self.analysis["contributions"] = contributions
-
-    def generate_markdown_report(self) -> str:
-        """Generate markdown analysis report.
+    def infer_research_topics(self) -> str:
+        """
+        Infer research topics from repository content.
 
         Returns:
-            Markdown formatted analysis
+            Inferred topics as formatted string
         """
-        md = []
+        topics = set()
 
-        # Header
-        md.append(f"# Repository Analysis: {self.analysis['repository_name']}")
-        md.append(f"\n**Analyzed**: {self.analysis['analyzed_at']}")
-        md.append(f"**Repository Path**: `{self.analysis['repository_path']}`\n")
+        # Extract from README
+        readme_files = self.find_files_by_pattern(self.DOC_PATTERNS)
+        if readme_files:
+            try:
+                content = readme_files[0].read_text(encoding='utf-8', errors='ignore')
+                # Look for common research keywords
+                keywords = ['machine learning', 'deep learning', 'neural network', 'classification',
+                           'regression', 'clustering', 'bioinformatics', 'genomics', 'proteomics',
+                           'RNA-seq', 'single-cell', 'phylogenetics', 'evolution', 'statistics',
+                           'data analysis', 'visualization', 'pipeline', 'workflow', 'algorithm']
 
-        # Git Info
-        if "git_info" in self.analysis:
-            git = self.analysis["git_info"]
-            md.append("## Git Repository Information\n")
-            if "remote_url" in git:
-                md.append(f"- **Remote URL**: {git['remote_url']}")
-            if "commit_hash" in git:
-                md.append(f"- **Current Commit**: `{git['commit_hash']}`")
-            if "total_commits" in git:
-                md.append(f"- **Total Commits**: {git['total_commits']}")
-            if "contributors_count" in git:
-                md.append(f"- **Contributors**: {git['contributors_count']}")
-            md.append("")
+                for keyword in keywords:
+                    if keyword.lower() in content.lower():
+                        topics.add(keyword.title())
+            except Exception:
+                pass
 
-        # Research Domain
-        if "research_domain" in self.analysis:
-            domain = self.analysis["research_domain"]
-            md.append("## Research Domain\n")
-            md.append(f"**Primary Domain**: {domain['primary_domain'].replace('_', ' ').title()}\n")
-            if domain.get("detected_domains"):
-                md.append("**Related Domains**:")
-                for d in domain["detected_domains"]:
-                    score = domain["domain_scores"].get(d, 0)
-                    md.append(f"- {d.replace('_', ' ').title()} (confidence: {score})")
-                md.append("")
+        # Extract from directory names
+        for path in self.repo_path.rglob('*'):
+            if path.is_dir() and path.name not in self.SKIP_DIRS:
+                name = path.name.lower().replace('_', ' ').replace('-', ' ')
+                if any(kw in name for kw in ['analysis', 'model', 'data', 'result', 'figure']):
+                    topics.add(path.name.replace('_', ' ').title())
 
-        # Description
-        if "documentation" in self.analysis:
-            doc = self.analysis["documentation"]
-            if doc.get("description"):
-                md.append("## Project Description\n")
-                md.append(doc["description"])
-                md.append("")
+        # Extract from script files
+        script_files = self.find_files_by_pattern(['*.py'])[:10]  # Check first 10
+        for script in script_files:
+            try:
+                content = script.read_text(encoding='utf-8', errors='ignore')[:1000]
+                # Look for import statements that indicate research domain
+                if 'sklearn' in content or 'tensorflow' in content or 'torch' in content:
+                    topics.add('Machine Learning')
+                if 'pandas' in content or 'numpy' in content:
+                    topics.add('Data Analysis')
+                if 'matplotlib' in content or 'seaborn' in content or 'plotly' in content:
+                    topics.add('Data Visualization')
+                if 'biopython' in content or 'pysam' in content:
+                    topics.add('Bioinformatics')
+            except Exception:
+                pass
 
-        # Key Contributions
-        if "contributions" in self.analysis:
-            contrib = self.analysis["contributions"]
-            md.append("## Key Contributions\n")
-            if contrib.get("type"):
-                md.append(f"**Contribution Type**: {contrib['type'].title()}\n")
-            if contrib.get("artifacts"):
-                md.append("**Artifacts**:")
-                for artifact in contrib["artifacts"]:
-                    md.append(f"- {artifact}")
-                md.append("")
+        if not topics:
+            return "Unable to infer specific research topics from repository content."
 
-        # Repository Structure
-        if "structure" in self.analysis:
-            struct = self.analysis["structure"]
-            md.append("## Repository Structure\n")
-            md.append(f"- **Total Files**: {struct['total_files']}")
-            md.append(f"- **Total Directories**: {struct['total_directories']}\n")
+        return "**Detected Topics**:\n" + "\n".join(f"- {topic}" for topic in sorted(topics))
 
-            if struct.get("key_directories"):
-                md.append("**Key Directories**:")
-                for directory in struct["key_directories"][:15]:
-                    md.append(f"- `{directory}/`")
-                md.append("")
-
-        # Programming Languages
-        if "languages" in self.analysis:
-            langs = self.analysis["languages"]
-            md.append("## Programming Languages\n")
-            if langs.get("primary_language"):
-                md.append(f"**Primary Language**: {langs['primary_language']}\n")
-
-            if langs.get("file_counts"):
-                md.append("**Language Distribution**:")
-                for lang, count in list(langs["file_counts"].items())[:10]:
-                    md.append(f"- {lang}: {count} files")
-                md.append("")
-
-            if langs.get("line_counts"):
-                md.append("**Lines of Code**:")
-                for lang, lines in list(langs["line_counts"].items())[:5]:
-                    md.append(f"- {lang}: {lines:,} lines")
-                md.append("")
-
-        # Tools and Technologies
-        if "tools" in self.analysis:
-            tools = self.analysis["tools"]
-            md.append("## Tools and Technologies\n")
-
-            if tools.get("frameworks"):
-                md.append("**Frameworks/Technologies**:")
-                for fw in tools["frameworks"][:10]:
-                    md.append(f"- {fw}")
-                md.append("")
-
-            if tools.get("python_packages"):
-                packages = list(set(tools["python_packages"]))  # Remove duplicates
-                md.append(f"**Python Dependencies**: {len(packages)} packages")
-                if packages:
-                    md.append(f"- Key packages: {', '.join(packages[:10])}")
-                md.append("")
-
-            if tools.get("schemas"):
-                md.append("**Schema Files**:")
-                for schema in tools["schemas"][:10]:
-                    md.append(f"- `{schema}`")
-                md.append("")
-
-        # Documentation
-        if "documentation" in self.analysis:
-            doc = self.analysis["documentation"]
-            md.append("## Documentation\n")
-            md.append(f"- **README Present**: {'✓ Yes' if doc['has_readme'] else '✗ No'}")
-            md.append(f"- **Installation Instructions**: {'✓ Yes' if doc['installation_instructions'] else '✗ No'}")
-            md.append(f"- **Usage Examples**: {'✓ Yes' if doc['usage_examples'] else '✗ No'}")
-            md.append(f"- **Documentation Directory**: {'✓ Yes' if doc['has_docs_directory'] else '✗ No'}\n")
-
-            if doc.get("readme_sections"):
-                md.append("**README Sections**:")
-                for section in doc["readme_sections"][:10]:
-                    md.append(f"- {section}")
-                md.append("")
-
-            if doc.get("key_features"):
-                md.append("**Key Features** (from README):")
-                for feature in doc["key_features"][:10]:
-                    if len(feature) > 100:
-                        feature = feature[:97] + "..."
-                    md.append(f"- {feature}")
-                md.append("")
-
-        # Analysis Summary
-        md.append("## Analysis Summary\n")
-        md.append("This repository analysis provides foundational information for manuscript generation.")
-        md.append("The detected research domain, key contributions, and technical details will inform")
-        md.append("the manuscript outline and content development.\n")
-
-        md.append("---")
-        md.append(f"\n*Analysis generated by RRWrite Repository Analyzer on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
-
-        return "\n".join(md)
-
-    def analyze(self) -> str:
-        """Run complete repository analysis.
+    def suggest_sections(self) -> str:
+        """
+        Suggest manuscript sections based on repository content.
 
         Returns:
-            Path to generated analysis file
+            Suggested sections as formatted string
         """
-        print(f"Analyzing repository: {self.repo_path}")
-        print(f"Output directory: {self.output_dir}")
+        sections = []
 
-        # Run all analysis steps
-        print("\n1. Analyzing git information...")
-        self.analyze_git_info()
+        # Check for data files
+        data_files = self.find_files_by_pattern(self.DATA_PATTERNS)
+        if data_files:
+            sections.append("**Data Description**: Repository contains data files that should be described in Methods")
 
-        print("2. Analyzing repository structure...")
-        self.analyze_structure()
+        # Check for analysis scripts
+        script_files = self.find_files_by_pattern(self.SCRIPT_PATTERNS)
+        if script_files:
+            sections.append("**Analysis Methods**: Repository contains analysis scripts/notebooks")
 
-        print("3. Detecting programming languages...")
-        self.analyze_programming_languages()
+        # Check for figures
+        figure_files = self.find_files_by_pattern(self.FIGURE_PATTERNS)
+        if figure_files:
+            sections.append("**Results**: Repository contains figure files suggesting visualized results")
 
-        print("4. Analyzing documentation...")
-        self.analyze_documentation()
+        # Check for notebooks
+        notebooks = self.find_files_by_pattern(['*.ipynb'])
+        if notebooks:
+            sections.append("**Computational Workflow**: Jupyter notebooks suggest step-by-step analysis")
 
-        print("5. Detecting research domain...")
-        self.detect_research_domain()
+        if not sections:
+            sections.append("Standard manuscript structure recommended: Abstract, Introduction, Methods, Results, Discussion")
 
-        print("6. Detecting tools and frameworks...")
-        self.detect_tools_and_frameworks()
+        return "\n".join(f"{i+1}. {s}" for i, s in enumerate(sections))
 
-        print("7. Identifying key contributions...")
-        self.identify_key_contributions()
+    def analyze(self) -> Dict[str, str]:
+        """
+        Perform complete repository analysis.
 
-        # Generate report
-        print("\n8. Generating analysis report...")
-        report = self.generate_markdown_report()
+        Returns:
+            Dictionary with analysis results
+        """
+        self.repo_path, self.repo_name = self.setup_repo_path()
 
-        # Save report
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        output_file = self.output_dir / "repository_analysis.md"
-        output_file.write_text(report)
+        print(f"Analyzing repository: {self.repo_name}", file=sys.stderr)
+        print(f"Path: {self.repo_path}", file=sys.stderr)
 
-        # Save JSON data
-        json_file = self.output_dir / "repository_analysis.json"
-        with open(json_file, 'w') as f:
-            json.dump(self.analysis, f, indent=2)
+        # Gather all information
+        results = {
+            'repo_url': self.repo_input,
+            'repo_name': self.repo_name,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'directory_tree': self.scan_directory_tree(),
+            'readme_summary': self.extract_readme_summary(),
+            'data_files_list': self.format_file_list(self.find_files_by_pattern(self.DATA_PATTERNS)),
+            'script_files_list': self.format_file_list(self.find_files_by_pattern(self.SCRIPT_PATTERNS)),
+            'figure_files_list': self.format_file_list(self.find_files_by_pattern(self.FIGURE_PATTERNS)),
+            'config_files_list': self.format_file_list(self.find_files_by_pattern(self.CONFIG_PATTERNS)),
+            'inferred_topics': self.infer_research_topics(),
+            'suggested_sections': self.suggest_sections(),
+            'additional_notes': self._generate_additional_notes()
+        }
 
-        print(f"\n✓ Analysis complete!")
-        print(f"  Markdown report: {output_file}")
-        print(f"  JSON data: {json_file}")
+        # Generate data tables if output_file is provided
+        if hasattr(self, '_output_file') and self._output_file:
+            table_results = self._generate_data_tables(self._output_file)
+            results.update(table_results)
 
-        return str(output_file)
+        return results
+
+    def _generate_additional_notes(self) -> str:
+        """Generate additional notes about the repository."""
+        notes = []
+
+        # Count total files
+        all_files = list(self.repo_path.rglob('*'))
+        all_files = [f for f in all_files if f.is_file() and not any(skip in f.parts for skip in self.SKIP_DIRS)]
+        notes.append(f"- Total files analyzed: {len(all_files)}")
+
+        # Check for tests
+        test_files = self.find_files_by_pattern(['test_*.py', '*_test.py', 'test*.py'])
+        if test_files:
+            notes.append(f"- Contains {len(test_files)} test file(s)")
+
+        # Check for documentation
+        doc_files = self.find_files_by_pattern(['*.md', '*.rst', '*.txt'])
+        if doc_files:
+            notes.append(f"- Contains {len(doc_files)} documentation file(s)")
+
+        return "\n".join(notes) if notes else "No additional notes."
+
+    def _generate_data_tables(self, output_file: str) -> Dict[str, str]:
+        """
+        Generate TSV data tables from repository analysis.
+
+        Args:
+            output_file: Path to output markdown file (used to determine output directory)
+
+        Returns:
+            Dict with keys: data_tables_generated, data_tables_dir
+        """
+        # Create output directory for tables
+        output_path = Path(output_file)
+        output_dir = output_path.parent / 'data_tables'
+        output_dir.mkdir(exist_ok=True)
+
+        print(f"Generating data tables in: {output_dir}", file=sys.stderr)
+
+        # Collect categorized files
+        categorized_files = {
+            'data': self.find_files_by_pattern(self.DATA_PATTERNS),
+            'script': self.find_files_by_pattern(self.SCRIPT_PATTERNS),
+            'figure': self.find_files_by_pattern(self.FIGURE_PATTERNS),
+            'config': self.find_files_by_pattern(self.CONFIG_PATTERNS),
+            'doc': self.find_files_by_pattern(['*.md', '*.rst', '*.txt', '*.pdf'])
+        }
+
+        # Generate TSV tables
+        try:
+            table_paths = TableGenerator.generate_repo_tables(
+                repo_path=self.repo_path,
+                categorized_files=categorized_files,
+                output_dir=output_dir
+            )
+
+            print(f"Generated {len(table_paths)} data tables", file=sys.stderr)
+
+            # Return relative path from output file directory
+            rel_dir = output_dir.relative_to(output_path.parent)
+
+            return {
+                'data_tables_generated': str(len(table_paths)),
+                'data_tables_dir': str(rel_dir)
+            }
+        except Exception as e:
+            print(f"Warning: Failed to generate data tables: {e}", file=sys.stderr)
+            return {
+                'data_tables_generated': '0',
+                'data_tables_dir': 'N/A'
+            }
+
+    def populate_template(self, template_path: Path, results: Dict[str, str]) -> str:
+        """
+        Populate template with analysis results.
+
+        Args:
+            template_path: Path to template file
+            results: Analysis results dictionary
+
+        Returns:
+            Populated template as string
+        """
+        template = template_path.read_text(encoding='utf-8')
+
+        # Replace placeholders
+        for key, value in results.items():
+            placeholder = '{' + key + '}'
+            template = template.replace(placeholder, value)
+
+        return template
 
 
 def main():
-    """CLI interface for repository analyzer."""
+    """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Analyze research software repository for manuscript generation",
+        description='Analyze repository for manuscript generation',
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  %(prog)s --repo-path /path/to/repo --output-dir manuscript/repo_v1
-  %(prog)s --repo-path ../my-tool --output-dir output --branch develop
-        """
+        epilog=__doc__
     )
     parser.add_argument(
-        "--repo-path",
-        required=True,
-        help="Path to repository to analyze"
+        'repo',
+        help='GitHub URL or local repository path'
     )
     parser.add_argument(
-        "--output-dir",
-        required=True,
-        help="Output directory for analysis files"
+        '--output', '-o',
+        help='Output file (default: stdout)',
+        default=None
     )
     parser.add_argument(
-        "--branch",
-        default="main",
-        help="Git branch to analyze (default: main)"
+        '--template',
+        help='Template file to use',
+        default=None
+    )
+    parser.add_argument(
+        '--max-depth',
+        help='Maximum directory depth to scan',
+        type=int,
+        default=5
     )
 
     args = parser.parse_args()
 
-    try:
-        analyzer = RepositoryAnalyzer(
-            repo_path=args.repo_path,
-            output_dir=args.output_dir,
-            branch=args.branch
-        )
+    # Determine template path
+    if args.template:
+        template_path = Path(args.template)
+    else:
+        # Default template path relative to script location
+        script_dir = Path(__file__).parent
+        template_path = script_dir.parent / 'templates' / 'repo_analysis_prompt.md'
 
-        analyzer.analyze()
-        sys.exit(0)
+    if not template_path.exists():
+        print(f"Error: Template not found: {template_path}", file=sys.stderr)
+        return 1
+
+    try:
+        with RepoAnalyzer(args.repo, max_depth=args.max_depth) as analyzer:
+            # Store output file path for table generation
+            if args.output:
+                analyzer._output_file = args.output
+
+            results = analyzer.analyze()
+            output = analyzer.populate_template(template_path, results)
+
+            if args.output:
+                output_path = Path(args.output)
+                output_path.write_text(output, encoding='utf-8')
+                print(f"Analysis written to: {output_path}", file=sys.stderr)
+            else:
+                print(output)
+
+        return 0
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         import traceback
-        traceback.print_exc()
-        sys.exit(1)
+        traceback.print_exc(file=sys.stderr)
+        return 1
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    sys.exit(main())

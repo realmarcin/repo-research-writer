@@ -97,6 +97,10 @@ class StateManager:
                     "file": None,
                     "topics_count": 0,
                     "papers_found": 0,
+                    "papers_from_previous": 0,
+                    "papers_new": 0,
+                    "source_version": None,
+                    "validation_summary": None,
                     "completed_at": None,
                     "git_commit": None
                 },
@@ -152,7 +156,8 @@ class StateManager:
                 "total_word_count": 0,
                 "citations_count": 0,
                 "figures_count": 0,
-                "tables_count": 0
+                "tables_count": 0,
+                "data_tables_generated": False
             }
         }
 
@@ -314,13 +319,95 @@ class StateManager:
 
         self._save_state()
 
-    def update_section_status(self, section: str, status: str, file_path: Optional[str] = None):
+    def update_research_with_import(
+        self,
+        source_version: str,
+        papers_imported: int,
+        papers_new: int,
+        validation_summary: dict
+    ):
+        """Update research stage with import metadata.
+
+        Args:
+            source_version: Path to source version directory
+            papers_imported: Number of papers imported from previous version
+            papers_new: Number of newly found papers
+            validation_summary: Validation summary dictionary
+        """
+        total_papers = papers_imported + papers_new
+
+        self.state["workflow_status"]["research"] = {
+            "status": "completed",
+            "file": f"{self.manuscript_dir}/literature.md",
+            "papers_found": total_papers,
+            "papers_from_previous": papers_imported,
+            "papers_new": papers_new,
+            "source_version": source_version,
+            "validation_summary": validation_summary,
+            "completed_at": self._get_timestamp(),
+            "git_commit": self._get_git_commit()
+        }
+        self._save_state()
+
+    def update_repository_analysis(
+        self,
+        analysis_file: str,
+        repo_path: str,
+        file_counts: Dict[str, int],
+        topics_detected: List[str],
+        data_tables: Optional[Dict[str, str]] = None
+    ):
+        """Update repository analysis workflow stage.
+
+        Args:
+            analysis_file: Path to generated analysis.md file
+            repo_path: Repository path or URL that was analyzed
+            file_counts: Dict mapping file types to counts {'data': N, 'scripts': N, 'figures': N}
+            topics_detected: List of inferred research topics
+            data_tables: Optional dict mapping table names to file paths
+        """
+        self.state["workflow_status"]["repository_analysis"] = {
+            "status": "completed",
+            "file": analysis_file,
+            "repo_path": repo_path,
+            "file_counts": file_counts,
+            "topics_detected": topics_detected,
+            "completed_at": self._get_timestamp(),
+            "git_commit": self._get_git_commit()
+        }
+
+        # Track data tables if generated
+        if data_tables:
+            self.state["workflow_status"]["repository_analysis"]["data_tables"] = data_tables
+            self.state["metadata"]["tables_count"] = len(data_tables)
+            self.state["metadata"]["data_tables_generated"] = True
+
+        # Update main state fields
+        self.state["repository_path"] = repo_path
+        self.state["files"]["repository_analysis"] = analysis_file
+
+        self._save_state()
+
+        print(f"✓ Repository analysis completed: {analysis_file}")
+        print(f"  Analyzed: {repo_path}")
+        print(f"  Topics detected: {len(topics_detected)}")
+        if data_tables:
+            print(f"  Data tables generated: {len(data_tables)}")
+
+    def update_section_status(
+        self,
+        section: str,
+        status: str,
+        file_path: Optional[str] = None,
+        table_count: Optional[int] = None
+    ):
         """Update status of a specific manuscript section.
 
         Args:
             section: Section name (e.g., 'introduction', 'methods')
             status: Status value (e.g., 'in_progress', 'completed')
             file_path: Path to the section file
+            table_count: Number of tables in the section
         """
         if section not in self.state["workflow_status"]["drafting"]["sections"]:
             # Add new section dynamically
@@ -339,6 +426,17 @@ class StateManager:
 
         if status == "completed":
             self.state["workflow_status"]["drafting"]["sections"][section]["completed_at"] = self._get_timestamp()
+
+            # Track table count if provided
+            if table_count is not None:
+                self.state["workflow_status"]["drafting"]["sections"][section]["table_count"] = table_count
+
+                # Update total table count in metadata
+                total_tables = sum(
+                    s.get("table_count", 0)
+                    for s in self.state["workflow_status"]["drafting"]["sections"].values()
+                )
+                self.state["metadata"]["tables_count"] = total_tables
 
             # Update completed count
             completed = sum(

@@ -28,18 +28,132 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 
 ## Workflow
 
+### Phase 0: Version Reuse Detection (Automatic)
+
+**Purpose:** Detect if a previous manuscript version exists with completed literature research and offer to reuse it as a starting point.
+
+1. **Auto-Detect Previous Version:**
+   ```bash
+   python scripts/rrwrite_import_evidence_tool.py \
+     --detect-only \
+     --target-dir {target_dir}
+   ```
+
+2. **If Previous Version Found:**
+   Display information about the detected version and ask user if they want to reuse the literature:
+
+   ```
+   ✓ Detected previous version: manuscript/project_v1
+   - Created: 2026-02-05
+   - Papers: 23
+   - Status: Research completed
+
+   Reuse literature from previous version as starting point?
+   This will:
+   - Import literature review and citations
+   - Validate all DOIs (check if still accessible)
+   - Allow you to expand with new recent papers
+
+   Reuse previous literature? [Y/n]:
+   ```
+
+3. **If User Accepts (Y or blank):**
+
+   **Step A: Import and Validate Evidence**
+   ```bash
+   python scripts/rrwrite_import_evidence_tool.py \
+     --target-dir {target_dir} \
+     --validate
+   ```
+
+   This imports:
+   - `literature.md` (copied as base for expansion)
+   - `literature_citations.bib` (validated subset only)
+   - `literature_evidence.csv` (validated subset only)
+   - `literature_evidence_metadata.json` (provenance tracking)
+
+   Display results:
+   ```
+   VALIDATION RESULTS:
+   ✓ Imported 20 of 23 papers from project_v1
+
+   Papers imported:
+     • 18 papers - Valid (DOI resolves, <5 years old)
+     • 2 papers - Flagged for review (>5 years old, may need update)
+
+   Papers excluded:
+     • 3 papers - DOI does not resolve (404 error)
+       → Check validation report for details: literature_evidence_validation.csv
+
+   Next step: Review flagged papers and decide whether to:
+     - Keep (foundational/seminal work)
+     - Replace with newer reference
+     - Remove if not appropriate
+       → See details in: literature_evidence_validation.csv
+
+   ============================================================
+   IMPORT COMPLETE - Proceeding to NEW Literature Search
+   ============================================================
+   ```
+
+   **Step B: Save imported files as backups**
+   ```bash
+   cp {target_dir}/literature_evidence.csv {target_dir}/literature_evidence_imported.csv
+   cp {target_dir}/literature.md {target_dir}/literature_imported.md
+   ```
+
+   **Step C: CONTINUE AUTOMATICALLY to Phases 1-3**
+
+   **IMPORTANT:** After import, the skill MUST continue to Phases 1-3 to conduct NEW literature search. This is not optional - it's the "review, extend, and refine" part of the workflow.
+
+   **Adjusted search strategy for Phases 1-3:**
+   - **Focus:** Papers from **last 2 years only** (2024-2026)
+   - **Target:** 10-15 new papers (not 20-25)
+   - **Avoid duplicates:** Check against `literature_evidence_imported.csv`
+   - **Context:** Use imported `literature.md` to identify gaps and extensions
+   - **Goal:** Update "Recent Advances" section with latest research
+
+   **After Phase 3 (new search complete), merge automatically:**
+   ```bash
+   python scripts/rrwrite_import_evidence_tool.py \
+     --merge \
+     --old {target_dir}/literature_evidence_imported.csv \
+     --new {target_dir}/literature_evidence_new.csv \
+     --output {target_dir}/literature_evidence.csv
+   ```
+
+   **Final output:**
+   - Updated `literature.md` with new papers integrated
+   - Updated `literature_citations.bib` with all citations
+   - Merged `literature_evidence.csv` (deduplicated by DOI)
+   - Total: ~30 papers (20 from v1 + 10 new)
+
+4. **If User Declines (n):**
+   Skip to Phase 1 (fresh research from scratch)
+   - Do not import any previous evidence
+   - Follow standard workflow (20-25 papers total)
+
+5. **If No Previous Version Found:**
+   Skip to Phase 1 (fresh research from scratch)
+   - No user prompt shown
+   - Continue with normal workflow (20-25 papers total)
+
+**Note:** Version reuse applies **only to literature evidence** (not repository evidence, as repos change).
+
 ### Phase 1: Topic Extraction
 1. **Read Context Documents:**
    - Read `PROJECT.md` to understand the research domain
    - Read `manuscript_plan.md` if available (for detailed topics)
    - Read `{target_dir}/introduction.md` or `{target_dir}/abstract.md` if available
    - Read `references.bib` to see what's already cited
+   - **If evidence was imported:** Read `{target_dir}/literature.md` and `{target_dir}/literature_evidence_imported.csv` to understand existing coverage
 
 2. **Extract Key Research Topics:**
    - Primary methodology (e.g., "transformer-based protein structure prediction")
    - Domain area (e.g., "computational biology", "deep learning")
    - Specific techniques (e.g., "attention mechanisms", "MSA features")
    - Comparison methods (e.g., "AlphaFold2", "RoseTTAFold")
+   - **If building on previous version:** Note topics already covered and identify gaps to fill
 
 3. **Formulate Search Queries:**
    Create 3-5 targeted search queries combining:
@@ -51,63 +165,50 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 
 ### Phase 2: Literature Search
 
-**Use API-based search tools for reliable results:**
+**Search Strategy:**
 
-**2.1 Run Combined API Search**
+**If building on previous version (evidence was imported in Phase 0):**
+- **Focus exclusively on recent papers (2024-2026)**
+- Target 10-15 new papers to add
+- Check against `literature_evidence_imported.csv` to avoid duplicates
+- Prioritize: NeurIPS 2024/2025, ICLR 2025, Nature/Science 2024+
+- Query format: "[method] 2024", "[method] 2025", "[method] recent"
 
-Use the integrated literature search script with caching:
+**If starting fresh (no previous version):**
 
-```bash
-python3 scripts/rrwrite-search-literature.py \
-  "[your search query]" \
-  --max-results 20 \
-  --cache-dir {target_dir}/.cache \
-  --output {target_dir}/.cache/search_results.json
-```
-
-This searches:
-- **Semantic Scholar API**: All domains, citation counts, recent papers
-- **PubMed E-utilities**: Biomedical focus (if applicable)
-- **24-hour cache**: Instant results for repeat searches
-
-**2.2 Search Strategy**
-
-Run 3-5 targeted searches:
-
-1. **Foundational Papers** (core concepts)
-   - Query: "[core method] review" OR "[domain] fundamentals"
-   - API automatically prioritizes highly-cited papers (>100 citations)
+**Use WebSearch tool to find:**
+1. **Foundational Papers** (highly cited, >1000 citations)
+   - Query: "[core method] review" OR "[domain] survey"
+   - Focus on papers from last 5 years for reviews, last 10 for foundations
 
 2. **Recent Advances** (last 2 years, 2024-2026)
-   - Query: "[method] 2024" OR "[method] recent advances"
-   - API returns papers sorted by year + citations
+   - Query: "[method] 2024" OR "[method] 2025" OR "[method] 2026"
+   - Look for: NeurIPS, ICLR, ICML, Nature, Science papers
 
 3. **Direct Competitors** (methods you're comparing against)
    - Query: exact names of competing methods
-   - Semantic Scholar finds original papers + citations
+   - Find their original papers and recent improvements
 
 4. **Application Domain** (specific to your problem)
    - Query: "[your application] + [your method type]"
-   - Example: "dataset documentation standards LinkML"
+   - Example: "protein structure prediction transformers"
 
-**2.3 Extract Paper Metadata**
-
-The API automatically provides:
-- **Authors**: Formatted string (e.g., "Smith J, Jones A, et al.")
-- **Title**: Full paper title
-- **Venue**: Journal/conference name
-- **Year**: Publication year
-- **DOI**: Digital Object Identifier (for citing)
-- **PMID**: PubMed ID (for biomedical papers)
-- **Abstract**: Full abstract text
-- **Citations**: Citation count (from Semantic Scholar)
-- **URL**: Direct link to paper
-
-**For each relevant paper:**
-- **Citation key**: Generate from first author + year (e.g., smith2024)
-- **Direct quote**: Extract 1-2 sentences from abstract representing key finding
+**For each relevant paper found:**
+- Extract: Authors, Title, Venue, Year, **DOI** (critical!)
+- Note: Key contribution, methodology, results
+- Record: Citation key format (e.g., author2024)
+- **Capture direct quote**: Extract 1-2 sentences that best represent the key finding or contribution
 
 ### Phase 3: Synthesis
+
+**If building on previous version:**
+1. Read imported `{target_dir}/literature.md`
+2. Integrate new papers into existing sections
+3. Update "Recent Advances" section with 2024-2026 papers
+4. Preserve existing foundational and related work sections
+5. Mark additions with comment: `<!-- Added from v2 research 2026-02-08 -->`
+
+**If starting fresh:**
 
 Generate a structured summary in `{target_dir}/literature.md`:
 
@@ -212,6 +313,20 @@ Generate a structured summary in `{target_dir}/literature.md`:
 
 ### Phase 4: Citation File Generation
 
+**If building on previous version:**
+- Merge imported `{target_dir}/literature_citations.bib` with newly found papers
+- Use merge script to avoid duplicates:
+  ```bash
+  python scripts/rrwrite_import_evidence_tool.py \
+    --merge \
+    --old {target_dir}/literature_evidence_imported.csv \
+    --new {target_dir}/literature_evidence_new.csv \
+    --output {target_dir}/literature_evidence.csv
+  ```
+- Update `literature_citations.bib` to include only papers in final merged evidence
+
+**If starting fresh:**
+
 Create or update `bib_additions.bib` with BibTeX entries for all newly found papers:
 
 ```bibtex
@@ -229,59 +344,19 @@ Create or update `bib_additions.bib` with BibTeX entries for all newly found pap
 
 ### Phase 5: Evidence Documentation
 
-Create `{target_dir}/literature_evidence.md` in markdown format:
+Create `literature_evidence.csv` with columns:
 
-```markdown
-# Literature Evidence
-
-**Generated**: [Date]
-**Purpose**: Verbatim quotes supporting cited claims
-
----
-
-## [citation_key]: [Paper Title]
-
-**Authors**: [Author list]
-**Venue**: [Journal/Conference, Year]
-**DOI**: [DOI or arXiv]
-**URL**: [Direct link]
-
-**Evidence Quote**:
-> "[Verbatim quote from abstract or paper capturing key finding/contribution]"
-
-**Key Findings**:
-- [Specific result, metric, or claim]
-- [Novel method or approach]
-- [Quantitative improvement if applicable]
-
----
-
-## Example:
-
-## gebru2021: Datasheets for Datasets
-
-**Authors**: Gebru T, Morgenstern J, Vecchione B, et al.
-**Venue**: Communications of the ACM, 2021
-**DOI**: 10.1145/3458723
-**URL**: https://doi.org/10.1145/3458723
-
-**Evidence Quote**:
-> "Currently there is no standard way to identify how a dataset was created, and what characteristics, motivations, and potential skews it represents. To address this gap, we propose datasheets for datasets."
-
-**Key Findings**:
-- Proposes structured documentation framework for datasets
-- Covers motivation, composition, collection, preprocessing, uses, distribution, maintenance
-- Analogous to datasheets in electronics manufacturing
-- Addresses transparency and accountability in AI/ML
-
----
+```csv
+doi,citation_key,evidence
+10.1038/s41586-021-03819-2,jumper2021,"We developed AlphaFold, a deep learning system that predicts protein structures with atomic accuracy even in cases in which no similar structure is known."
+10.1126/science.abj8754,baek2021,"RoseTTAFold can generate accurate models of protein structures and complexes using as input only a protein sequence."
+10.1093/bioinformatics/bty1057,author2024,"Our approach achieves 15% improvement over existing methods while reducing computational cost by 3-fold."
 ```
 
 **Requirements for evidence quotes:**
 - Extract 1-2 sentences that capture the KEY finding or contribution
-- Use direct quotes (verbatim from the paper abstract or full text)
+- Use direct quotes (verbatim from the paper)
 - Focus on quantitative results or novel methodological claims
-- Include enough context to verify the claim independently
 - Ensure quote is self-contained and understandable
 - Include page number in comment if possible
 
@@ -317,6 +392,35 @@ python scripts/rrwrite-validate-manuscript.py --file {target_dir}/literature.md 
 ## State Update
 
 After successful validation, update workflow state:
+
+**If evidence was imported (building on previous version):**
+```python
+import sys
+import json
+from pathlib import Path
+sys.path.insert(0, str(Path('scripts').resolve()))
+from rrwrite_state_manager import StateManager
+
+manager = StateManager(output_dir="{target_dir}")
+
+# Load provenance metadata
+with open('{target_dir}/literature_evidence_metadata.json', 'r') as f:
+    metadata = json.load(f)
+
+# Count papers
+papers_imported = metadata['validation_summary']['papers_imported']
+papers_new = len(pd.read_csv('{target_dir}/literature_evidence_new.csv'))
+
+# Update state with import info
+manager.update_research_with_import(
+    source_version=metadata['source_version'],
+    papers_imported=papers_imported,
+    papers_new=papers_new,
+    validation_summary=metadata['validation_summary']
+)
+```
+
+**If starting fresh (no import):**
 ```python
 import sys
 from pathlib import Path

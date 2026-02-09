@@ -35,71 +35,92 @@ context: fork
 *   If the number involves a calculation (e.g., mean, p-value), generate a temporary Python script to compute it from the raw data and verify your claim.
 *   **Command:** `python scripts/rrwrite-verify-stats.py --file <PATH> --col [NAME] --op [mean/max/min]`
 
-## Evidence Tracking
-
-**IMPORTANT:** Track all repository-based claims for verification.
-
-When drafting sections, automatically track factual claims about the repository by appending to `{target_dir}/repo_evidence.md`. This enables reviewers to verify all claims.
-
-**What to track:**
-- Numerical claims (line counts, file counts, commit counts, contributor counts)
-- Version requirements (Python 3.9+, etc.)
-- Feature capabilities (100% validation, etc.)
-- Repository statistics (classes, functions, tests)
-
-**How to track:**
-
-After drafting a section with repository claims, append evidence stubs to repo_evidence.md:
-
-```bash
-# Extract claims from the just-drafted section
-python3 scripts/rrwrite-extract-repo-evidence.py \
-  --repo-path <REPO_PATH> \
-  --manuscript {target_dir}/SECTIONNAME.md \
-  --output {target_dir}/SECTIONNAME_evidence.md
-
-# Append to main evidence file (create if doesn't exist)
-if [ -f "{target_dir}/repo_evidence.md" ]; then
-  # Skip header and append new claims
-  tail -n +8 {target_dir}/SECTIONNAME_evidence.md >> {target_dir}/repo_evidence.md
-else
-  # First section - copy entire file
-  cp {target_dir}/SECTIONNAME_evidence.md {target_dir}/repo_evidence.md
-fi
-
-# Clean up temporary file
-rm {target_dir}/SECTIONNAME_evidence.md
-```
-
-**Evidence stub format** (auto-generated):
-```markdown
-## Claim: "372 commits"
-
-**Section**: [Section Name]
-**Evidence Source**: Git repository metadata
-
-**Verification**:
-```bash
-git rev-list --all --count
-```
-
-**Output**:
-```
-[Actual count from repository]
-```
-
-**Status**: ⚠ Approximate
-```
-
-**Why this matters:**
-- Enables fact-checking during critique
-- Provides verification commands for reviewers
-- Tracks claim accuracy across manuscript versions
-- Supports reproducibility requirements
-
 ## Figure referencing
 *   Ensure every Figure mentioned is referenced as "Figure X" (capitalized).
 *   Describe the figure content based on the generating script's logic (e.g., "Figure 1 visualizes the t-SNE projection...").
+
+## Table discovery and inclusion
+
+### When to include tables
+
+Include tables when:
+1. Data communicates more clearly in tabular format than prose
+2. Comparing 3+ items or showing multiple metrics
+3. Within journal table limits (Bioinformatics: 5, Nature: 4, PLOS: 10)
+
+### Discovering available data tables
+
+Before drafting, check for pre-generated TSV tables from repository analysis:
+
+```python
+from pathlib import Path
+import sys
+sys.path.append(str(Path.cwd() / "scripts"))
+from rrwrite_table_generator import TableSelector
+
+# Check for available tables
+data_tables_dir = Path("{target_dir}") / "data_tables"
+
+if data_tables_dir.exists():
+    available_tables = TableSelector.get_tables_for_section(
+        section_name="{section_name}",
+        data_tables_dir=data_tables_dir
+    )
+
+    print(f"Found {len(available_tables)} relevant data tables for {section_name}:")
+    for table_info in available_tables:
+        if table_info['exists']:
+            print(f"  - {table_info['name']}")
+```
+
+### Loading and formatting tables
+
+To include a table in your section:
+
+```python
+import pandas as pd
+from rrwrite_table_generator import TableGenerator
+
+# Load TSV table
+df = pd.read_csv("data_tables/repository_statistics.tsv", sep='\t', comment='#')
+
+# Optional: Filter or transform data
+df = df.head(10)  # Limit to top 10 rows
+
+# Format as markdown table
+table_md = TableGenerator.format_markdown_table(
+    df,
+    caption="**Table 1: Repository composition by file type**",
+    alignment={'file_count': 'right', 'total_size_mb': 'right'}
+)
+
+# Include in section text
+section_text = f"""
+The repository structure is summarized in Table 1, showing the distribution
+of files across categories.
+
+{table_md}
+
+As shown in Table 1, the repository contains...
+"""
+```
+
+### Table reference format
+
+- **First mention:** "Table 1: Repository composition" (full caption)
+- **Subsequent mentions:** "Table 1" or "(Table 1)"
+- **Numbering:** Sequential across entire manuscript (Table 1, Table 2, Table 3...)
+
+### Available table files
+
+Tables generated during repository analysis:
+
+| File | Content | Best for sections |
+|------|---------|-------------------|
+| `file_inventory.tsv` | Complete file listing with metadata | Results (filtered) |
+| `repository_statistics.tsv` | Summary metrics by category | Methods, Results |
+| `size_distribution.tsv` | File size distribution quartiles | Results |
+| `research_indicators.tsv` | Detected research topics | Introduction, Methods |
 
 ## Section-Specific Guidelines
 

@@ -1,1137 +1,645 @@
+# Journal-Specific Author Guidelines Database
+# Used by rrwrite-assess-journal skill to evaluate manuscript-journal fit
+# and provide comprehensive formatting/citation requirements
+
 journals:
   bioinformatics:
-    name: "Bioinformatics"
-    publisher: "Oxford University Press"
+    full_name: "Bioinformatics (Oxford Academic)"
+
     scope:
-      - computational biology methods
-      - bioinformatics algorithms
-      - sequence analysis
-      - structural bioinformatics
-      - gene expression analysis
-      - systems biology
-      - database development
-      - software tools
-      - machine learning for biology
-      - omics data analysis
+      - Computational biology algorithms and methods
+      - Sequence analysis and genome informatics
+      - Bioinformatics databases and data integration
+      - Systems biology modeling and simulation
+      - Structural bioinformatics
+      - Machine learning applications in biology
+      - Network analysis and pathway inference
+      - Text mining and literature analysis
+
     structure:
       required_sections:
-        - Introduction
-        - Methods
-        - Results
-        - Discussion
-        - Conclusion
+        - abstract
+        - introduction
+        - methods
+        - results
+        - discussion
+        - availability
+
       optional_sections:
-        - Supplementary Material
-        - Data Availability
-        - Code Availability
+        - supplementary_materials
+        - acknowledgements
+        - funding
+
       section_order:
-        - Abstract
-        - Introduction
-        - Methods
-        - Results
-        - Discussion
-        - Conclusion
-        - Acknowledgements
-        - Funding
-        - Data Availability
-        - References
+        - abstract
+        - introduction
+        - methods
+        - results
+        - discussion
+        - availability
+        - supplementary_materials
+
     word_limits:
-      total:
-        min: 3000
-        max: 7000
-      abstract:
-        min: 150
-        max: 250
-      introduction:
-        min: 500
-        max: 1500
-      methods:
-        min: 1000
-        max: 2500
-      results:
-        min: 1000
-        max: 2000
-      discussion:
-        min: 500
-        max: 1500
+      total: 6000
+      abstract: {min: 150, max: 250}
+      introduction: {min: 400, max: 800}
+      methods: {min: 800, max: 1600}
+      results: {min: 600, max: 1200}
+      discussion: {min: 400, max: 1000}
+      availability: {min: 50, max: 150}
+
     formatting:
       citation_style: "numbered"
       reference_limit: 50
-      figure_limit: 6
-      table_limit: 4
-      supplementary_limit: 10
+      figure_limit: 10
+      table_limit: 5
+      line_spacing: "double"
+      font: "Times New Roman or Arial, 12pt"
+
     special_requirements:
-      - "Software must be freely available to non-commercial users"
-      - "Web servers must be publicly accessible"
-      - "Source code must be deposited in public repository"
-      - "Data availability statement is mandatory"
-      - "Include runtime and memory benchmarks"
-      - "Compare with at least 2 existing tools"
-      - "Provide installation instructions"
-      - "Include use case or case study"
+      - "Must include Data and Code Availability statement"
+      - "Abstract should be structured with Background/Results/Conclusions subsections"
+      - "Software tools must cite original publications"
+      - "Figures must be referenced in numerical order (Figure 1 before Figure 2)"
+      - "Methods section can be titled 'Methods', 'Algorithm', or 'Implementation'"
+      - "Results section can be titled 'Results' or 'Implementation'"
+      - "Availability section is mandatory for software/database papers"
+      - "Supplementary materials should include detailed algorithms, parameters, and additional results"
+
     citation_rules:
-      introduction:
-        - "Cite previous methods being improved upon"
-        - "Cite related computational approaches"
-        - "Avoid excessive background citations"
-      methods:
-        - "Cite algorithms and statistical methods used"
-        - "Cite software dependencies and libraries"
-        - "Cite data sources and datasets"
-      results:
-        - "Cite benchmark datasets"
-        - "Cite compared tools and methods"
-        - "Minimal review citations"
-      discussion:
-        - "Cite papers for comparison and context"
-        - "Cite future directions if building on prior work"
+      introduction: "Cite relevant background literature and existing computational methods"
+      methods: "Cite specific tools, algorithms, datasets, and software packages used"
+      results: "Cite papers analyzed, benchmarked, or compared against"
+      discussion: "Cite supporting or contrasting findings from the literature"
+      availability: "Only cite platforms (Zenodo, GitHub, Bioconductor), not FAIR principles or general best practices"
+
     author_guidelines_url: "https://academic.oup.com/bioinformatics/pages/instructions_for_authors"
+
     suitability_keywords:
       positive:
         - algorithm
-        - software
-        - tool
+        - computational method
+        - bioinformatics tool
+        - software package
         - database
         - pipeline
         - workflow
-        - computational method
         - sequence analysis
-        - genomics
-        - proteomics
-        - transcriptomics
+        - genome annotation
         - machine learning
-        - deep learning
+        - data integration
         - network analysis
-        - pathway analysis
+        - text mining
+        - prediction model
+        - classification
       negative:
-        - wet lab protocol
-        - experimental validation only
+        - purely experimental
+        - wet lab only
         - clinical trial
-        - epidemiology
-        - purely statistical
-        - review only
+        - patient study
+        - no computational component
+        - hardware design
 
   nature_methods:
-    name: "Nature Methods"
-    publisher: "Nature Publishing Group"
+    full_name: "Nature Methods"
+
     scope:
-      - novel methods development
-      - significant method improvements
-      - imaging technologies
-      - genomics methods
-      - proteomics methods
-      - systems biology approaches
-      - single-cell methods
-      - structural biology methods
-      - computational tools with experimental validation
-      - high-impact biological applications
+      - Novel experimental methods with broad applicability
+      - Computational tools with significant methodological advance
+      - Imaging and microscopy techniques
+      - High-throughput screening and profiling methods
+      - Single-cell analysis technologies
+      - Genome editing and engineering approaches
+      - Structural biology methods
+      - Methods with demonstrated utility across multiple biological systems
+
     structure:
       required_sections:
-        - Introduction
-        - Results
-        - Discussion
-        - Methods
+        - abstract
+        - introduction
+        - results
+        - discussion
+        - methods  # NOTE: Methods at END, not beginning!
+
       optional_sections:
-        - Online Methods
-        - Supplementary Information
-        - Data Availability
-        - Code Availability
+        - online_methods  # Detailed methods go here
+        - supplementary_materials
+        - acknowledgements
+
       section_order:
-        - Abstract
-        - Introduction
-        - Results
-        - Discussion
-        - Methods
-        - Acknowledgements
-        - Author Contributions
-        - Competing Interests
-        - Data Availability
-        - Code Availability
-        - References
+        - abstract
+        - introduction
+        - results
+        - discussion
+        - methods
+        - online_methods
+
     word_limits:
-      total:
-        min: 3000
-        max: 5000
-      abstract:
-        min: 150
-        max: 200
-      introduction:
-        min: 400
-        max: 800
-      results:
-        min: 1500
-        max: 2500
-      discussion:
-        min: 500
-        max: 1000
-      methods:
-        min: 1000
-        max: 3000
+      total: 3000  # Strict limit for main text
+      abstract: {min: 100, max: 150}
+      introduction: {min: 200, max: 400}
+      results: {min: 800, max: 1200}
+      discussion: {min: 300, max: 600}
+      methods: {min: 200, max: 400}  # Brief; details in Online Methods
+      online_methods: {min: 0, max: 0}  # No limit for supplementary
+
     formatting:
       citation_style: "numbered"
-      reference_limit: 60
-      figure_limit: 8
+      reference_limit: 30
+      figure_limit: 6
       table_limit: 3
-      supplementary_limit: 20
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
     special_requirements:
-      - "Methods must represent significant advance over existing approaches"
-      - "Experimental validation required for computational methods"
-      - "Data and code availability statements mandatory"
-      - "Detailed protocols in methods section"
-      - "Author contributions statement required"
-      - "Reporting standards compliance (e.g., MIQE, MIAME)"
-      - "Statistics must be appropriate and justified"
-      - "Reproducibility information required"
+      - "Methods section goes at END of main text, not beginning"
+      - "Extensive methods must go to Online Methods (supplementary)"
+      - "Must demonstrate novelty vs. existing methods with direct comparison"
+      - "Include quantitative benchmarking against state-of-the-art"
+      - "Abstract strictly limited to 150 words (enforced)"
+      - "Main text strictly limited to 3000 words (enforced)"
+      - "Must show applicability across multiple biological contexts"
+      - "Data and code availability required"
+      - "All figures must have detailed legends"
+
     citation_rules:
-      introduction:
-        - "Cite landmark papers establishing field context"
-        - "Cite methods being improved or compared"
-        - "Keep introduction concise and focused"
-      results:
-        - "Cite benchmark datasets and standards"
-        - "Cite comparison methods"
-        - "Support claims with primary literature"
-      discussion:
-        - "Cite papers for context and comparison"
-        - "Cite limitations from primary sources"
-      methods:
-        - "Cite all reagents, software, and protocols"
-        - "Cite statistical methods"
-        - "Cite data repositories"
-    author_guidelines_url: "https://www.nature.com/nmeth/for-authors"
+      introduction: "Emphasize novelty; cite current state-of-the-art methods"
+      results: "Benchmark comparisons required; cite methods being compared"
+      discussion: "Cite studies that could benefit from the new method"
+      methods: "Keep citations minimal; extensive references go to Online Methods"
+      online_methods: "Comprehensive citations of all protocols, reagents, and software"
+
+    author_guidelines_url: "https://www.nature.com/nature-methods/for-authors"
+
     suitability_keywords:
       positive:
         - novel method
-        - breakthrough
-        - innovative approach
+        - innovative technique
+        - broad applicability
         - experimental validation
+        - high impact
+        - methodological advance
+        - state-of-the-art comparison
+        - benchmark
         - imaging
-        - microscopy
         - single-cell
         - high-throughput
-        - proteomics
-        - genomics
-        - validated tool
-        - benchmark
+        - genome editing
       negative:
         - incremental improvement
-        - software update
-        - review
-        - meta-analysis
-        - purely computational
-        - clinical study
+        - narrow application
+        - database only
+        - no experimental validation
+        - single use case
+        - no comparison to existing methods
 
   plos_computational_biology:
-    name: "PLOS Computational Biology"
-    publisher: "Public Library of Science"
+    full_name: "PLOS Computational Biology"
+
     scope:
-      - computational biology research
-      - mathematical modeling
-      - systems biology
-      - bioinformatics methods
-      - evolutionary biology
-      - computational neuroscience
-      - population genetics
-      - network biology
-      - structural computational biology
-      - synthetic biology modeling
+      - Computational biology models with biological insight
+      - Systems biology and network analysis
+      - Bioinformatics methods that advance biological understanding
+      - Evolutionary and population genomics modeling
+      - Disease modeling and epidemiology
+      - Computational neuroscience
+      - Molecular dynamics and structural modeling
+      - Multi-scale biological modeling
+
     structure:
       required_sections:
-        - Introduction
-        - Results
-        - Discussion
-        - Methods
-        - Supporting Information
+        - abstract
+        - author_summary  # UNIQUE to PLOS! Non-technical summary
+        - introduction
+        - results
+        - discussion
+        - methods
+        - references
+        - supporting_information
+
       optional_sections:
-        - Author Summary
-        - Conclusions
-        - Data Availability
-        - Software Availability
+        - conclusions
+
       section_order:
-        - Abstract
-        - Author Summary
-        - Introduction
-        - Results
-        - Discussion
-        - Methods
-        - Supporting Information
-        - Acknowledgments
-        - References
-        - Figure Legends
-        - Tables
+        - abstract
+        - author_summary
+        - introduction
+        - results
+        - discussion
+        - methods
+        - supporting_information
+
     word_limits:
-      total:
-        min: 4000
-        max: 10000
-      abstract:
-        min: 250
-        max: 300
-      author_summary:
-        min: 100
-        max: 200
-      introduction:
-        min: 600
-        max: 1500
-      results:
-        min: 1500
-        max: 4000
-      discussion:
-        min: 600
-        max: 2000
-      methods:
-        min: 1000
-        max: 3000
+      total: 0  # No strict overall limit
+      abstract: {min: 200, max: 300}
+      author_summary: {min: 100, max: 200}  # Non-technical language!
+      introduction: {min: 800, max: 1500}
+      results: {min: 1000, max: 3000}
+      discussion: {min: 600, max: 1500}
+      methods: {min: 800, max: 2500}
+      supporting_information: {min: 0, max: 0}  # No limit
+
     formatting:
       citation_style: "numbered"
-      reference_limit: 80
-      figure_limit: 10
-      table_limit: 5
-      supplementary_limit: 15
+      reference_limit: 0  # No limit
+      figure_limit: 0  # No strict limit
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Times, Times New Roman, or Symbol, 12pt"
+
     special_requirements:
-      - "Author Summary required (non-technical summary for broad audience)"
-      - "Data Availability Statement mandatory"
-      - "Software and code must be openly available"
-      - "PLOS policy requires deposition in public repositories"
-      - "Statistical methods must be clearly described"
-      - "Model code must be provided"
-      - "Figure legends must be comprehensive"
-      - "Supporting Information should include detailed methods"
+      - "MANDATORY Author Summary section (150-200 words, non-technical language for general audience)"
+      - "Must emphasize biological insight, not just computational methods"
+      - "Reproducibility statement required in Methods"
+      - "Ethics statement required if using human/animal data"
+      - "Data Availability statement is MANDATORY"
+      - "Code availability with clear licensing information"
+      - "All data must be deposited in public repositories"
+      - "Figure legends must be self-contained"
+      - "Supporting Information should include detailed methods, parameters, and validation"
+
     citation_rules:
-      introduction:
-        - "Provide sufficient background for interdisciplinary audience"
-        - "Cite foundational computational and biological papers"
-        - "Cite recent reviews for context"
-      results:
-        - "Cite methods and datasets used for validation"
-        - "Cite comparison studies"
-        - "Support biological interpretations with citations"
-      discussion:
-        - "Cite papers supporting interpretations"
-        - "Cite alternative models or approaches"
-        - "Cite papers for future directions"
-      methods:
-        - "Cite all computational methods and algorithms"
-        - "Cite software packages and versions"
-        - "Cite data sources with accession numbers"
+      all_sections: "Emphasize reproducibility and transparency in all citations"
+      introduction: "Cite foundational work and recent advances in the field"
+      results: "Cite data sources, validation datasets, and comparison studies"
+      methods: "Cite all software, algorithms, and statistical methods used"
+      discussion: "Cite biological implications and related biological studies"
+      supporting_information: "Comprehensive citations for all protocols and parameters"
+
     author_guidelines_url: "https://journals.plos.org/ploscompbiol/s/submission-guidelines"
+
     suitability_keywords:
       positive:
-        - computational model
-        - mathematical model
-        - simulation
-        - network analysis
+        - biological insight
         - systems biology
-        - evolutionary analysis
-        - population dynamics
-        - genomic analysis
-        - algorithm development
-        - data integration
+        - computational model
+        - network analysis
+        - mechanistic understanding
+        - disease modeling
+        - evolutionary dynamics
+        - population genetics
+        - multi-scale modeling
+        - biological validation
+        - hypothesis generation
         - predictive model
-        - theoretical framework
       negative:
-        - purely experimental
-        - clinical trial
-        - case report
-        - wet lab only
-        - no computational component
+        - pure algorithm
+        - no biological context
+        - no biological validation
+        - purely theoretical
+        - no biological interpretation
 
   bmc_bioinformatics:
-    name: "BMC Bioinformatics"
-    publisher: "BioMed Central"
+    full_name: "BMC Bioinformatics"
+
     scope:
-      - bioinformatics methodology
-      - computational biology algorithms
-      - database development
-      - software tools
-      - genomics analysis
-      - proteomics analysis
-      - systems biology
-      - biological data analysis
-      - machine learning applications
-      - text mining in biology
+      - Bioinformatics methodology development
+      - Computational biology software and databases
+      - Algorithm development for biological data analysis
+      - Data mining and machine learning in biology
+      - Genome and sequence analysis
+      - Structural bioinformatics
+      - Systems biology and network analysis
+      - Comparative genomics
+
     structure:
       required_sections:
-        - Background
-        - Methods
-        - Results
-        - Discussion
-        - Conclusions
+        - abstract
+        - background  # Not "introduction"!
+        - methods
+        - results
+        - discussion
+        - conclusions
+        - availability_and_requirements  # Specific format!
+
       optional_sections:
-        - Availability and Requirements
-        - Supplementary Information
-        - Data Availability
+        - supplementary_materials
+
       section_order:
-        - Abstract
-        - Background
-        - Methods
-        - Results
-        - Discussion
-        - Conclusions
-        - Availability of Data and Materials
-        - Declarations
-        - References
+        - abstract
+        - background
+        - methods
+        - results
+        - discussion
+        - conclusions
+        - availability_and_requirements
+
     word_limits:
-      total:
-        min: 3000
-        max: 8000
-      abstract:
-        min: 250
-        max: 350
-      background:
-        min: 500
-        max: 1500
-      methods:
-        min: 1000
-        max: 3000
-      results:
-        min: 1000
-        max: 2500
-      discussion:
-        min: 500
-        max: 1500
-      conclusions:
-        min: 200
-        max: 500
+      total: 0  # No strict limit, but recommend 4000-6000
+      abstract: {min: 250, max: 350}
+      background: {min: 500, max: 1000}
+      methods: {min: 800, max: 2000}
+      results: {min: 800, max: 2000}
+      discussion: {min: 500, max: 1200}
+      conclusions: {min: 100, max: 300}
+      availability_and_requirements: {min: 100, max: 200}
+
     formatting:
       citation_style: "numbered"
-      reference_limit: 100
-      figure_limit: 12
-      table_limit: 6
-      supplementary_limit: 20
+      reference_limit: 0  # No formal limit
+      figure_limit: 0  # No strict limit
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
     special_requirements:
-      - "Software availability section with operating system, license, restrictions"
-      - "Open Access publication"
-      - "Data availability statement required"
-      - "Declarations section (ethics, consent, competing interests)"
-      - "Author contributions required"
-      - "Source code must be in public repository"
-      - "Test data must be provided"
-      - "Documentation required"
+      - "Section titled 'Background' not 'Introduction'"
+      - "Separate 'Conclusions' section required (brief, 1-2 paragraphs)"
+      - "Availability and Requirements section with specific format: Project name, URL, OS, Language, License, Restrictions"
+      - "Abstract must include: Background, Results, Conclusions subsections"
+      - "Open access publication (author pays APC)"
+      - "Data and software must be openly accessible"
+      - "Supporting data should be in GigaDB or similar repository"
+
     citation_rules:
-      background:
-        - "Cite foundational bioinformatics papers"
-        - "Cite recent relevant methods"
-        - "Cite biological context literature"
-      methods:
-        - "Cite all algorithms implemented"
-        - "Cite software libraries and dependencies"
-        - "Cite datasets and databases"
-        - "Cite statistical methods"
-      results:
-        - "Cite benchmark datasets"
-        - "Cite tools used for comparison"
-        - "Support findings with appropriate citations"
-      discussion:
-        - "Cite papers for comparison and context"
-        - "Cite papers discussing limitations"
-        - "Cite future applications"
+      background: "Cite relevant prior work and establish context"
+      methods: "Cite all tools, datasets, and algorithms used"
+      results: "Cite comparison studies and validation datasets"
+      discussion: "Cite related work and contrasting approaches"
+      availability_and_requirements: "No citations needed; provide direct links"
+
     author_guidelines_url: "https://bmcbioinformatics.biomedcentral.com/submission-guidelines"
+
     suitability_keywords:
       positive:
-        - bioinformatics
-        - algorithm
-        - software
+        - bioinformatics method
+        - computational pipeline
+        - software tool
         - database
-        - tool development
-        - pipeline
+        - algorithm
         - data analysis
-        - computational method
-        - genomic analysis
-        - sequence analysis
         - machine learning
-        - statistical method
-        - workflow
+        - genome analysis
+        - sequence alignment
+        - comparative genomics
+        - open source
       negative:
         - purely experimental
-        - clinical only
         - no software component
-        - review article
+        - proprietary method
+        - clinical only
 
   genome_biology:
-    name: "Genome Biology"
-    publisher: "BioMed Central"
+    full_name: "Genome Biology"
+
     scope:
-      - genome biology research
-      - genomics methods
-      - epigenomics
-      - transcriptomics
-      - single-cell genomics
-      - evolutionary genomics
-      - population genomics
-      - cancer genomics
-      - functional genomics
-      - genome annotation
+      - Genome-scale studies with significant biological insight
+      - Innovative genomics methods and technologies
+      - Comparative and evolutionary genomics
+      - Epigenomics and chromatin biology
+      - Single-cell genomics
+      - Transcriptomics and gene regulation
+      - Computational genomics with experimental validation
+      - Cancer genomics
+
     structure:
       required_sections:
-        - Background
-        - Results
-        - Discussion
-        - Conclusions
-        - Methods
+        - abstract
+        - background
+        - results
+        - discussion
+        - conclusions
+        - methods
+        - data_availability
+
       optional_sections:
-        - Supplementary Information
-        - Data Availability
-        - Code Availability
+        - supplementary_materials
+
       section_order:
-        - Abstract
-        - Background
-        - Results
-        - Discussion
-        - Conclusions
-        - Methods
-        - Declarations
-        - References
+        - abstract
+        - background
+        - results
+        - discussion
+        - conclusions
+        - methods
+
     word_limits:
-      total:
-        min: 4000
-        max: 8000
-      abstract:
-        min: 250
-        max: 350
-      background:
-        min: 600
-        max: 1200
-      results:
-        min: 2000
-        max: 4000
-      discussion:
-        min: 800
-        max: 2000
-      conclusions:
-        min: 200
-        max: 400
-      methods:
-        min: 1500
-        max: 3000
+      total: 0  # No strict limit, typically 5000-8000
+      abstract: {min: 250, max: 350}
+      background: {min: 600, max: 1200}
+      results: {min: 2000, max: 4000}
+      discussion: {min: 800, max: 1500}
+      conclusions: {min: 150, max: 300}
+      methods: {min: 1000, max: 2500}
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 0  # No limit
+      figure_limit: 0  # No strict limit, but be reasonable
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
+    special_requirements:
+      - "Must present genome-scale data or analysis"
+      - "Requires significant biological insight beyond method description"
+      - "Data must be deposited in public repositories (GEO, SRA, ENA, etc.)"
+      - "Code and analysis pipelines must be available"
+      - "Separate Conclusions section required"
+      - "Methods section at end of main text"
+      - "All datasets must have accession numbers"
+      - "Statistical methods must be clearly described"
+      - "Reproducibility information required"
+
+    citation_rules:
+      background: "Cite foundational genomics studies and recent advances"
+      results: "Cite data sources, validation studies, and comparison datasets"
+      discussion: "Cite biological implications and related genomic studies"
+      methods: "Cite all software, statistical methods, and protocols"
+      data_availability: "Provide accession numbers and repository links, no citations"
+
+    author_guidelines_url: "https://genomebiology.biomedcentral.com/submission-guidelines"
+
+    suitability_keywords:
+      positive:
+        - genome-scale
+        - genomics
+        - transcriptomics
+        - epigenomics
+        - single-cell
+        - evolutionary genomics
+        - comparative genomics
+        - gene regulation
+        - chromatin
+        - cancer genomics
+        - biological insight
+        - experimental validation
+      negative:
+        - small-scale study
+        - no genomic data
+        - purely computational
+        - no biological validation
+        - single gene focus
+
+  cell_systems:
+    full_name: "Cell Systems"
+
+    scope:
+      - Systems biology with mechanistic insight
+      - Multi-scale biological modeling
+      - Integrative computational biology
+      - Network biology and pathway analysis
+      - Quantitative cell biology
+      - Synthetic biology design
+      - Metabolic modeling
+      - Spatial and temporal modeling of biological systems
+
+    structure:
+      required_sections:
+        - summary  # Not "abstract"!
+        - introduction
+        - results
+        - discussion
+        - experimental_procedures  # Not "methods"!
+
+      optional_sections:
+        - supplemental_information
+
+      section_order:
+        - summary
+        - introduction
+        - results
+        - discussion
+        - experimental_procedures
+
+    word_limits:
+      total: 0  # No strict limit, typically 5000-7000
+      summary: {min: 150, max: 200}  # Strict!
+      introduction: {min: 600, max: 1000}
+      results: {min: 2000, max: 3500}
+      discussion: {min: 600, max: 1200}
+      experimental_procedures: {min: 800, max: 2000}
+
     formatting:
       citation_style: "numbered"
       reference_limit: 80
-      figure_limit: 10
-      table_limit: 5
-      supplementary_limit: 20
-    special_requirements:
-      - "High-impact genomics research"
-      - "Genome-wide or transcriptome-wide scope preferred"
-      - "Novel biological insights required"
-      - "Rigorous statistical analysis mandatory"
-      - "Data deposition in public repositories required"
-      - "Code availability for computational analyses"
-      - "Reporting standards compliance (ENCODE, MIAME, etc.)"
-      - "Author contributions and declarations required"
-    citation_rules:
-      background:
-        - "Cite landmark genomics papers"
-        - "Cite recent advances in the field"
-        - "Provide biological context with citations"
-      results:
-        - "Cite datasets and resources used"
-        - "Cite methods for comparison"
-        - "Support biological interpretations"
-      discussion:
-        - "Cite papers for comparative analysis"
-        - "Cite papers supporting biological conclusions"
-        - "Cite papers for future directions"
-      methods:
-        - "Cite sequencing protocols"
-        - "Cite computational methods and tools"
-        - "Cite statistical approaches"
-        - "Cite reference genomes and annotations"
-    author_guidelines_url: "https://genomebiology.biomedcentral.com/submission-guidelines"
-    suitability_keywords:
-      positive:
-        - genomics
-        - genome-wide
-        - transcriptome
-        - epigenome
-        - single-cell
-        - sequencing
-        - genome assembly
-        - genome annotation
-        - regulatory elements
-        - chromatin
-        - RNA-seq
-        - ChIP-seq
-        - ATAC-seq
-        - variant analysis
-      negative:
-        - single gene study
-        - small-scale analysis
-        - purely computational
-        - no biological validation
-        - review only
-
-  cell_systems:
-    name: "Cell Systems"
-    publisher: "Cell Press"
-    scope:
-      - systems biology
-      - synthetic biology
-      - computational modeling
-      - network biology
-      - multi-omics integration
-      - cellular systems engineering
-      - quantitative biology
-      - systems medicine
-      - biological circuits
-      - predictive biology
-    structure:
-      required_sections:
-        - Summary
-        - Introduction
-        - Results
-        - Discussion
-        - Experimental Procedures
-      optional_sections:
-        - Supplemental Information
-        - Data and Code Availability
-      section_order:
-        - Summary
-        - Introduction
-        - Results
-        - Discussion
-        - Experimental Procedures
-        - Acknowledgments
-        - Author Contributions
-        - Declaration of Interests
-        - Data and Code Availability
-        - References
-    word_limits:
-      total:
-        min: 4000
-        max: 7000
-      summary:
-        min: 150
-        max: 200
-      introduction:
-        min: 500
-        max: 1000
-      results:
-        min: 2000
-        max: 3500
-      discussion:
-        min: 600
-        max: 1500
-      experimental_procedures:
-        min: 1000
-        max: 2500
-    formatting:
-      citation_style: "numbered"
-      reference_limit: 70
       figure_limit: 7
-      table_limit: 4
-      supplementary_limit: 15
+      table_limit: 3
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
     special_requirements:
-      - "Systems-level analysis required"
-      - "Integration of multiple data types preferred"
-      - "Quantitative analysis mandatory"
-      - "Model validation required"
-      - "Code and data availability statements required"
-      - "STAR Methods section for detailed protocols"
-      - "Graphical abstract required"
-      - "Highlights (3-5 bullet points) required"
+      - "Section titled 'Summary' not 'Abstract'"
+      - "Section titled 'Experimental Procedures' not 'Methods'"
+      - "Summary must be exactly 150-200 words (strictly enforced)"
+      - "Must emphasize systems-level understanding"
+      - "Requires integration of multiple data types or scales"
+      - "Code and models must be publicly available"
+      - "Data availability statement required"
+      - "All computational models must be reproducible"
+      - "Figures must be high-quality and publication-ready"
+
     citation_rules:
-      introduction:
-        - "Cite systems biology foundational papers"
-        - "Cite related systems approaches"
-        - "Keep focused on systems context"
-      results:
-        - "Cite datasets and omics resources"
-        - "Cite computational methods"
-        - "Support systems-level conclusions"
-      discussion:
-        - "Cite papers for systems-level comparison"
-        - "Cite papers on biological networks"
-        - "Cite papers on system properties"
-      experimental_procedures:
-        - "Cite omics protocols"
-        - "Cite computational workflows"
-        - "Cite modeling frameworks"
-        - "Cite data processing methods"
+      introduction: "Cite systems biology context and integrative approaches"
+      results: "Cite data sources, model validation, and comparison studies"
+      discussion: "Cite systems-level implications and mechanistic insights"
+      experimental_procedures: "Cite all computational tools, databases, and statistical methods"
+
     author_guidelines_url: "https://www.cell.com/cell-systems/authors"
+
     suitability_keywords:
       positive:
         - systems biology
-        - network analysis
-        - multi-omics
-        - integration
-        - mathematical model
-        - cellular network
+        - multi-scale modeling
+        - integrative analysis
+        - network biology
+        - mechanistic model
+        - quantitative biology
+        - synthetic biology
+        - metabolic modeling
         - pathway analysis
         - systems-level
-        - quantitative
-        - predictive model
-        - synthetic biology
-        - biological circuit
+        - data integration
       negative:
-        - single pathway
-        - single molecule
+        - single-scale only
         - purely descriptive
-        - no systems integration
-        - clinical trial
+        - no mechanistic insight
+        - single method focus
+        - no integration
+        - purely computational
 
   nucleic_acids_research:
-    name: "Nucleic Acids Research"
-    publisher: "Oxford University Press"
+    full_name: "Nucleic Acids Research"
+
     scope:
-      - nucleic acids research
-      - genome biology
-      - RNA biology
+      - Nucleic acid biochemistry and molecular biology
+      - Genome biology and genomics
+      - Computational biology and bioinformatics
+      - Database and software tools for nucleic acid research
+      - RNA biology and regulation
       - DNA repair and replication
-      - chromatin and epigenetics
-      - structural biology of nucleic acids
-      - gene expression and regulation
-      - genome integrity
-      - databases and bioinformatics tools
-      - computational biology of genomes
+      - Gene expression and regulation
+      - Chromatin and epigenetics
+
     structure:
       required_sections:
-        - Introduction
-        - Materials and Methods
-        - Results
-        - Discussion
+        - abstract
+        - introduction
+        - materials_and_methods  # Specific terminology
+        - results
+        - discussion
+        - data_availability
+
       optional_sections:
-        - Supplementary Data
-        - Data Availability
-        - Code Availability
+        - supplementary_data
+
       section_order:
-        - Abstract
-        - Introduction
-        - Materials and Methods
-        - Results
-        - Discussion
-        - Acknowledgements
-        - Funding
-        - Data Availability
-        - References
+        - abstract
+        - introduction
+        - materials_and_methods
+        - results
+        - discussion
+
     word_limits:
-      total:
-        min: 4000
-        max: 9000
-      abstract:
-        min: 200
-        max: 250
-      introduction:
-        min: 600
-        max: 1500
-      materials_and_methods:
-        min: 1500
-        max: 3000
-      results:
-        min: 1500
-        max: 3500
-      discussion:
-        min: 600
-        max: 1500
+      total: 0  # No strict limit, but database papers have 10-page limit
+      abstract: {min: 200, max: 250}
+      introduction: {min: 600, max: 1200}
+      materials_and_methods: {min: 800, max: 2000}
+      results: {min: 1200, max: 3000}
+      discussion: {min: 500, max: 1200}
+
     formatting:
       citation_style: "numbered"
-      reference_limit: 100
-      figure_limit: 10
-      table_limit: 6
-      supplementary_limit: 25
+      reference_limit: 0  # No formal limit
+      figure_limit: 0  # No strict limit
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Times New Roman, 12pt"
+
     special_requirements:
-      - "For database papers: public accessibility required"
-      - "For methods papers: comparison with existing tools required"
-      - "Data availability statement mandatory"
-      - "Source code must be available for computational tools"
-      - "Detailed methods for reproducibility"
-      - "Database papers must describe content, interface, and updates"
-      - "Annual database issue for database updates"
-      - "Web application issue for online tools"
+      - "Database papers have special format: Abstract, Introduction, Database content, Utility, Discussion"
+      - "Database papers limited to 10 printed pages"
+      - "Web Server papers have 4-page limit"
+      - "Data Availability statement mandatory"
+      - "All databases must be freely accessible"
+      - "All software must be open source"
+      - "Accession numbers required for sequence data"
+      - "Database URL must be functional at submission"
+
     citation_rules:
-      introduction:
-        - "Cite foundational papers in nucleic acids research"
-        - "Cite recent advances in the field"
-        - "Cite related databases or tools"
-      materials_and_methods:
-        - "Cite all protocols and procedures"
-        - "Cite software and algorithms"
-        - "Cite data sources and databases"
-        - "Cite statistical methods"
-      results:
-        - "Cite datasets used for validation"
-        - "Cite comparison tools or databases"
-        - "Support findings with primary literature"
-      discussion:
-        - "Cite papers for comparison and context"
-        - "Cite papers on biological implications"
-        - "Cite papers for future directions"
-    author_guidelines_url: "https://academic.oup.com/nar/pages/instructions-to-authors"
+      introduction: "Cite related databases, tools, and foundational work"
+      materials_and_methods: "Cite all software, databases, and protocols used"
+      results: "Cite validation datasets and comparison studies"
+      discussion: "Cite related resources and future directions"
+
+    author_guidelines_url: "https://academic.oup.com/nar/pages/instructions_for_authors"
+
     suitability_keywords:
       positive:
-        - nucleic acids
-        - DNA
-        - RNA
-        - genome
-        - transcription
-        - translation
-        - replication
-        - repair
-        - chromatin
-        - epigenetics
+        - nucleic acid
         - database
+        - web server
         - genome annotation
+        - sequence analysis
         - RNA structure
+        - DNA repair
         - gene regulation
+        - transcription
+        - epigenetics
+        - chromatin
+        - bioinformatics tool
       negative:
         - protein-only focus
-        - metabolomics only
-        - purely cellular biology
         - no nucleic acid component
-
-  scientific_data:
-    name: "Scientific Data"
-    publisher: "Nature Publishing Group"
-    scope:
-      - dataset descriptions
-      - data infrastructure
-      - data standards and schemas
-      - metadata frameworks
-      - data repositories
-      - data documentation
-      - reproducible data
-      - FAIR data principles
-      - data quality
-      - data reuse
-    structure:
-      required_sections:
-        - Background & Summary
-        - Methods
-        - Data Records
-        - Technical Validation
-        - Usage Notes
-        - Code Availability
-        - Data Availability
-      optional_sections:
-        - Acknowledgements
-      section_order:
-        - Abstract
-        - Background & Summary
-        - Methods
-        - Data Records
-        - Technical Validation
-        - Usage Notes
-        - Code Availability
-        - Data Availability
-        - References
-    word_limits:
-      total:
-        min: 3000
-        max: 5000
-      abstract:
-        min: 150
-        max: 170
-      background_summary:
-        min: 700
-        max: 800
-      methods:
-        min: 800
-        max: 1500
-      data_records:
-        min: 600
-        max: 1000
-      technical_validation:
-        min: 500
-        max: 1000
-      usage_notes:
-        min: 300
-        max: 600
-    formatting:
-      citation_style: numbered
-      reference_limit: 50
-      figure_limit: 10
-      table_limit: 5
-    special_requirements:
-      - "Focus on data description, not novel scientific findings"
-      - "Must describe datasets, data standards, or data infrastructure"
-      - "Data Records section must describe where data is deposited"
-      - "Technical Validation section required for dataset quality"
-      - "Code Availability statement mandatory"
-      - "Abstract must be under 170 words (strictly enforced)"
-    citation_rules:
-      background_summary: "Cite related datasets, standards, and data infrastructure"
-      methods: "Cite tools, protocols, and data collection methods"
-      data_records: "Cite data repositories and access methods"
-      technical_validation: "Cite validation methods and quality metrics"
-      usage_notes: "Cite example use cases and analysis workflows"
-    suitability_keywords:
-      positive:
-        - dataset
-        - data standard
-        - schema
-        - metadata
-        - data infrastructure
-        - data repository
-        - FAIR
-        - ontology
-        - data model
-        - data documentation
-        - LinkML
-        - data descriptor
-        - data quality
-        - reproducibility
-      negative:
-        - novel scientific discovery
-        - biological mechanism
-        - clinical trial
-        - purely algorithmic
-        - no data component
-
-  journal_biomedical_semantics:
-    name: "Journal of Biomedical Semantics"
-    publisher: "BMC (Springer Nature)"
-    scope:
-      - ontologies and terminologies
-      - semantic web technologies
-      - metadata standards
-      - data integration
-      - knowledge representation
-      - linked data
-      - schema development
-      - semantic interoperability
-      - biomedical vocabularies
-      - FAIR data principles
-    structure:
-      required_sections:
-        - Background
-        - Implementation
-        - Results
-        - Discussion
-        - Conclusions
-        - Availability
-      optional_sections:
-        - Methods
-        - Use Cases
-      section_order:
-        - Abstract
-        - Background
-        - Implementation
-        - Results
-        - Discussion
-        - Conclusions
-        - Availability and requirements
-        - References
-    word_limits:
-      total:
-        min: 3000
-        max: 8000
-      abstract:
-        min: 200
-        max: 350
-      background:
-        min: 800
-        max: 1500
-      implementation:
-        min: 1000
-        max: 2500
-      results:
-        min: 800
-        max: 2000
-      discussion:
-        min: 600
-        max: 1500
-    formatting:
-      citation_style: numbered
-      reference_limit: 80
-      figure_limit: 15
-      table_limit: 10
-    special_requirements:
-      - "Focus on semantic technologies and standards"
-      - "Must describe schema, ontology, or semantic framework"
-      - "Availability section must include schema access and documentation"
-      - "Emphasis on interoperability and reusability"
-      - "Open-access publication (APC applies)"
-    citation_rules:
-      background: "Cite related ontologies, standards, and semantic frameworks"
-      implementation: "Cite tools, languages (e.g., OWL, LinkML), and methodologies"
-      results: "Cite use cases, applications, and validation studies"
-      discussion: "Cite community adoption and integration with other standards"
-    suitability_keywords:
-      positive:
-        - ontology
-        - schema
-        - metadata
-        - semantic
-        - LinkML
-        - OWL
-        - RDF
-        - vocabulary
-        - terminology
-        - interoperability
-        - FAIR
-        - knowledge graph
-        - linked data
-        - data model
-        - semantic web
-      negative:
-        - purely algorithmic
-        - no semantic component
-        - clinical trial only
-        - wet lab only
-
-  database_journal:
-    name: "Database: The Journal of Biological Databases and Curation"
-    publisher: "Oxford University Press"
-    scope:
-      - biological databases
-      - data curation methods
-      - database design
-      - data standards
-      - metadata frameworks
-      - data integration
-      - database tools
-      - data quality
-      - schema design
-      - data visualization
-    structure:
-      required_sections:
-        - Introduction
-        - Database content
-        - Utility and discussion
-        - Conclusions
-      optional_sections:
-        - Methods
-        - Future directions
-      section_order:
-        - Abstract
-        - Introduction
-        - Database content
-        - Utility and discussion
-        - Conclusions
-        - Acknowledgements
-        - Funding
-        - Data availability
-        - References
-    word_limits:
-      total:
-        min: 2500
-        max: 6000
-      abstract:
-        min: 150
-        max: 250
-      introduction:
-        min: 500
-        max: 1000
-      database_content:
-        min: 1000
-        max: 2500
-      utility_discussion:
-        min: 800
-        max: 2000
-    formatting:
-      citation_style: numbered
-      reference_limit: 60
-      figure_limit: 10
-      table_limit: 8
-    special_requirements:
-      - "Focus on database resources and data curation"
-      - "Database content section must describe schema and data model"
-      - "Must provide database URL and access information"
-      - "Utility section should demonstrate practical applications"
-      - "Open-access publication"
-    citation_rules:
-      introduction: "Cite related databases and data resources"
-      database_content: "Cite schema languages, data models, and standards"
-      utility_discussion: "Cite applications, integrations, and user communities"
-    suitability_keywords:
-      positive:
-        - database
-        - data curation
-        - schema
-        - metadata
-        - data model
-        - data standard
-        - data integration
-        - data quality
-        - repository
-        - data infrastructure
-        - curation workflow
-        - data validation
-      negative:
-        - purely algorithmic
-        - no data component
-        - clinical trial
-        - wet lab methods only
-
-  gigascience:
-    name: "GigaScience"
-    publisher: "Oxford University Press"
-    scope:
-      - big data methods
-      - data standards
-      - reproducible research
-      - data-intensive science
-      - workflow systems
-      - data sharing
-      - open science
-      - computational tools for big data
-      - data integration
-      - FAIR data
-    structure:
-      required_sections:
-        - Background
-        - Implementation
-        - Results and Discussion
-        - Conclusions
-        - Availability of data and materials
-      optional_sections:
-        - Methods
-        - Use cases
-      section_order:
-        - Abstract
-        - Background
-        - Implementation
-        - Results and Discussion
-        - Conclusions
-        - Methods
-        - Availability of data and materials
-        - References
-    word_limits:
-      total:
-        min: 3000
-        max: 8000
-      abstract:
-        min: 200
-        max: 350
-      background:
-        min: 600
-        max: 1200
-      implementation:
-        min: 1000
-        max: 2500
-      results_discussion:
-        min: 1000
-        max: 3000
-    formatting:
-      citation_style: numbered
-      reference_limit: 100
-      figure_limit: 20
-      table_limit: 15
-    special_requirements:
-      - "Strong emphasis on reproducibility and data sharing"
-      - "Must provide code and data in public repositories"
-      - "GigaDB integration encouraged for datasets"
-      - "Workflow documentation required for computational methods"
-      - "Open-access and open-data publication"
-    citation_rules:
-      background: "Cite data standards, big data challenges, and related work"
-      implementation: "Cite tools, frameworks, and computational methods"
-      results_discussion: "Cite validation studies, benchmarks, and applications"
-    suitability_keywords:
-      positive:
-        - big data
-        - data standard
-        - workflow
-        - reproducibility
-        - data sharing
-        - FAIR
-        - open science
-        - data integration
-        - scalability
-        - metadata
-        - automation
-        - data pipeline
-      negative:
-        - small-scale only
-        - no data component
-        - proprietary methods
-        - closed data
+        - purely clinical
+        - no computational/database aspect
