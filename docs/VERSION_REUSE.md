@@ -80,12 +80,28 @@ The system:
 **Validation Results:**
 
 ```
-✓ Imported 20 of 23 papers from manuscript/project_v1
-✓ Valid: 18 papers
-⚠ Stale: 2 papers (>5 years old, marked for review)
-✗ Invalid: 3 papers (DOIs not found, removed)
+VALIDATION RESULTS:
+✓ Imported 20 of 23 papers from project_v1
 
-Proceeding to Phase 1 to expand with recent research (2024-2026)...
+Papers imported:
+  • 18 papers - Valid (DOI resolves, <5 years old)
+  • 2 papers - Flagged for review (>5 years old, may need update)
+
+Papers excluded:
+  • 3 papers - DOI does not resolve (404 error)
+    → Check validation report for details: literature_evidence_validation.csv
+
+Next step: Review flagged papers and decide whether to:
+  - Keep (foundational/seminal work)
+  - Replace with newer reference
+  - Remove if not appropriate
+    → See details in: literature_evidence_validation.csv
+
+============================================================
+IMPORT COMPLETE
+============================================================
+
+Ready to continue with Phase 1-3: Literature search for recent papers (2024-2026)...
 ```
 
 **Then:** The skill continues with **focused new research**:
@@ -106,19 +122,25 @@ For each paper in the previous version, the system:
    - Returns: `valid`, `invalid`, or `unknown`
 
 2. **Actions based on status:**
-   - `valid`: Keep the paper
-   - `invalid` (404): Remove the paper (DOI no longer resolves)
-   - `unknown` (timeout/error): Keep with warning
+   - `valid`: **Import** - Keep the paper (DOI resolves successfully)
+   - `invalid` (404): **Exclude** - Remove the paper (DOI no longer resolves)
+   - `unknown` (timeout/error): **Import with warning** - Keep but flag for manual check
 
 ### Freshness Check
 
 Papers are categorized by age:
 
-- **Fresh** (<5 years old): Keep without warning
-- **Stale** (5-10 years old): Keep but flag for review
-- **Old** (>10 years old): Keep but flag for review
+- **Fresh** (<5 years old): **Import** - No warning, automatically included
+- **Stale** (5-10 years old): **Import with flag** - Flagged for manual review
+- **Old** (>10 years old): **Import with flag** - Flagged for manual review
 
-**Note:** Stale/old papers are NOT removed automatically. They're flagged for you to decide whether to keep them.
+**IMPORTANT:** Stale/old papers are **ALWAYS imported** - they're never automatically removed. Age alone is not a reason to exclude a paper. The system only flags them for your manual review so you can decide:
+
+- **Keep** - Foundational work, seminal papers, classic references
+- **Replace** - Newer reference available that supersedes it
+- **Remove** - Citation not appropriate or work has been superseded
+
+Only papers with **invalid DOIs** (404 errors) are automatically excluded from import.
 
 ### Validation Report
 
@@ -126,9 +148,29 @@ A detailed validation report is saved to `{target_dir}/literature_evidence_valid
 
 ```csv
 doi,citation_key,citation,evidence_quote,doi_status,freshness,action,reason
-10.1038/nature,jumper2021,"Jumper et al. (2021)","We developed AlphaFold...",valid,stale,review,Paper is 5 years old
-10.9999/fake,removed2020,"Fake et al. (2020)","Fake quote",invalid,fresh,remove,DOI does not resolve
+10.1038/s41586-021-03819-2,jumper2021,"Jumper et al. (2021)","We developed AlphaFold...",valid,stale,review,Paper is 5 years old
+10.1038/s41467-024-12345-6,yang2024,"Yang et al. (2024)","Novel approach...",valid,fresh,keep,Valid
+10.9999/invalid.doi.12345,removed2020,"Removed et al. (2020)","Fake quote",invalid,fresh,remove,DOI does not resolve
 ```
+
+**Understanding the columns:**
+
+- `doi_status`: Result of DOI validation
+  - `valid` = DOI resolves (HTTP 200)
+  - `invalid` = DOI not found (HTTP 404)
+  - `unknown` = Network error or timeout
+
+- `freshness`: Age category
+  - `fresh` = <5 years old
+  - `stale` = 5-10 years old
+  - `old` = >10 years old
+
+- `action`: What happens to this paper
+  - `keep` = Automatically imported (valid + fresh)
+  - `review` = Imported but flagged for manual review (valid + stale/old)
+  - `remove` = Excluded from import (invalid DOI only)
+
+- `reason`: Explanation of the action
 
 ## Provenance Tracking
 

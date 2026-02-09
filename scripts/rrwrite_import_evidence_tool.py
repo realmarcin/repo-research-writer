@@ -190,10 +190,25 @@ def import_evidence(
             index=False
         )
 
-        print(f"✓ Imported {len(valid_df)} of {len(validation_df)} papers")
-        print(f"  Valid: {summary['valid_papers']}")
-        print(f"  Needs review: {summary['needs_review']}")
-        print(f"  Removed (invalid DOI): {summary['to_remove']}")
+        # Display informative results
+        print("\nVALIDATION RESULTS:")
+        print(f"✓ Imported {len(valid_df)} of {len(validation_df)} papers from {source_dir.name}")
+        print("\nPapers imported:")
+        print(f"  • {summary['valid_papers']} papers - Valid (DOI resolves, <5 years old)")
+        if summary['needs_review'] > 0:
+            print(f"  • {summary['needs_review']} papers - Flagged for review (>5 years old, may need update)")
+
+        if summary['to_remove'] > 0:
+            print(f"\nPapers excluded:")
+            print(f"  • {summary['to_remove']} papers - DOI does not resolve (404 error)")
+            print(f"    → Check validation report for details: {target_dir}/literature_evidence_validation.csv")
+
+        if summary['needs_review'] > 0:
+            print(f"\nNext step: Review flagged papers and decide whether to:")
+            print("  - Keep (foundational/seminal work)")
+            print("  - Replace with newer reference")
+            print("  - Remove if not appropriate")
+            print(f"    → See details in: {target_dir}/literature_evidence_validation.csv")
 
     else:
         # Copy without validation
@@ -536,18 +551,10 @@ def main():
         json.dump(metadata, f, indent=2)
 
     print(f"\n✓ Provenance metadata saved to: {metadata_file}")
-
-    # Summary
     print("\n" + "=" * 60)
     print("IMPORT COMPLETE")
     print("=" * 60)
-    print(f"Source: {source_dir.name}")
-    print(f"Target: {target_dir}")
-    print(f"Papers imported: {import_results['validation_summary']['valid_papers']}")
-    if validate_dois:
-        print(f"Papers removed (invalid DOI): {import_results['validation_summary']['to_remove']}")
-        print(f"Papers needing review: {import_results['validation_summary']['needs_review']}")
-    print("=" * 60)
+    print(f"\nReady to continue with Phase 1-3: Literature search for recent papers (2024-2026)...")
 
 
 if __name__ == "__main__":

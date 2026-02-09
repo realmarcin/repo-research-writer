@@ -73,12 +73,28 @@ Conduct comprehensive literature research on the manuscript topic and generate a
 
    Display results:
    ```
-   ✓ Imported 20 of 23 papers from manuscript/project_v1
-   ✓ Valid: 18 papers
-   ⚠ Stale: 2 papers (>5 years old, marked for review)
-   ✗ Invalid: 3 papers (DOIs not found, removed)
+   VALIDATION RESULTS:
+   ✓ Imported 20 of 23 papers from project_v1
 
-   Proceeding to Phase 1 to expand with recent research (2024-2026)...
+   Papers imported:
+     • 18 papers - Valid (DOI resolves, <5 years old)
+     • 2 papers - Flagged for review (>5 years old, may need update)
+
+   Papers excluded:
+     • 3 papers - DOI does not resolve (404 error)
+       → Check validation report for details: literature_evidence_validation.csv
+
+   Next step: Review flagged papers and decide whether to:
+     - Keep (foundational/seminal work)
+     - Replace with newer reference
+     - Remove if not appropriate
+       → See details in: literature_evidence_validation.csv
+
+   ============================================================
+   IMPORT COMPLETE
+   ============================================================
+
+   Ready to continue with Phase 1-3: Literature search for recent papers (2024-2026)...
    ```
 
    **Save imported files as backups:**
