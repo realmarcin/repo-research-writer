@@ -25,6 +25,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from rrwrite_table_generator import TableGenerator
+
 
 class RepoAnalyzer:
     """Analyzes repository structure and content for manuscript generation."""
@@ -356,6 +358,11 @@ class RepoAnalyzer:
             'additional_notes': self._generate_additional_notes()
         }
 
+        # Generate data tables if output_file is provided
+        if hasattr(self, '_output_file') and self._output_file:
+            table_results = self._generate_data_tables(self._output_file)
+            results.update(table_results)
+
         return results
 
     def _generate_additional_notes(self) -> str:
@@ -378,6 +385,56 @@ class RepoAnalyzer:
             notes.append(f"- Contains {len(doc_files)} documentation file(s)")
 
         return "\n".join(notes) if notes else "No additional notes."
+
+    def _generate_data_tables(self, output_file: str) -> Dict[str, str]:
+        """
+        Generate TSV data tables from repository analysis.
+
+        Args:
+            output_file: Path to output markdown file (used to determine output directory)
+
+        Returns:
+            Dict with keys: data_tables_generated, data_tables_dir
+        """
+        # Create output directory for tables
+        output_path = Path(output_file)
+        output_dir = output_path.parent / 'data_tables'
+        output_dir.mkdir(exist_ok=True)
+
+        print(f"Generating data tables in: {output_dir}", file=sys.stderr)
+
+        # Collect categorized files
+        categorized_files = {
+            'data': self.find_files_by_pattern(self.DATA_PATTERNS),
+            'script': self.find_files_by_pattern(self.SCRIPT_PATTERNS),
+            'figure': self.find_files_by_pattern(self.FIGURE_PATTERNS),
+            'config': self.find_files_by_pattern(self.CONFIG_PATTERNS),
+            'doc': self.find_files_by_pattern(['*.md', '*.rst', '*.txt', '*.pdf'])
+        }
+
+        # Generate TSV tables
+        try:
+            table_paths = TableGenerator.generate_repo_tables(
+                repo_path=self.repo_path,
+                categorized_files=categorized_files,
+                output_dir=output_dir
+            )
+
+            print(f"Generated {len(table_paths)} data tables", file=sys.stderr)
+
+            # Return relative path from output file directory
+            rel_dir = output_dir.relative_to(output_path.parent)
+
+            return {
+                'data_tables_generated': str(len(table_paths)),
+                'data_tables_dir': str(rel_dir)
+            }
+        except Exception as e:
+            print(f"Warning: Failed to generate data tables: {e}", file=sys.stderr)
+            return {
+                'data_tables_generated': '0',
+                'data_tables_dir': 'N/A'
+            }
 
     def populate_template(self, template_path: Path, results: Dict[str, str]) -> str:
         """
@@ -444,6 +501,10 @@ def main():
 
     try:
         with RepoAnalyzer(args.repo, max_depth=args.max_depth) as analyzer:
+            # Store output file path for table generation
+            if args.output:
+                analyzer._output_file = args.output
+
             results = analyzer.analyze()
             output = analyzer.populate_template(template_path, results)
 

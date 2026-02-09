@@ -20,6 +20,33 @@ Let me check your project structure:
 
 ## Complete Workflow
 
+### Stage 0: Repository Analysis ✓/✗
+**Goal:** Analyze repository structure and extract research context
+
+**Run:**
+```
+Use /rrwrite-analyze-repository to analyze [repo-path] --target-dir [output-dir]
+```
+
+**Examples:**
+- "Use /rrwrite-analyze-repository --repo-path . --target-dir manuscript"
+- "Use /rrwrite-analyze-repository --repo-path /path/to/research/repo --target-dir manuscript/v1"
+- "Use /rrwrite-analyze-repository --repo-path https://github.com/user/project --target-dir manuscript"
+
+**Output:**
+- `manuscript/repository_analysis.md` - Structured analysis document
+- Workflow state updated with file counts and topics
+
+**Benefits:**
+- Provides planning skill with complete file inventory
+- Identifies research topics for literature search
+- Tracks metadata for downstream validation
+- Enables better outline generation
+
+**Note:** This step is highly recommended but optional. The planning skill will prompt you if skipped.
+
+---
+
 ### Stage 1: Project Setup ✓/✗
 **Prerequisites:**
 - [ ] RRWrite installed globally
@@ -189,6 +216,9 @@ pandoc rrwrite-drafts/full_manuscript.md \
 ## Quick Commands Reference
 
 ```bash
+# Repository Analysis
+"Use /rrwrite-analyze-repository --repo-path [path] --target-dir [dir]"
+
 # Planning
 "Use /rrwrite-plan-manuscript for [Journal]"
 
@@ -201,6 +231,9 @@ pandoc rrwrite-drafts/full_manuscript.md \
 "Use /rrwrite-draft-section to write the Introduction section"
 "Use /rrwrite-draft-section to write the Discussion section"
 "Use /rrwrite-draft-section to write the Abstract"
+
+# Assembly
+"Use /rrwrite-assemble --target-dir [dir]"
 
 # Critiquing
 "Use /rrwrite-critique-manuscript to critique [file]"
@@ -220,7 +253,7 @@ pandoc rrwrite-drafts/full_manuscript.md \
 ## What stage are you at?
 
 Please let me know:
-1. What stage you're currently at (1-6)
+1. What stage you're currently at (0-6)
 2. Any issues you're encountering
 3. What you'd like to do next
 

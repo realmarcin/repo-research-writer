@@ -9,6 +9,41 @@ allowed-tools:
 ---
 # Manuscript Planning Protocol
 
+## Phase 0.5: Check Repository Analysis Status
+
+Before beginning reconnaissance, check if repository analysis has been performed:
+
+```python
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path('scripts').resolve()))
+from rrwrite_state_manager import StateManager
+
+manager = StateManager(output_dir="{target_dir}", enable_git=False)
+state = manager.state
+
+repo_analysis_status = state.get("workflow_status", {}).get("repository_analysis", {}).get("status")
+
+if repo_analysis_status != "completed":
+    print("")
+    print("=" * 60)
+    print("RECOMMENDATION: Run Repository Analysis First")
+    print("=" * 60)
+    print("")
+    print("For best results, analyze your repository before planning:")
+    print("  /rrwrite-analyze-repository --repo-path <path> --target-dir {target_dir}")
+    print("")
+
+    response = input("Proceed with planning without analysis? [y/N]: ").strip().lower()
+    if response not in ['y', 'yes']:
+        print("\nExiting. Please run repository analysis first.")
+        sys.exit(0)
+    else:
+        print("\nProceeding with planning without repository analysis...")
+else:
+    print("✓ Repository analysis found - using existing analysis data")
+```
+
 ## Phase 1: Repository Reconnaissance
 1.  **Map Structure:** Execute `tree -L 2 --prune` to understand the project layout.
 2.  **Locate Assets:**

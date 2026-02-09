@@ -5,10 +5,62 @@ Complete step-by-step workflow for generating a scientific manuscript from your 
 ## 🎯 Overview
 
 ```
-Research Repository → Manuscript Outline → Literature Review → Draft Sections → Review & Revise → Publication
+Research Repository → Repository Analysis → Manuscript Outline → Literature Review → Draft Sections → Assembly → Review & Revise → Publication
 ```
 
 ## 📋 Complete Workflow
+
+### Phase 0: Repository Analysis
+
+**Goal**: Analyze repository structure and extract research context before planning.
+
+#### Step 0.1: Analyze Repository Structure
+```
+Use /rrwrite-analyze-repository to analyze the repository
+```
+
+**Command:**
+```bash
+/rrwrite-analyze-repository \
+  --repo-path /path/to/your/repository \
+  --target-dir manuscript
+```
+
+**For GitHub repositories:**
+```bash
+/rrwrite-analyze-repository \
+  --repo-path https://github.com/user/project \
+  --target-dir manuscript
+```
+
+**What happens:**
+1. Scans repository directory structure
+2. Identifies key files: data files (*.csv, *.xlsx), scripts (*.py, *.R), figures (*.png, *.pdf)
+3. Reads README and documentation
+4. Infers research topics and context
+5. Generates structured analysis document
+
+**Outputs:**
+- `manuscript/repository_analysis.md` - Structured analysis with:
+  - Repository structure overview
+  - Categorized file listings (data, scripts, figures)
+  - Inferred research context and topics
+  - File metadata for validation
+- Workflow state updated with:
+  - File counts by type
+  - Detected research topics
+  - Repository path
+
+**Benefits:**
+- Provides complete file inventory for planning
+- Identifies research topics for literature search
+- Enables metadata-driven outline generation
+- Tracks file counts for validation
+- Improves manuscript structure quality
+
+**Note:** This step is highly recommended. The planning skill will prompt you if skipped, but proceeding without analysis may result in less comprehensive outlines.
+
+---
 
 ### Phase 1: Project Initialization
 
@@ -341,6 +393,9 @@ pandoc rrwrite-drafts/full_manuscript.md \
 ## 🔄 Quick Reference Workflow
 
 ```bash
+# 0. Analyze Repository (recommended)
+"Use /rrwrite-analyze-repository --repo-path <path> --target-dir manuscript"
+
 # 1. Plan
 "Use /rrwrite-plan-manuscript for [Journal]"
 
@@ -358,12 +413,12 @@ pandoc rrwrite-drafts/full_manuscript.md \
 "Use /rrwrite-draft-section to write Discussion"
 "Use /rrwrite-draft-section to write Abstract"
 
-# 5. Critique and revise
+# 5. Assemble
+"Use /rrwrite-assemble --target-dir manuscript"
+
+# 6. Critique and revise
 "Use /rrwrite-critique-manuscript to critique the complete draft"
 # Address feedback, iterate
-
-# 6. Compile
-cat rrwrite-drafts/*.md > rrwrite-drafts/full_manuscript.md
 ```
 
 ---
@@ -374,6 +429,7 @@ cat rrwrite-drafts/*.md > rrwrite-drafts/full_manuscript.md
 ```
 your-research-project/
 ├── PROJECT.md                          # Your documented findings
+├── repository_analysis.md              # Repository structure analysis (Phase 0)
 ├── manuscript_plan.md                   # Generated outline
 ├── rrwrite-drafts/
 │   ├── literature_review.md            # Literature summary
@@ -407,6 +463,13 @@ your-research-project/
 - ✅ Document your scripts with comments
 - ✅ Name figures descriptively
 - ✅ Keep a references.bib file updated
+- ✅ Run repository analysis before planning for best results
+
+### During Repository Analysis
+- ✅ Ensure README.md is up to date
+- ✅ Organize files in logical directories (data/, scripts/, figures/)
+- ✅ Remove temporary or unrelated files
+- ✅ Review generated analysis for accuracy
 
 ### During Planning
 - ✅ Be specific in PROJECT.md about key findings
@@ -429,6 +492,7 @@ your-research-project/
 - ✅ Keep evidence.csv handy for verification
 
 ### Common Pitfalls to Avoid
+- ❌ Skipping repository analysis (less comprehensive outlines)
 - ❌ Drafting before planning (leads to poor structure)
 - ❌ Skipping literature research (weak positioning)
 - ❌ Not verifying numbers (risk of errors)

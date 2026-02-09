@@ -76,6 +76,38 @@ class ManuscriptValidator:
             print(f"Error extracting figures: {e}")
             return []
 
+    def extract_table_refs(self, filepath):
+        """Extract table references (e.g., 'Table 1', 'Table 2')."""
+        try:
+            with open(filepath, 'r') as f:
+                content = f.read()
+                # Match Table N
+                tables = re.findall(r'Table\s+(\d+)', content, re.IGNORECASE)
+                return list(set(tables))
+        except Exception as e:
+            print(f"Error extracting table references: {e}")
+            return []
+
+    def count_markdown_tables(self, filepath):
+        """Count markdown table blocks (consecutive lines starting with |)."""
+        try:
+            with open(filepath, 'r') as f:
+                lines = f.readlines()
+
+            table_count = 0
+            in_table = False
+            for line in lines:
+                if line.strip().startswith('|'):
+                    if not in_table:
+                        table_count += 1
+                        in_table = True
+                else:
+                    in_table = False
+            return table_count
+        except Exception as e:
+            print(f"Error counting tables: {e}")
+            return 0
+
     def check_sections(self, filepath, expected_sections):
         """Check if required sections are present."""
         try:
@@ -269,6 +301,23 @@ class ManuscriptValidator:
         if figures:
             info.append(f"✓ References {len(figures)} figure(s)")
 
+        # Check table references and markdown tables
+        table_refs = self.extract_table_refs(filepath)
+        table_count = self.count_markdown_tables(filepath)
+
+        if table_count > 0:
+            info.append(f"✓ Contains {table_count} markdown table(s)")
+
+        if table_refs:
+            info.append(f"✓ References {len(table_refs)} table(s)")
+
+            # Warn if references don't match table count
+            if len(table_refs) != table_count:
+                warnings.append(
+                    f"Table reference count ({len(table_refs)}) doesn't match "
+                    f"markdown table count ({table_count})"
+                )
+
         return errors, warnings, info
 
     def validate_manuscript(self, filepath):
@@ -326,6 +375,36 @@ class ManuscriptValidator:
         # Check figures
         figures = self.extract_figure_refs(filepath)
         info.append(f"✓ Total figures: {len(figures)}")
+
+        # Check tables
+        table_refs = self.extract_table_refs(filepath)
+        table_count = self.count_markdown_tables(filepath)
+        info.append(f"✓ Total tables: {table_count}")
+
+        # Check journal-specific table limits
+        journal_table_limits = {
+            'bioinformatics': 5,
+            'nature': 4,
+            'plos': 10,
+            'bmc': 10
+        }
+
+        # Check against common journal limits
+        if table_count > 0:
+            for journal, limit in journal_table_limits.items():
+                if table_count > limit:
+                    warnings.append(
+                        f"Table count ({table_count}) exceeds {journal.title()} limit ({limit}). "
+                        f"Consider moving tables to supplementary materials."
+                    )
+                    break  # Only warn once
+
+        # Warn if table references don't match table count
+        if len(table_refs) != table_count and table_count > 0:
+            warnings.append(
+                f"Table reference count ({len(table_refs)}) doesn't match "
+                f"markdown table count ({table_count}). Check table numbering."
+            )
 
         return errors, warnings, info
 
