@@ -1,49 +1,45 @@
-# Python
+# Manuscript output directory (user workspace)
+# Each manuscript project has its own .git/ repository
+manuscript/
+
+# Python cache
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
-env/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
 venv/
+env/
 ENV/
+.venv
 
-# Self-generated manuscripts (when running RRWrite on itself)
-# V2 is the reference example with word limit enforcement (committed)
-# V1 and V3+ are gitignored
-manuscript/repo-research-writer_v1/
-manuscript/repo-research-writer_v[3-9]/
-manuscript/repo-research-writer_v[1-9][0-9]/
-manuscript/archives/
-
-# Keep manuscript directory structure in git
-!manuscript/.gitkeep
-!manuscript/repo_research_writer_v2/
-
-# Legacy drafts and outputs (project-specific)
-drafts/
-manuscript_plan.md
-critique_round_*.md
-repo_map.md
-bib_index.md
-
-# Data files (examples use committed data; users manage their own)
-data/raw/
-data/processed/
-
-# Figures (examples use committed figures; users manage their own)
-figures/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
+# Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.DS_Store
 
-# Temporary files
-context/
-temp-skills/
+# Test outputs
+test_output/
+tmp/
+
+# IDE-specific
+.project
+.pydevproject
+.settings/
+
+# OS-specific
+Thumbs.db
+desktop.ini

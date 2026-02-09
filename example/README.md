@@ -1,112 +1,47 @@
-# Example: Protein Structure Prediction Project
+# RRWrite Example Manuscripts
 
-This example demonstrates how to use RRWrite skills to generate a manuscript from a computational biology research project.
+This directory contains reference example manuscripts demonstrating RRWrite's capabilities.
 
-## Project Overview
+## Available Examples
 
-This fictional project analyzes protein structure prediction accuracy using a novel deep learning approach.
+### repo_research_writer_v2
 
-## Directory Structure
+A complete self-referential manuscript documenting the RRWrite tool itself.
 
-```
-example/
-├── data/
-│   ├── predictions.csv          # Model predictions
-│   └── benchmark_results.csv    # Comparison with existing methods
-├── scripts/
-│   ├── train_model.py          # Training pipeline
-│   └── evaluate.py             # Evaluation metrics
-├── figures/
-│   ├── accuracy_comparison.png # Figure 1
-│   └── training_curve.png      # Figure 2
-├── notebooks/
-│   └── exploratory_analysis.ipynb
-├── PROJECT.md                   # Project context for ClueWrite
-└── references.bib              # Citations
+**Contents:**
+- `abstract.md`, `introduction.md`, `methods.md`, `results.md`, `discussion.md`, `availability.md`
+- `literature.md` - One-page literature review
+- `literature_citations.bib` - BibTeX bibliography
+- `literature_evidence.csv` - Citation database
+- `outline.md` - Manuscript outline
+- `critique_manuscript_v1.md` - Adversarial critique report
+- `.rrwrite/state.json` - Workflow state
 
-```
+**Use this example to:**
+- See complete RRWrite output format
+- Understand section structure and content
+- Learn citation and evidence tracking
+- Reference when drafting your own manuscripts
 
-## Workflow Demonstration
+## Generating Additional Examples
 
-### Step 1: Initialize Project Context
+To create another example manuscript:
 
-See `PROJECT.md` for the project context that guides the AI agent.
-
-### Step 2: Plan the Manuscript
-
-```
-User: "Use /rrwrite-plan-manuscript to create an outline for Bioinformatics journal"
-
-Agent: [Reads PROJECT.md, scans data/ and scripts/]
-       [Creates manuscript_plan.md with sections mapped to files]
+```bash
+# From the rrwrite directory
+/rrwrite --repo /path/to/another-repo --output-dir example/example_name_v1
 ```
 
-Output: `manuscript_plan.md`
+## Purpose
 
-### Step 3: Draft Individual Sections
+Examples in this directory:
+- **Are tracked in git** (part of the tool repository)
+- Serve as reference implementations
+- Demonstrate RRWrite's output format
+- Help new users understand the workflow
 
-```
-User: "Use /rrwrite-draft-section to write the Methods section"
+## User Manuscripts
 
-Agent: [Reads scripts/train_model.py and scripts/evaluate.py]
-       [References data files to understand pipeline]
-       [Generates rrwrite-drafts/methods.md]
-```
+User-generated manuscripts should go in `manuscript/` directory (gitignored) where each will have its own separate git repository.
 
-Output: `rrwrite-drafts/methods.md`
-
-```
-User: "Use /rrwrite-draft-section to write the Results section"
-
-Agent: [Reads data/benchmark_results.csv]
-       [Verifies numbers using rrwrite-verify-stats.py]
-       [References figures/accuracy_comparison.png]
-       [Generates rrwrite-drafts/results.md]
-```
-
-Output: `rrwrite-drafts/results.md`
-
-### Step 4: Critique for Compliance
-
-```
-User: "Use /rrwrite-critique-manuscript to check the draft"
-
-Agent: [Reads all rrwrite-drafts/*]
-       [Checks Bioinformatics journal requirements]
-       [Verifies citation integrity]
-       [Generates critique_round_1.md]
-```
-
-Output: `critique_round_1.md` with actionable feedback
-
-## Expected Outputs
-
-After running the full workflow:
-
-```
-example/
-├── manuscript_plan.md          # Detailed outline
-├── rrwrite-drafts/
-│   ├── abstract.md
-│   ├── introduction.md
-│   ├── methods.md
-│   ├── results.md
-│   └── discussion.md
-└── critique_round_1.md          # Critique feedback
-```
-
-## Key Features Demonstrated
-
-1. **Repository Awareness**: Agent reads actual code and data files
-2. **Fact Checking**: Numbers verified against source CSV files
-3. **Journal Compliance**: Follows Bioinformatics formatting rules
-4. **Citation Management**: Extracts from references.bib
-5. **Figure Integration**: Describes figures based on generating scripts
-
-## Try It Yourself
-
-1. Copy this example directory
-2. Install RRWrite skills globally
-3. Navigate to the example directory
-4. Start your AI agent
-5. Follow the workflow above
+See [Git Architecture](../docs/GIT_ARCHITECTURE.md) for details on the separation between tool and manuscript repositories.

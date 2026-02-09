@@ -1,0 +1,645 @@
+# Journal-Specific Author Guidelines Database
+# Used by rrwrite-assess-journal skill to evaluate manuscript-journal fit
+# and provide comprehensive formatting/citation requirements
+
+journals:
+  bioinformatics:
+    full_name: "Bioinformatics (Oxford Academic)"
+
+    scope:
+      - Computational biology algorithms and methods
+      - Sequence analysis and genome informatics
+      - Bioinformatics databases and data integration
+      - Systems biology modeling and simulation
+      - Structural bioinformatics
+      - Machine learning applications in biology
+      - Network analysis and pathway inference
+      - Text mining and literature analysis
+
+    structure:
+      required_sections:
+        - abstract
+        - introduction
+        - methods
+        - results
+        - discussion
+        - availability
+
+      optional_sections:
+        - supplementary_materials
+        - acknowledgements
+        - funding
+
+      section_order:
+        - abstract
+        - introduction
+        - methods
+        - results
+        - discussion
+        - availability
+        - supplementary_materials
+
+    word_limits:
+      total: 6000
+      abstract: {min: 150, max: 250}
+      introduction: {min: 400, max: 800}
+      methods: {min: 800, max: 1600}
+      results: {min: 600, max: 1200}
+      discussion: {min: 400, max: 1000}
+      availability: {min: 50, max: 150}
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 50
+      figure_limit: 10
+      table_limit: 5
+      line_spacing: "double"
+      font: "Times New Roman or Arial, 12pt"
+
+    special_requirements:
+      - "Must include Data and Code Availability statement"
+      - "Abstract should be structured with Background/Results/Conclusions subsections"
+      - "Software tools must cite original publications"
+      - "Figures must be referenced in numerical order (Figure 1 before Figure 2)"
+      - "Methods section can be titled 'Methods', 'Algorithm', or 'Implementation'"
+      - "Results section can be titled 'Results' or 'Implementation'"
+      - "Availability section is mandatory for software/database papers"
+      - "Supplementary materials should include detailed algorithms, parameters, and additional results"
+
+    citation_rules:
+      introduction: "Cite relevant background literature and existing computational methods"
+      methods: "Cite specific tools, algorithms, datasets, and software packages used"
+      results: "Cite papers analyzed, benchmarked, or compared against"
+      discussion: "Cite supporting or contrasting findings from the literature"
+      availability: "Only cite platforms (Zenodo, GitHub, Bioconductor), not FAIR principles or general best practices"
+
+    author_guidelines_url: "https://academic.oup.com/bioinformatics/pages/instructions_for_authors"
+
+    suitability_keywords:
+      positive:
+        - algorithm
+        - computational method
+        - bioinformatics tool
+        - software package
+        - database
+        - pipeline
+        - workflow
+        - sequence analysis
+        - genome annotation
+        - machine learning
+        - data integration
+        - network analysis
+        - text mining
+        - prediction model
+        - classification
+      negative:
+        - purely experimental
+        - wet lab only
+        - clinical trial
+        - patient study
+        - no computational component
+        - hardware design
+
+  nature_methods:
+    full_name: "Nature Methods"
+
+    scope:
+      - Novel experimental methods with broad applicability
+      - Computational tools with significant methodological advance
+      - Imaging and microscopy techniques
+      - High-throughput screening and profiling methods
+      - Single-cell analysis technologies
+      - Genome editing and engineering approaches
+      - Structural biology methods
+      - Methods with demonstrated utility across multiple biological systems
+
+    structure:
+      required_sections:
+        - abstract
+        - introduction
+        - results
+        - discussion
+        - methods  # NOTE: Methods at END, not beginning!
+
+      optional_sections:
+        - online_methods  # Detailed methods go here
+        - supplementary_materials
+        - acknowledgements
+
+      section_order:
+        - abstract
+        - introduction
+        - results
+        - discussion
+        - methods
+        - online_methods
+
+    word_limits:
+      total: 3000  # Strict limit for main text
+      abstract: {min: 100, max: 150}
+      introduction: {min: 200, max: 400}
+      results: {min: 800, max: 1200}
+      discussion: {min: 300, max: 600}
+      methods: {min: 200, max: 400}  # Brief; details in Online Methods
+      online_methods: {min: 0, max: 0}  # No limit for supplementary
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 30
+      figure_limit: 6
+      table_limit: 3
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
+    special_requirements:
+      - "Methods section goes at END of main text, not beginning"
+      - "Extensive methods must go to Online Methods (supplementary)"
+      - "Must demonstrate novelty vs. existing methods with direct comparison"
+      - "Include quantitative benchmarking against state-of-the-art"
+      - "Abstract strictly limited to 150 words (enforced)"
+      - "Main text strictly limited to 3000 words (enforced)"
+      - "Must show applicability across multiple biological contexts"
+      - "Data and code availability required"
+      - "All figures must have detailed legends"
+
+    citation_rules:
+      introduction: "Emphasize novelty; cite current state-of-the-art methods"
+      results: "Benchmark comparisons required; cite methods being compared"
+      discussion: "Cite studies that could benefit from the new method"
+      methods: "Keep citations minimal; extensive references go to Online Methods"
+      online_methods: "Comprehensive citations of all protocols, reagents, and software"
+
+    author_guidelines_url: "https://www.nature.com/nature-methods/for-authors"
+
+    suitability_keywords:
+      positive:
+        - novel method
+        - innovative technique
+        - broad applicability
+        - experimental validation
+        - high impact
+        - methodological advance
+        - state-of-the-art comparison
+        - benchmark
+        - imaging
+        - single-cell
+        - high-throughput
+        - genome editing
+      negative:
+        - incremental improvement
+        - narrow application
+        - database only
+        - no experimental validation
+        - single use case
+        - no comparison to existing methods
+
+  plos_computational_biology:
+    full_name: "PLOS Computational Biology"
+
+    scope:
+      - Computational biology models with biological insight
+      - Systems biology and network analysis
+      - Bioinformatics methods that advance biological understanding
+      - Evolutionary and population genomics modeling
+      - Disease modeling and epidemiology
+      - Computational neuroscience
+      - Molecular dynamics and structural modeling
+      - Multi-scale biological modeling
+
+    structure:
+      required_sections:
+        - abstract
+        - author_summary  # UNIQUE to PLOS! Non-technical summary
+        - introduction
+        - results
+        - discussion
+        - methods
+        - references
+        - supporting_information
+
+      optional_sections:
+        - conclusions
+
+      section_order:
+        - abstract
+        - author_summary
+        - introduction
+        - results
+        - discussion
+        - methods
+        - supporting_information
+
+    word_limits:
+      total: 0  # No strict overall limit
+      abstract: {min: 200, max: 300}
+      author_summary: {min: 100, max: 200}  # Non-technical language!
+      introduction: {min: 800, max: 1500}
+      results: {min: 1000, max: 3000}
+      discussion: {min: 600, max: 1500}
+      methods: {min: 800, max: 2500}
+      supporting_information: {min: 0, max: 0}  # No limit
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 0  # No limit
+      figure_limit: 0  # No strict limit
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Times, Times New Roman, or Symbol, 12pt"
+
+    special_requirements:
+      - "MANDATORY Author Summary section (150-200 words, non-technical language for general audience)"
+      - "Must emphasize biological insight, not just computational methods"
+      - "Reproducibility statement required in Methods"
+      - "Ethics statement required if using human/animal data"
+      - "Data Availability statement is MANDATORY"
+      - "Code availability with clear licensing information"
+      - "All data must be deposited in public repositories"
+      - "Figure legends must be self-contained"
+      - "Supporting Information should include detailed methods, parameters, and validation"
+
+    citation_rules:
+      all_sections: "Emphasize reproducibility and transparency in all citations"
+      introduction: "Cite foundational work and recent advances in the field"
+      results: "Cite data sources, validation datasets, and comparison studies"
+      methods: "Cite all software, algorithms, and statistical methods used"
+      discussion: "Cite biological implications and related biological studies"
+      supporting_information: "Comprehensive citations for all protocols and parameters"
+
+    author_guidelines_url: "https://journals.plos.org/ploscompbiol/s/submission-guidelines"
+
+    suitability_keywords:
+      positive:
+        - biological insight
+        - systems biology
+        - computational model
+        - network analysis
+        - mechanistic understanding
+        - disease modeling
+        - evolutionary dynamics
+        - population genetics
+        - multi-scale modeling
+        - biological validation
+        - hypothesis generation
+        - predictive model
+      negative:
+        - pure algorithm
+        - no biological context
+        - no biological validation
+        - purely theoretical
+        - no biological interpretation
+
+  bmc_bioinformatics:
+    full_name: "BMC Bioinformatics"
+
+    scope:
+      - Bioinformatics methodology development
+      - Computational biology software and databases
+      - Algorithm development for biological data analysis
+      - Data mining and machine learning in biology
+      - Genome and sequence analysis
+      - Structural bioinformatics
+      - Systems biology and network analysis
+      - Comparative genomics
+
+    structure:
+      required_sections:
+        - abstract
+        - background  # Not "introduction"!
+        - methods
+        - results
+        - discussion
+        - conclusions
+        - availability_and_requirements  # Specific format!
+
+      optional_sections:
+        - supplementary_materials
+
+      section_order:
+        - abstract
+        - background
+        - methods
+        - results
+        - discussion
+        - conclusions
+        - availability_and_requirements
+
+    word_limits:
+      total: 0  # No strict limit, but recommend 4000-6000
+      abstract: {min: 250, max: 350}
+      background: {min: 500, max: 1000}
+      methods: {min: 800, max: 2000}
+      results: {min: 800, max: 2000}
+      discussion: {min: 500, max: 1200}
+      conclusions: {min: 100, max: 300}
+      availability_and_requirements: {min: 100, max: 200}
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 0  # No formal limit
+      figure_limit: 0  # No strict limit
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
+    special_requirements:
+      - "Section titled 'Background' not 'Introduction'"
+      - "Separate 'Conclusions' section required (brief, 1-2 paragraphs)"
+      - "Availability and Requirements section with specific format: Project name, URL, OS, Language, License, Restrictions"
+      - "Abstract must include: Background, Results, Conclusions subsections"
+      - "Open access publication (author pays APC)"
+      - "Data and software must be openly accessible"
+      - "Supporting data should be in GigaDB or similar repository"
+
+    citation_rules:
+      background: "Cite relevant prior work and establish context"
+      methods: "Cite all tools, datasets, and algorithms used"
+      results: "Cite comparison studies and validation datasets"
+      discussion: "Cite related work and contrasting approaches"
+      availability_and_requirements: "No citations needed; provide direct links"
+
+    author_guidelines_url: "https://bmcbioinformatics.biomedcentral.com/submission-guidelines"
+
+    suitability_keywords:
+      positive:
+        - bioinformatics method
+        - computational pipeline
+        - software tool
+        - database
+        - algorithm
+        - data analysis
+        - machine learning
+        - genome analysis
+        - sequence alignment
+        - comparative genomics
+        - open source
+      negative:
+        - purely experimental
+        - no software component
+        - proprietary method
+        - clinical only
+
+  genome_biology:
+    full_name: "Genome Biology"
+
+    scope:
+      - Genome-scale studies with significant biological insight
+      - Innovative genomics methods and technologies
+      - Comparative and evolutionary genomics
+      - Epigenomics and chromatin biology
+      - Single-cell genomics
+      - Transcriptomics and gene regulation
+      - Computational genomics with experimental validation
+      - Cancer genomics
+
+    structure:
+      required_sections:
+        - abstract
+        - background
+        - results
+        - discussion
+        - conclusions
+        - methods
+        - data_availability
+
+      optional_sections:
+        - supplementary_materials
+
+      section_order:
+        - abstract
+        - background
+        - results
+        - discussion
+        - conclusions
+        - methods
+
+    word_limits:
+      total: 0  # No strict limit, typically 5000-8000
+      abstract: {min: 250, max: 350}
+      background: {min: 600, max: 1200}
+      results: {min: 2000, max: 4000}
+      discussion: {min: 800, max: 1500}
+      conclusions: {min: 150, max: 300}
+      methods: {min: 1000, max: 2500}
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 0  # No limit
+      figure_limit: 0  # No strict limit, but be reasonable
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
+    special_requirements:
+      - "Must present genome-scale data or analysis"
+      - "Requires significant biological insight beyond method description"
+      - "Data must be deposited in public repositories (GEO, SRA, ENA, etc.)"
+      - "Code and analysis pipelines must be available"
+      - "Separate Conclusions section required"
+      - "Methods section at end of main text"
+      - "All datasets must have accession numbers"
+      - "Statistical methods must be clearly described"
+      - "Reproducibility information required"
+
+    citation_rules:
+      background: "Cite foundational genomics studies and recent advances"
+      results: "Cite data sources, validation studies, and comparison datasets"
+      discussion: "Cite biological implications and related genomic studies"
+      methods: "Cite all software, statistical methods, and protocols"
+      data_availability: "Provide accession numbers and repository links, no citations"
+
+    author_guidelines_url: "https://genomebiology.biomedcentral.com/submission-guidelines"
+
+    suitability_keywords:
+      positive:
+        - genome-scale
+        - genomics
+        - transcriptomics
+        - epigenomics
+        - single-cell
+        - evolutionary genomics
+        - comparative genomics
+        - gene regulation
+        - chromatin
+        - cancer genomics
+        - biological insight
+        - experimental validation
+      negative:
+        - small-scale study
+        - no genomic data
+        - purely computational
+        - no biological validation
+        - single gene focus
+
+  cell_systems:
+    full_name: "Cell Systems"
+
+    scope:
+      - Systems biology with mechanistic insight
+      - Multi-scale biological modeling
+      - Integrative computational biology
+      - Network biology and pathway analysis
+      - Quantitative cell biology
+      - Synthetic biology design
+      - Metabolic modeling
+      - Spatial and temporal modeling of biological systems
+
+    structure:
+      required_sections:
+        - summary  # Not "abstract"!
+        - introduction
+        - results
+        - discussion
+        - experimental_procedures  # Not "methods"!
+
+      optional_sections:
+        - supplemental_information
+
+      section_order:
+        - summary
+        - introduction
+        - results
+        - discussion
+        - experimental_procedures
+
+    word_limits:
+      total: 0  # No strict limit, typically 5000-7000
+      summary: {min: 150, max: 200}  # Strict!
+      introduction: {min: 600, max: 1000}
+      results: {min: 2000, max: 3500}
+      discussion: {min: 600, max: 1200}
+      experimental_procedures: {min: 800, max: 2000}
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 80
+      figure_limit: 7
+      table_limit: 3
+      line_spacing: "double"
+      font: "Arial, 12pt"
+
+    special_requirements:
+      - "Section titled 'Summary' not 'Abstract'"
+      - "Section titled 'Experimental Procedures' not 'Methods'"
+      - "Summary must be exactly 150-200 words (strictly enforced)"
+      - "Must emphasize systems-level understanding"
+      - "Requires integration of multiple data types or scales"
+      - "Code and models must be publicly available"
+      - "Data availability statement required"
+      - "All computational models must be reproducible"
+      - "Figures must be high-quality and publication-ready"
+
+    citation_rules:
+      introduction: "Cite systems biology context and integrative approaches"
+      results: "Cite data sources, model validation, and comparison studies"
+      discussion: "Cite systems-level implications and mechanistic insights"
+      experimental_procedures: "Cite all computational tools, databases, and statistical methods"
+
+    author_guidelines_url: "https://www.cell.com/cell-systems/authors"
+
+    suitability_keywords:
+      positive:
+        - systems biology
+        - multi-scale modeling
+        - integrative analysis
+        - network biology
+        - mechanistic model
+        - quantitative biology
+        - synthetic biology
+        - metabolic modeling
+        - pathway analysis
+        - systems-level
+        - data integration
+      negative:
+        - single-scale only
+        - purely descriptive
+        - no mechanistic insight
+        - single method focus
+        - no integration
+        - purely computational
+
+  nucleic_acids_research:
+    full_name: "Nucleic Acids Research"
+
+    scope:
+      - Nucleic acid biochemistry and molecular biology
+      - Genome biology and genomics
+      - Computational biology and bioinformatics
+      - Database and software tools for nucleic acid research
+      - RNA biology and regulation
+      - DNA repair and replication
+      - Gene expression and regulation
+      - Chromatin and epigenetics
+
+    structure:
+      required_sections:
+        - abstract
+        - introduction
+        - materials_and_methods  # Specific terminology
+        - results
+        - discussion
+        - data_availability
+
+      optional_sections:
+        - supplementary_data
+
+      section_order:
+        - abstract
+        - introduction
+        - materials_and_methods
+        - results
+        - discussion
+
+    word_limits:
+      total: 0  # No strict limit, but database papers have 10-page limit
+      abstract: {min: 200, max: 250}
+      introduction: {min: 600, max: 1200}
+      materials_and_methods: {min: 800, max: 2000}
+      results: {min: 1200, max: 3000}
+      discussion: {min: 500, max: 1200}
+
+    formatting:
+      citation_style: "numbered"
+      reference_limit: 0  # No formal limit
+      figure_limit: 0  # No strict limit
+      table_limit: 0  # No strict limit
+      line_spacing: "double"
+      font: "Times New Roman, 12pt"
+
+    special_requirements:
+      - "Database papers have special format: Abstract, Introduction, Database content, Utility, Discussion"
+      - "Database papers limited to 10 printed pages"
+      - "Web Server papers have 4-page limit"
+      - "Data Availability statement mandatory"
+      - "All databases must be freely accessible"
+      - "All software must be open source"
+      - "Accession numbers required for sequence data"
+      - "Database URL must be functional at submission"
+
+    citation_rules:
+      introduction: "Cite related databases, tools, and foundational work"
+      materials_and_methods: "Cite all software, databases, and protocols used"
+      results: "Cite validation datasets and comparison studies"
+      discussion: "Cite related resources and future directions"
+
+    author_guidelines_url: "https://academic.oup.com/nar/pages/instructions_for_authors"
+
+    suitability_keywords:
+      positive:
+        - nucleic acid
+        - database
+        - web server
+        - genome annotation
+        - sequence analysis
+        - RNA structure
+        - DNA repair
+        - gene regulation
+        - transcription
+        - epigenetics
+        - chromatin
+        - bioinformatics tool
+      negative:
+        - protein-only focus
+        - no nucleic acid component
+        - purely clinical
+        - no computational/database aspect
