@@ -1,0 +1,148 @@
+{
+  "version": "1.0",
+  "created_at": "2026-02-09T20:04:15.648043",
+  "last_updated": "2026-02-09T23:45:02.595105",
+  "manuscript_dir": "/Users/marcin/Documents/VIMSS/ontology/repo-research-writer/example/rrwrite_v1",
+  "repository_path": "/Users/marcin/Documents/VIMSS/ontology/repo-research-writer",
+  "target_journal": null,
+  "workflow_status": {
+    "repository_analysis": {
+      "status": "completed",
+      "file": "example/rrwrite_v1/repository_analysis.md",
+      "repo_path": "/Users/marcin/Documents/VIMSS/ontology/repo-research-writer",
+      "file_counts": {
+        "data": 20,
+        "scripts": 20,
+        "figures": 0
+      },
+      "topics_detected": [
+        "Bioinformatics",
+        "Data",
+        "Data Analysis",
+        "Data Tables",
+        "Data Visualization",
+        "Figures",
+        "Machine Learning",
+        "Visualization",
+        "Workflow"
+      ],
+      "completed_at": "2026-02-09T20:04:15.648343",
+      "git_commit": null
+    },
+    "plan": {
+      "status": "completed",
+      "file": null,
+      "target_journal": null,
+      "completed_at": "2026-02-09T20:10:24.513599",
+      "git_commit": "9956cc6",
+      "file_path": "example/rrwrite_v1/outline.md"
+    },
+    "assessment": {
+      "status": "not_started",
+      "file": null,
+      "journal_initial": null,
+      "journal_confirmed": null,
+      "compatibility_score": null,
+      "required_adjustments": 0,
+      "guidelines_path": null,
+      "completed_at": null,
+      "git_commit": null
+    },
+    "research": {
+      "status": "not_started",
+      "file": null,
+      "topics_count": 0,
+      "papers_found": 0,
+      "papers_from_previous": 0,
+      "papers_new": 0,
+      "source_version": null,
+      "validation_summary": null,
+      "completed_at": null,
+      "git_commit": null
+    },
+    "drafting": {
+      "status": "completed",
+      "sections": {
+        "abstract": {
+          "status": "completed",
+          "file": "abstract.md",
+          "completed_at": "2026-02-09T20:25:20.906468"
+        },
+        "introduction": {
+          "status": "completed",
+          "file": null,
+          "completed_at": "2026-02-09T20:27:51.787515"
+        },
+        "methods": {
+          "status": "completed",
+          "file": "example/rrwrite_v1/methods.md",
+          "completed_at": "2026-02-09T21:02:48.022505"
+        },
+        "results": {
+          "status": "completed",
+          "file": null,
+          "completed_at": "2026-02-09T22:49:22.543060"
+        },
+        "discussion": {
+          "status": "completed",
+          "file": "discussion.md",
+          "completed_at": "2026-02-09T22:51:57.045986"
+        },
+        "availability": {
+          "status": "completed",
+          "file": null,
+          "completed_at": "2026-02-09T22:54:05.477704"
+        }
+      },
+      "completed_sections": 6,
+      "total_sections": 6,
+      "completed_at": "2026-02-09T22:54:05.477740",
+      "git_commit": "9956cc6"
+    },
+    "assembly": {
+      "status": "completed",
+      "file": "example/rrwrite_v1/manuscript_full.md",
+      "manifest_file": "example/rrwrite_v1/manifest.json",
+      "sections_included": 8,
+      "sections_missing": 0,
+      "total_word_count": 4016,
+      "validation_warnings": 2,
+      "completed_at": "2026-02-09T23:45:02.595096",
+      "git_commit": null
+    },
+    "critique": {
+      "status": "not_started",
+      "file": null,
+      "issues_found": 0,
+      "issues_major": 0,
+      "issues_minor": 0,
+      "completed_at": null,
+      "git_commit": null
+    }
+  },
+  "files": {
+    "repository_analysis": "example/rrwrite_v1/repository_analysis.md",
+    "outline": null,
+    "assessment_report": null,
+    "author_guidelines": null,
+    "literature_review": null,
+    "sections": {
+      "abstract": "abstract.md",
+      "methods": "example/rrwrite_v1/methods.md",
+      "discussion": "discussion.md"
+    },
+    "critique_report": null,
+    "final_manuscript": "example/rrwrite_v1/manuscript_full.md"
+  },
+  "metadata": {
+    "total_word_count": 4016,
+    "citations_count": 3,
+    "figures_count": 0,
+    "tables_count": 0,
+    "data_tables_generated": false
+  },
+  "git": {
+    "repository_initialized": true,
+    "initialized_at": "2026-02-09T20:10:24.513167"
+  }
+}

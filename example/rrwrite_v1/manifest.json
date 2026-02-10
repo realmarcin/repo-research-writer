@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "generated": "2026-02-09T23:43:18.877670",
+  "manuscript_file": "manuscript_full.md",
+  "statistics": {
+    "total_words": 4016,
+    "total_sections": 8,
+    "unique_citations": 3,
+    "section_breakdown": {
+      "RRWrite: Repository-to-Manuscript Generation with Automated Literature Research and Defense-in-Depth Citation Validation": 6,
+      "Abstract": 193,
+      "Introduction": 442,
+      "Results": 838,
+      "Discussion": 946,
+      "Methods": 1599,
+      "Data and Code Availability": 77,
+      "References": 0
+    }
+  },
+  "sections_included": [
+    "RRWrite: Repository-to-Manuscript Generation with Automated Literature Research and Defense-in-Depth Citation Validation",
+    "Abstract",
+    "Introduction",
+    "Results",
+    "Discussion",
+    "Methods",
+    "Data and Code Availability",
+    "References"
+  ],
+  "validation": {
+    "all_required_sections": true,
+    "word_count_target": 3000,
+    "within_limit": false
+  }
+}

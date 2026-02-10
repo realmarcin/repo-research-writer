@@ -1,0 +1,3 @@
+# Data and Code Availability
+
+Source code is available at https://github.com/realmarcin/repo-research-writer under the MIT license. Installation requires Python 3.8+ with no external dependencies beyond the Python standard library. RRWrite accesses literature via PubMed and Semantic Scholar APIs without requiring local databases. Complete documentation is provided in the README.md file, with workflow guides in the docs/ directory, 9 Claude Code skill descriptions in .claude/skills/, and 20 implementation scripts in scripts/. Example manuscripts demonstrating the complete workflow are available in the example/ directory.
