@@ -32,7 +32,7 @@ class CitationMismatchError(CitationError):
     pass
 
 
-class CitationAppropriateness Warning(Warning):
+class CitationAppropriatenessWarning(Warning):
     """Warning for potentially inappropriate citation usage."""
     pass
 

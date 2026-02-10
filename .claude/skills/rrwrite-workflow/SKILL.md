@@ -148,6 +148,14 @@ python scripts/rrwrite-research-literature.py \
   --target-dir {target_dir}
 ```
 
+**Search Strategy:** Cascading year search (prioritize recent, expand back if needed)
+- **Tier 1**: Recent work (2024-2026) - target 15-20 papers
+- **Tier 2**: Medium recent (2020-2023) - if <15 papers found
+- **Tier 3**: Foundational (2016-2019) - if still <15 papers
+- **Stopping**: 15-20 papers ideal, 10+ acceptable for niche topics
+
+See `docs/cascading-literature-search.md` for detailed strategy.
+
 **Generates:**
 - `literature.md` - 1-page summary (background, related work, gaps)
 - `literature_evidence.csv` - Citation database (DOI, title, year, quote)
