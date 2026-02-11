@@ -138,6 +138,16 @@ class StateManager:
                     "issues_minor": 0,
                     "completed_at": None,
                     "git_commit": None
+                },
+                "revision": {
+                    "status": "not_started",
+                    "max_revisions": 0,
+                    "current_iteration": 0,
+                    "iterations": [],
+                    "convergence_status": None,
+                    "convergence_reason": None,
+                    "completed_at": None,
+                    "git_commit": None
                 }
             },
 
@@ -520,7 +530,8 @@ class StateManager:
             "assessment",
             "research",
             "drafting",
-            "critique"
+            "critique",
+            "revision"
         ]
 
         for stage in stages_order:
@@ -531,6 +542,154 @@ class StateManager:
                 return stage
 
         return "completed"
+
+    # ===== Revision Methods =====
+
+    def start_revision(self, max_revisions: int):
+        """Start the revision workflow.
+
+        Args:
+            max_revisions: Maximum number of revision iterations
+        """
+        self.state["workflow_status"]["revision"]["status"] = "in_progress"
+        self.state["workflow_status"]["revision"]["max_revisions"] = max_revisions
+        self.state["workflow_status"]["revision"]["current_iteration"] = 0
+        self.state["workflow_status"]["revision"]["iterations"] = []
+        self._save_state()
+
+    def update_revision_iteration(
+        self,
+        iteration: int,
+        sections_revised: List[str],
+        metrics_before: Dict[str, int],
+        metrics_after: Dict[str, int],
+        critique_files: Optional[Dict[str, str]] = None
+    ):
+        """Update state after completing a revision iteration.
+
+        Args:
+            iteration: Iteration number (1-based)
+            sections_revised: List of sections revised in this iteration
+            metrics_before: Issue counts before revision {'major': N, 'minor': N}
+            metrics_after: Issue counts after revision {'major': N, 'minor': N}
+            critique_files: Optional dict with 'content' and 'format' critique file paths
+        """
+        # Calculate improvement metrics
+        major_resolved = metrics_before.get('major', 0) - metrics_after.get('major', 0)
+        minor_resolved = metrics_before.get('minor', 0) - metrics_after.get('minor', 0)
+
+        improvement_rate = 0.0
+        if metrics_before.get('major', 0) > 0:
+            improvement_rate = major_resolved / metrics_before['major']
+
+        # Create iteration record
+        iteration_record = {
+            "iteration": iteration,
+            "started_at": self._get_timestamp(),
+            "completed_at": self._get_timestamp(),
+            "sections_revised": sections_revised,
+            "issues_before": metrics_before,
+            "issues_after": metrics_after,
+            "convergence_metrics": {
+                "major_resolved": major_resolved,
+                "minor_resolved": minor_resolved,
+                "improvement_rate": improvement_rate
+            },
+            "git_commit": self._get_git_commit()
+        }
+
+        if critique_files:
+            iteration_record["critique_files"] = critique_files
+
+        # Add to iterations list
+        self.state["workflow_status"]["revision"]["iterations"].append(iteration_record)
+        self.state["workflow_status"]["revision"]["current_iteration"] = iteration
+
+        self._save_state()
+
+    def check_revision_convergence(
+        self,
+        metrics_after: Dict[str, int],
+        iteration: int,
+        max_revisions: int,
+        improvement_rate: float,
+        min_improvement: float = 0.05
+    ) -> tuple[bool, str]:
+        """Check if revision should stop based on convergence criteria.
+
+        Args:
+            metrics_after: Issue counts after latest revision
+            iteration: Current iteration number
+            max_revisions: Maximum allowed iterations
+            improvement_rate: Improvement rate from last iteration (0.0-1.0)
+            min_improvement: Minimum improvement rate to continue (default: 0.05 = 5%)
+
+        Returns:
+            Tuple of (should_stop, reason)
+        """
+        # Criterion 1: Major issues resolved
+        if metrics_after.get('major', 0) == 0:
+            return (True, "major_issues_resolved")
+
+        # Criterion 2: Max iterations reached
+        if iteration >= max_revisions:
+            return (True, "max_iterations_reached")
+
+        # Criterion 3: Stalled (no improvement)
+        if improvement_rate <= min_improvement:
+            return (True, "stalled_no_improvement")
+
+        # Continue iterating
+        return (False, None)
+
+    def complete_revision(self, convergence_status: str, convergence_reason: str):
+        """Mark revision workflow as completed.
+
+        Args:
+            convergence_status: 'converged' or 'stalled'
+            convergence_reason: Reason for stopping (e.g., 'major_issues_resolved')
+        """
+        self.state["workflow_status"]["revision"]["status"] = "completed"
+        self.state["workflow_status"]["revision"]["convergence_status"] = convergence_status
+        self.state["workflow_status"]["revision"]["convergence_reason"] = convergence_reason
+        self.state["workflow_status"]["revision"]["completed_at"] = self._get_timestamp()
+        self.state["workflow_status"]["revision"]["git_commit"] = self._get_git_commit()
+        self._save_state()
+
+    def get_revision_summary(self) -> Dict[str, Any]:
+        """Get summary of revision workflow.
+
+        Returns:
+            Dict with revision metrics
+        """
+        revision_state = self.state["workflow_status"]["revision"]
+
+        if revision_state["status"] == "not_started":
+            return {"status": "not_started"}
+
+        iterations = revision_state.get("iterations", [])
+
+        if not iterations:
+            return {
+                "status": revision_state["status"],
+                "iterations": 0
+            }
+
+        # Get first and last iteration metrics
+        first_iter = iterations[0]
+        last_iter = iterations[-1]
+
+        return {
+            "status": revision_state["status"],
+            "iterations": len(iterations),
+            "max_revisions": revision_state.get("max_revisions", 0),
+            "issues_initial": first_iter["issues_before"],
+            "issues_final": last_iter["issues_after"],
+            "total_major_resolved": first_iter["issues_before"].get("major", 0) - last_iter["issues_after"].get("major", 0),
+            "total_minor_resolved": first_iter["issues_before"].get("minor", 0) - last_iter["issues_after"].get("minor", 0),
+            "convergence_status": revision_state.get("convergence_status"),
+            "convergence_reason": revision_state.get("convergence_reason")
+        }
 
     # ===== Export Methods =====
 

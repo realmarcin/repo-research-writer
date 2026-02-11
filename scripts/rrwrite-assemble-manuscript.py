@@ -15,7 +15,8 @@ from pathlib import Path
 from datetime import datetime
 
 def assemble_manuscript(manuscript_dir="manuscript", output_file=None,
-                       include_figures=False, repository_path=None, convert_docx=False):
+                       include_figures=False, repository_path=None, convert_docx=False,
+                       max_revisions=0, run_critique=True):
     """Assemble sections into full manuscript with optional figure handling.
 
     Args:
@@ -24,6 +25,8 @@ def assemble_manuscript(manuscript_dir="manuscript", output_file=None,
         include_figures: If True, copy figures from repository to manuscript dir
         repository_path: Path to source repository (for figure copying)
         convert_docx: If True, convert output to .docx format after assembly
+        max_revisions: If > 0, run automated revision after critique (default: 0)
+        run_critique: If True, run automated critique after assembly (default: True)
     """
 
     manuscript_dir = Path(manuscript_dir)
@@ -139,6 +142,29 @@ def assemble_manuscript(manuscript_dir="manuscript", output_file=None,
     print("\nGenerating evidence report...")
     generate_evidence_report(manuscript_dir)
 
+    # Run automated critique and revision if requested
+    if run_critique:
+        print("\nRunning automated critique...")
+        critique_success = run_automated_critique(manuscript_dir)
+
+        if critique_success and max_revisions > 0:
+            # Check if there are major issues to address
+            from rrwrite_revision_parser import CritiqueParser
+            parser = CritiqueParser(manuscript_dir)
+            issues = parser.parse_critique_reports(version=1)
+            metrics = parser.count_issues(issues)
+
+            if metrics['major'] > 0:
+                print(f"\nFound {metrics['major']} major issues")
+                print(f"Starting automated revision (max iterations: {max_revisions})...")
+
+                revision_success = run_automated_revision(manuscript_dir, max_revisions)
+
+                if revision_success:
+                    print("\n✓ Automated revision completed")
+                else:
+                    print("\n⚠ Automated revision encountered errors")
+
     print("\nNext steps:")
     print(f"1. Read the manuscript: {output_file}")
     print(f"2. Review evidence report: {manuscript_dir / 'EVIDENCE_REPORT.md'}")
@@ -147,7 +173,10 @@ def assemble_manuscript(manuscript_dir="manuscript", output_file=None,
         print(f"3. Open Word document: {docx_file}")
         print(f"4. Import to Google Docs: Upload {docx_file} to docs.google.com")
     print(f"5. Validate: python scripts/rrwrite-validate-manuscript.py --file {output_file} --type manuscript")
-    print(f"6. Critique: Use /rrwrite-critique-manuscript skill")
+    if not run_critique:
+        print(f"6. Critique: Use /rrwrite-critique-manuscript skill")
+    if max_revisions == 0 and run_critique:
+        print(f"6. Revise: python scripts/rrwrite-revise-manuscript.py --manuscript-dir {manuscript_dir} --max-iterations 2")
     print(f"7. Check status: python scripts/rrwrite-status.py")
     if figures_copied > 0:
         print(f"\n✓ Copied {figures_copied} figure(s) to {manuscript_dir / 'figures'}")
@@ -293,6 +322,86 @@ def generate_evidence_report(manuscript_dir: Path) -> bool:
         return False
 
 
+def run_automated_critique(manuscript_dir: Path) -> bool:
+    """
+    Run automated critique on assembled manuscript.
+
+    Args:
+        manuscript_dir: Manuscript directory
+
+    Returns:
+        True if critique succeeded
+    """
+    import subprocess
+    import sys
+
+    # Check if critique script exists
+    critique_script = Path(__file__).parent / 'rrwrite-critique-manuscript.py'
+
+    if not critique_script.exists():
+        print("  Critique script not found")
+        return False
+
+    try:
+        cmd = [
+            sys.executable,
+            str(critique_script),
+            '--manuscript-dir', str(manuscript_dir)
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        print(result.stdout.strip())
+        return True
+
+    except subprocess.CalledProcessError as e:
+        print(f"  Critique failed: {e.stderr}")
+        return False
+    except Exception as e:
+        print(f"  Error running critique: {e}")
+        return False
+
+
+def run_automated_revision(manuscript_dir: Path, max_iterations: int) -> bool:
+    """
+    Run automated revision on manuscript.
+
+    Args:
+        manuscript_dir: Manuscript directory
+        max_iterations: Maximum number of revision iterations
+
+    Returns:
+        True if revision succeeded
+    """
+    import subprocess
+    import sys
+
+    # Check if revision script exists
+    revision_script = Path(__file__).parent / 'rrwrite-revise-manuscript.py'
+
+    if not revision_script.exists():
+        print("  Revision script not found")
+        return False
+
+    try:
+        cmd = [
+            sys.executable,
+            str(revision_script),
+            '--manuscript-dir', str(manuscript_dir),
+            '--max-iterations', str(max_iterations)
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        print(result.stdout.strip())
+        return True
+
+    except subprocess.CalledProcessError as e:
+        print(f"  Revision failed: {e.stderr}")
+        return False
+    except Exception as e:
+        print(f"  Error running revision: {e}")
+        return False
+
+
 def convert_to_docx(markdown_file: Path) -> bool:
     """
     Convert markdown file to .docx format using pandoc.
@@ -382,6 +491,17 @@ def main():
         dest='convert_docx',
         help='Disable .docx conversion'
     )
+    parser.add_argument(
+        '--max-revisions',
+        type=int,
+        default=0,
+        help='After critique, automatically revise up to N times (0=disabled, default: 0)'
+    )
+    parser.add_argument(
+        '--no-critique',
+        action='store_true',
+        help='Skip automated critique step (for manual control)'
+    )
 
     args = parser.parse_args()
 
@@ -393,7 +513,9 @@ def main():
         args.output,
         include_figures=args.include_figures,
         repository_path=args.repository_path,
-        convert_docx=args.convert_docx
+        convert_docx=args.convert_docx,
+        max_revisions=args.max_revisions,
+        run_critique=not args.no_critique
     )
 
     if not success:
